@@ -21,7 +21,7 @@ export default function Home() {
 
       {/* 2. Hero Content Container */}
       {/* pt-28 ensures content starts below navbar. min-h-screen keeps it full height. */}
-      <div className="relative z-10 flex flex-col items-center justify-center flex-grow w-full px-4 pt-28 pb-10 md:pt-20">
+      <div className="relative z-10 flex flex-col items-center justify-center grow w-full px-4 pt-28 pb-10 md:pt-20">
         {/* Headline */}
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white text-center max-w-5xl leading-[1.1] mb-8 md:mb-12 drop-shadow-2xl">
           <TextType
