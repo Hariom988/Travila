@@ -1,0 +1,102 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// 1. USERS
+// Handles both regular users and admins
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+  email     String   @unique
+  password  String   // Will store hashed password
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+
+  hotelBookings    HotelBooking[]
+  activityBookings ActivityBooking[]
+}
+
+// 2. HOTELS
+model Hotel {
+  id            String   @id @default(uuid())
+  name          String
+  location      String
+  description   String
+  pricePerNight Decimal  // Better than Float for money
+  images        String[] // Array of image URLs
+  facilities    String[] // e.g. ["WiFi", "Pool"]
+  available     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  bookings      HotelBooking[]
+}
+
+// 3. ACTIVITIES
+model Activity {
+  id             String   @id @default(uuid())
+  name           String
+  location       String
+  description    String
+  pricePerPerson Decimal
+  duration       String   // e.g. "2 hours", "Full Day"
+  images         String[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  bookings       ActivityBooking[]
+}
+
+// 4. HOTEL BOOKINGS
+model HotelBooking {
+  id         String        @id @default(uuid())
+  startDate  DateTime
+  endDate    DateTime
+  totalPrice Decimal
+  status     BookingStatus @default(PENDING)
+  paymentId  String?       // Razorpay Payment ID
+  createdAt  DateTime      @default(now())
+
+  // Relationships
+  userId     String
+  user       User          @relation(fields: [userId], references: [id])
+  hotelId    String
+  hotel      Hotel         @relation(fields: [hotelId], references: [id])
+}
+
+// 5. ACTIVITY BOOKINGS
+model ActivityBooking {
+  id         String        @id @default(uuid())
+  date       DateTime
+  totalPrice Decimal
+  people     Int           @default(1)
+  status     BookingStatus @default(PENDING)
+  paymentId  String?       // Razorpay Payment ID
+  createdAt  DateTime      @default(now())
+
+  // Relationships
+  userId     String
+  user       User          @relation(fields: [userId], references: [id])
+  activityId String
+  activity   Activity      @relation(fields: [activityId], references: [id])
+}
+
+// ENUMS (Dropdown choices)
+enum Role {
+  USER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
