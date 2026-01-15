@@ -36,7 +36,7 @@ const Footer = () => {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-white leading-none">
-                  Travox
+                  Travila
                 </h2>
                 <p className="text-[10px] tracking-[0.2em] uppercase text-gray-500">
                   A Travel Agency
