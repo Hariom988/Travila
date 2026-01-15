@@ -4,6 +4,7 @@ import HeroImage from "@/public/assets/hero-image.jpg";
 import TextType from "@/app/components/textType";
 import TravelSection from "./travelSection";
 import TourPackages from "./tourPackageCard";
+import DiscoverSection from "./discoverSection";
 
 export default function Home() {
   return (
@@ -48,6 +49,7 @@ export default function Home() {
       {/* Travel Section */}
       <TravelSection />
       <TourPackages />
+      <DiscoverSection />
     </main>
   );
 }

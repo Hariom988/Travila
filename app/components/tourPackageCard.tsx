@@ -103,7 +103,7 @@ const TourPackages = () => {
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className="h-[350px] bg-gray-100 rounded-3xl animate-pulse"
+                className="h-87 bg-gray-100 rounded-3xl animate-pulse"
               ></div>
             ))}
           </div>
@@ -185,7 +185,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
          CONTENT AREA: 
          Reduced padding from p-6 to p-4 
       */}
-      <div className="p-4 flex flex-col flex-grow">
+      <div className="p-4 flex flex-col grow">
         {/* Location */}
         <div className="flex items-center gap-1 text-gray-500 text-xs mb-2">
           <MapPin className="w-3.5 h-3.5 text-gray-400" />
