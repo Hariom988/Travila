@@ -6,17 +6,12 @@ import TravelSection from "./travelSection";
 import TourPackages from "./tourPackageCard";
 import DiscoverSection from "./discoverSection";
 import Footer from "./footer";
+import ExploreSection from "./exploreSection";
 
 export default function Home() {
   return (
     <main className="w-full flex flex-col">
-      {/* 
-        HERO SECTION WRAPPER 
-        min-h-screen ensures it takes up the full viewport height.
-        relative ensures the background stays within this section.
-      */}
       <section className="relative min-h-screen flex flex-col">
-        {/* Background Image - Applied only to this section */}
         <div
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
           style={{
@@ -47,10 +42,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Travel Section */}
       <TravelSection />
       <TourPackages />
       <DiscoverSection />
+      <ExploreSection />
       <Footer />
     </main>
   );
