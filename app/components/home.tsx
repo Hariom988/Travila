@@ -7,6 +7,7 @@ import TourPackages from "./tourPackageCard";
 import DiscoverSection from "./discoverSection";
 import Footer from "./footer";
 import ExploreSection from "./exploreSection";
+import LocationSection from "./locationSection";
 
 export default function Home() {
   return (
@@ -44,8 +45,9 @@ export default function Home() {
 
       <TravelSection />
       <TourPackages />
-      <DiscoverSection />
       <ExploreSection />
+      <LocationSection />
+      <DiscoverSection />
       <Footer />
     </main>
   );

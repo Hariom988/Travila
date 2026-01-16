@@ -41,7 +41,7 @@ const ExploreSection = () => {
       </div>
 
       {/* --- EXPLORE COMPONENT PART --- */}
-      <div className="absolute bottom-0 left-0 w-full h-32 md:h-48 bg-gradient-to-t from-white via-white/50 to-transparent z-10 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-full h-32 md:h-48 bg-linear-to-t from-white via-white/50 to-transparent z-10 pointer-events-none" />
 
       <div className="absolute bottom-[-2%] left-0 w-full z-10 flex justify-center pointer-events-none">
         <ScrollFloat
