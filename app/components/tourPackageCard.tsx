@@ -39,10 +39,6 @@ const TourPackages = () => {
       try {
         const res = await fetch("/api/hotels");
 
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
         const data = await res.json();
 
         if (!Array.isArray(data)) {
