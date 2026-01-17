@@ -19,13 +19,7 @@ export default function Home() {
             backgroundImage: `url('${HeroImage.src}')`,
           }}
         >
-          {/* Optional Overlay to make text pop if needed, otherwise remove */}
           <div className="absolute inset-0 bg-black/30"></div>
-        </div>
-
-        {/* Navbar */}
-        <div className="relative z-20">
-          <Navbar />
         </div>
 
         {/* Hero Content */}
