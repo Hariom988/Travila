@@ -5,7 +5,6 @@ import TextType from "@/app/components/textType";
 import TravelSection from "./travelSection";
 import TourPackages from "./tourPackageCard";
 import DiscoverSection from "./discoverSection";
-import Footer from "./footer";
 import ExploreSection from "./exploreSection";
 import LocationSection from "./locationSection";
 
@@ -21,11 +20,6 @@ export default function Home() {
         >
           {/* Optional Overlay to make text pop if needed, otherwise remove */}
           <div className="absolute inset-0 bg-black/30"></div>
-        </div>
-
-        {/* Navbar */}
-        <div className="relative z-20">
-          <Navbar />
         </div>
 
         {/* Hero Content */}
@@ -48,7 +42,6 @@ export default function Home() {
       <ExploreSection />
       <LocationSection />
       <DiscoverSection />
-      <Footer />
     </main>
   );
 }
