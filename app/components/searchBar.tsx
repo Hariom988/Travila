@@ -35,18 +35,14 @@ const CustomDateInput = forwardRef<HTMLButtonElement, CustomInputProps>(
 export default function SearchBar() {
   const router = useRouter();
 
-  // --- State ---
   const [location, setLocation] = useState<string>("");
   const [guests, setGuests] = useState<number>(0);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
-  // Date State
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
 
-  // --- Handlers ---
   const handleSearch = () => {
-    // Helper to format date as YYYY-MM-DD
     const formatDate = (date: Date | null) => {
       if (!date) return "";
       const offset = date.getTimezoneOffset();
@@ -61,8 +57,6 @@ export default function SearchBar() {
       guests: guests.toString(),
     });
 
-    console.log("Searching for:", params.toString());
-    // Navigate to /search page
     router.push(`/search?${params.toString()}`);
   };
 
@@ -73,7 +67,6 @@ export default function SearchBar() {
   return (
     <div className="w-full max-w-7xl mx-auto px-4 z-30 relative">
       <div className="bg-black/40 backdrop-blur-md rounded-2xl p-6 md:p-8 flex flex-col lg:flex-row items-end gap-4 shadow-xl">
-        {/* --- 1. Destinations Input --- */}
         <div className="w-full lg:flex-2 relative">
           <label className="block text-white text-base font-medium mb-3 ml-1">
             Destinations:
