@@ -1,19 +1,16 @@
 "use client";
-
 import React, { useState, forwardRef } from "react";
 import { Search, MapPin, Calendar, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-// --- HELPER COMPONENT (Internal) ---
 interface CustomInputProps {
   value?: string;
   onClick?: () => void;
   placeholder?: string;
 }
 
-// eslint-disable-next-line react/display-name
 const CustomDateInput = forwardRef<HTMLButtonElement, CustomInputProps>(
   ({ value, onClick, placeholder }, ref) => (
     <button
@@ -77,7 +74,7 @@ export default function SearchBar() {
     <div className="w-full max-w-7xl mx-auto px-4 z-30 relative">
       <div className="bg-black/40 backdrop-blur-md rounded-2xl p-6 md:p-8 flex flex-col lg:flex-row items-end gap-4 shadow-xl">
         {/* --- 1. Destinations Input --- */}
-        <div className="w-full lg:flex-[2] relative">
+        <div className="w-full lg:flex-2 relative">
           <label className="block text-white text-base font-medium mb-3 ml-1">
             Destinations:
           </label>
@@ -182,7 +179,7 @@ export default function SearchBar() {
           </button>
 
           {activeDropdown === "guest" && (
-            <div className="absolute top-16 left-0 w-full bg-white shadow-xl rounded-lg p-4 z-50 border border-gray-100 min-w-[200px] animate-in fade-in zoom-in-95">
+            <div className="absolute top-16 left-0 w-full bg-white shadow-xl rounded-lg p-4 z-50 border border-gray-100 min-w-50 animate-in fade-in zoom-in-95">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-gray-700 font-bold">Adults</span>
                 <div className="flex items-center gap-3">
