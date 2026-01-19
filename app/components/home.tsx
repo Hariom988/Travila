@@ -1,4 +1,4 @@
-import Navbar from "@/app/components/navBar";
+"use client";
 import SearchBar from "@/app/components/searchBar";
 import HeroImage from "@/public/assets/hero-image.jpg";
 import TextType from "@/app/components/textType";
@@ -8,8 +8,24 @@ import DiscoverSection from "./discoverSection";
 import Footer from "./footer";
 import ExploreSection from "./exploreSection";
 import LocationSection from "./locationSection";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
+  const handleSearch = (params: {
+    searchQuery: string;
+    checkIn: string;
+    checkOut: string;
+    rooms: number;
+    adults: number;
+  }) => {
+    // Redirect to hotels page with search parameters
+    router.push(
+      `/hotel?search=${params.searchQuery}&checkIn=${params.checkIn}&checkOut=${params.checkOut}&rooms=${params.rooms}&adults=${params.adults}`
+    );
+  };
+
   return (
     <main className="w-full flex flex-col">
       <section className="relative min-h-screen flex flex-col">
@@ -32,7 +48,7 @@ export default function Home() {
             />
           </h1>
           <div className="w-full flex justify-center">
-            <SearchBar />
+            <SearchBar onSearch={handleSearch} />
           </div>
         </div>
       </section>

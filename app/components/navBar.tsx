@@ -23,6 +23,7 @@ const Navbar = () => {
     <nav
       className={`
         ${isHomePage ? "absolute" : "relative"} 
+        ${isHomePage ? "bg-black/10" : "bg-black/90"} 
         top-0 left-0 right-0 z-50 px-4 py-4 md:px-8 md:py-6 w-full text-white backdrop-blur-md transition-all duration-300
       `}
     >

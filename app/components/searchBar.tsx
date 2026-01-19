@@ -1,250 +1,466 @@
+// SearchBar.tsx
 "use client";
-import React, { useState, forwardRef } from "react";
-import { Search, MapPin, Calendar, User } from "lucide-react";
+import { useState } from "react";
+import { Search, Calendar, Users, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
-interface CustomInputProps {
-  value?: string;
-  onClick?: () => void;
-  placeholder?: string;
+interface DatePickerProps {
+  selectedDate: string;
+  onSelectDate: (date: string) => void;
+  minDate?: string;
+  maxDate?: string;
+}
+interface SearchBarProps {
+  onSearch?: (searchParams: {
+    searchQuery: string;
+    checkIn: string;
+    checkOut: string;
+    rooms: number;
+    adults: number;
+  }) => void;
+  defaultSearchQuery?: string;
+  defaultCheckIn?: string;
+  defaultCheckOut?: string;
+  defaultRooms?: number;
+  defaultAdults?: number;
 }
 
-const CustomDateInput = forwardRef<HTMLButtonElement, CustomInputProps>(
-  ({ value, onClick, placeholder }, ref) => (
-    <button
-      onClick={onClick}
-      ref={ref}
-      type="button"
-      className="w-full h-14 bg-[#f2f2f2] hover:bg-white transition-colors rounded-lg px-4 flex items-center justify-between cursor-pointer group text-left"
-    >
-      <span
-        className={`text-base font-medium ${
-          value ? "text-gray-900" : "text-gray-500"
-        }`}
-      >
-        {value || placeholder}
-      </span>
-      <Calendar className="w-5 h-5 text-gray-500 group-hover:text-gray-700" />
-    </button>
-  )
-);
+const DatePicker = ({
+  selectedDate,
+  onSelectDate,
+  minDate,
+  maxDate,
+}: DatePickerProps) => {
+  const [currentMonth, setCurrentMonth] = useState(new Date(selectedDate));
 
-// --- MAIN COMPONENT ---
-export default function SearchBar() {
-  const router = useRouter();
+  const daysInMonth = (date: Date) =>
+    new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
 
-  const [location, setLocation] = useState<string>("");
-  const [guests, setGuests] = useState<number>(0);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const firstDayOfMonth = (date: Date) =>
+    new Date(date.getFullYear(), date.getMonth(), 1).getDay();
 
-  const [checkInDate, setCheckInDate] = useState<Date | null>(null);
-  const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
+  const days: (Date | null)[] = [];
+  const startDay = firstDayOfMonth(currentMonth);
+  const daysCount = daysInMonth(currentMonth);
 
-  const handleSearch = () => {
-    const formatDate = (date: Date | null) => {
-      if (!date) return "";
-      const offset = date.getTimezoneOffset();
-      const adjustedDate = new Date(date.getTime() - offset * 60 * 1000);
-      return adjustedDate.toISOString().split("T")[0];
-    };
+  for (let i = 0; i < startDay; i++) {
+    days.push(null);
+  }
+  for (let i = 1; i <= daysCount; i++) {
+    days.push(new Date(currentMonth.getFullYear(), currentMonth.getMonth(), i));
+  }
 
-    const params = new URLSearchParams({
-      location: location,
-      checkIn: formatDate(checkInDate),
-      checkOut: formatDate(checkOutDate),
-      guests: guests.toString(),
-    });
-
-    router.push(`/search?${params.toString()}`);
+  const handlePrevMonth = () => {
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
+    );
   };
 
-  const toggleDropdown = (name: string) => {
-    setActiveDropdown(activeDropdown === name ? null : name);
+  const handleNextMonth = () => {
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
+    );
   };
+
+  const isDateDisabled = (date: Date): boolean => {
+    if (minDate && date < new Date(minDate)) return true;
+    if (maxDate && date > new Date(maxDate)) return true;
+    return false;
+  };
+
+  const isDateSelected = (date: Date): boolean => {
+    return date.toISOString().split("T")[0] === selectedDate;
+  };
+
+  const monthYear = currentMonth.toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 z-30 relative">
-      <div className="bg-black/40 backdrop-blur-md rounded-2xl p-6 md:p-8 flex flex-col lg:flex-row items-end gap-4 shadow-xl">
-        <div className="w-full lg:flex-2 relative">
-          <label className="block text-white text-base font-medium mb-3 ml-1">
-            Destinations:
-          </label>
-          <div className="relative">
-            <button
-              onClick={() => toggleDropdown("location")}
-              className="w-full h-14 bg-[#f2f2f2] hover:bg-white transition-colors rounded-lg px-4 flex items-center justify-between text-left group"
+    <div className="bg-white rounded-xl shadow-lg p-4">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="font-bold text-slate-800">{monthYear}</h3>
+        <div className="flex gap-2">
+          <button
+            onClick={handlePrevMonth}
+            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            aria-label="Previous month"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
             >
-              <span
-                className={`text-base font-medium truncate ${
-                  location ? "text-gray-900" : "text-gray-500"
-                }`}
-              >
-                {location || "Where are you going . . ."}
-              </span>
-              <MapPin className="w-5 h-5 text-gray-500 group-hover:text-gray-700" />
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <button
+            onClick={handleNextMonth}
+            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            aria-label="Next month"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-7 gap-1 mb-2">
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+          <div
+            key={day}
+            className="text-center text-[10px] font-bold text-slate-400 py-2"
+          >
+            {day}
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-7 gap-1">
+        {days.map((day, idx) => (
+          <button
+            key={`day-${idx}`}
+            disabled={!day || isDateDisabled(day as Date)}
+            onClick={() => day && onSelectDate(day.toISOString().split("T")[0])}
+            className={`aspect-square text-xs font-medium rounded-lg transition-all ${
+              !day
+                ? "opacity-0"
+                : isDateSelected(day as Date)
+                  ? "bg-blue-600 text-white font-bold shadow-md"
+                  : isDateDisabled(day as Date)
+                    ? "text-slate-300 cursor-not-allowed"
+                    : "text-slate-700 hover:bg-blue-50"
+            }`}
+          >
+            {day?.getDate()}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default function SearchBar({
+  onSearch,
+  defaultSearchQuery = "",
+  defaultCheckIn = "2026-01-25",
+  defaultCheckOut = "2026-01-28",
+  defaultRooms = 1,
+  defaultAdults = 2,
+}: SearchBarProps) {
+  const [searchQuery, setSearchQuery] = useState(defaultSearchQuery);
+  const [checkIn, setCheckIn] = useState(defaultCheckIn);
+  const [checkOut, setCheckOut] = useState(defaultCheckOut);
+  const [rooms, setRooms] = useState(defaultRooms);
+  const [adults, setAdults] = useState(defaultAdults);
+
+  const [showCalendarModal, setShowCalendarModal] = useState<
+    "in" | "out" | null
+  >(null);
+  const [showGuestsModal, setShowGuestsModal] = useState(false);
+
+  const handleSearch = () => {
+    if (onSearch) {
+      onSearch({
+        searchQuery,
+        checkIn,
+        checkOut,
+        rooms,
+        adults,
+      });
+    }
+  };
+
+  const nights = Math.max(
+    1,
+    Math.ceil(
+      (new Date(checkOut).getTime() - new Date(checkIn).getTime()) /
+        (1000 * 60 * 60 * 24)
+    )
+  );
+
+  return (
+    <>
+      {/* Enhanced Search Form */}
+      <div className="bg-white rounded-2xl shadow-lg lg:shadow-xl border border-slate-100 p-3 lg:p-2 mb-8 sticky top-20 lg:top-0 z-30">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
+          {/* Destination */}
+          <div className="lg:col-span-4">
+            <div className="flex items-center gap-3 p-3 lg:px-5 bg-linear-to-r from-blue-50 to-blue-50 lg:bg-transparent rounded-xl lg:rounded-none border lg:border-none border-blue-200">
+              <MapPin size={20} className="text-blue-600 shrink-0" />
+              <div className="flex-1">
+                <p className="text-[9px] uppercase font-bold text-blue-600 hidden lg:block">
+                  Destination
+                </p>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-transparent font-bold text-sm lg:text-base outline-none text-slate-900 placeholder:text-slate-400"
+                  placeholder="Where to?"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Dates & Guests */}
+          <div className="lg:col-span-6 grid grid-cols-3 gap-2">
+            {/* Check In */}
+            <button
+              onClick={() => setShowCalendarModal("in")}
+              className="flex items-center gap-2 p-3 lg:px-5 bg-linear-to-r from-green-50 to-green-50 lg:bg-transparent rounded-xl lg:rounded-none border lg:border-none border-green-200 hover:border-green-300 transition-colors"
+            >
+              <Calendar size={18} className="text-green-600 shrink-0" />
+              <div className="flex-1 text-left hidden lg:block">
+                <p className="text-[9px] uppercase font-bold text-green-600">
+                  Check-In
+                </p>
+                <p className="text-sm font-bold text-slate-900">
+                  {new Date(checkIn).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                  })}
+                </p>
+              </div>
+              <div className="lg:hidden">
+                <p className="text-xs font-bold text-slate-900">
+                  {new Date(checkIn).getDate()}
+                </p>
+                <p className="text-[8px] text-slate-500">
+                  {new Date(checkIn).toLocaleDateString("en-IN", {
+                    month: "short",
+                  })}
+                </p>
+              </div>
             </button>
 
-            {activeDropdown === "location" && (
-              <div className="absolute top-16 left-0 w-full bg-white shadow-xl rounded-lg p-2 z-50 border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
-                {["Paris", "Rome", "New York", "Tokyo", "London", "Bali"].map(
-                  (loc) => (
-                    <div
-                      key={loc}
-                      onClick={() => {
-                        setLocation(loc);
-                        setActiveDropdown(null);
-                      }}
-                      className="p-3 hover:bg-purple-50 rounded-md cursor-pointer text-sm font-medium text-gray-700 flex items-center gap-2"
-                    >
-                      <MapPin className="w-4 h-4 text-purple-600" />
-                      {loc}
-                    </div>
-                  )
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* --- 2. Check In (Functional) --- */}
-        <div className="w-full lg:flex-1 relative">
-          <label className="block text-white text-base font-medium mb-3 ml-1">
-            Check In:
-          </label>
-          <div className="w-full">
-            <DatePicker
-              selected={checkInDate}
-              onChange={(date: React.SetStateAction<Date | null>) => {
-                setCheckInDate(date);
-                if (checkOutDate && date && date > checkOutDate) {
-                  setCheckOutDate(null);
-                }
-              }}
-              minDate={new Date()}
-              customInput={<CustomDateInput placeholder="Add Date" />}
-              dateFormat="dd/MM   "
-              wrapperClassName="w-full"
-            />
-          </div>
-        </div>
-
-        {/* --- 3. Check Out (Functional) --- */}
-        <div className="w-full lg:flex-1 relative">
-          <label className="block text-white text-base font-medium mb-3 ml-1">
-            Check Out:
-          </label>
-          <div className="w-full">
-            <DatePicker
-              selected={checkOutDate}
-              onChange={(date: React.SetStateAction<Date | null>) =>
-                setCheckOutDate(date)
-              }
-              minDate={checkInDate || new Date()}
-              disabled={!checkInDate}
-              customInput={<CustomDateInput placeholder="Add Date" />}
-              dateFormat="dd/MM"
-              wrapperClassName="w-full"
-            />
-          </div>
-        </div>
-
-        {/* --- 4. Guest Input --- */}
-        <div className="w-full lg:flex-1 relative">
-          <label className="block text-white text-base font-medium mb-3 ml-1">
-            Guest:
-          </label>
-          <button
-            onClick={() => toggleDropdown("guest")}
-            className="w-full h-14 bg-[#f2f2f2] hover:bg-white transition-colors rounded-lg px-4 flex items-center justify-between text-left group"
-          >
-            <span
-              className={`font-medium text-base truncate ${
-                guests > 0 ? "text-gray-900" : "text-gray-500"
-              }`}
+            {/* Check Out */}
+            <button
+              onClick={() => setShowCalendarModal("out")}
+              className="flex items-center gap-2 p-3 lg:px-5 bg-linear-to-r from-orange-50 to-orange-50 lg:bg-transparent rounded-xl lg:rounded-none border lg:border-none border-orange-200 hover:border-orange-300 transition-colors"
             >
-              {guests > 0
-                ? `${guests} Guest${guests > 1 ? "s" : ""}`
-                : "+ Add Guests"}
-            </span>
-            <User className="w-5 h-5 text-gray-500 group-hover:text-gray-700" />
-          </button>
+              <Calendar size={18} className="text-orange-600 shrink-0" />
+              <div className="flex-1 text-left hidden lg:block">
+                <p className="text-[9px] uppercase font-bold text-orange-600">
+                  Check-Out
+                </p>
+                <p className="text-sm font-bold text-slate-900">
+                  {new Date(checkOut).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                  })}
+                </p>
+              </div>
+              <div className="lg:hidden">
+                <p className="text-xs font-bold text-slate-900">
+                  {new Date(checkOut).getDate()}
+                </p>
+                <p className="text-[8px] text-slate-500">
+                  {new Date(checkOut).toLocaleDateString("en-IN", {
+                    month: "short",
+                  })}
+                </p>
+              </div>
+            </button>
 
-          {activeDropdown === "guest" && (
-            <div className="absolute top-16 left-0 w-full bg-white shadow-xl rounded-lg p-4 z-50 border border-gray-100 min-w-50 animate-in fade-in zoom-in-95">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-gray-700 font-bold">Adults</span>
-                <div className="flex items-center gap-3">
+            {/* Guests */}
+            <button
+              onClick={() => setShowGuestsModal(true)}
+              className="flex items-center gap-2 p-3 lg:px-5 bg-linear-to-r from-purple-50 to-purple-50 lg:bg-transparent rounded-xl lg:rounded-none border lg:border-none border-purple-200 hover:border-purple-300 transition-colors"
+            >
+              <Users size={18} className="text-purple-600 shrink-0" />
+              <div className="flex-1 text-left hidden lg:block">
+                <p className="text-[9px] uppercase font-bold text-purple-600">
+                  Guests
+                </p>
+                <p className="text-sm font-bold text-slate-900">
+                  {rooms} Room, {adults} Adult
+                </p>
+              </div>
+              <div className="lg:hidden text-left">
+                <p className="text-xs font-bold text-slate-900">
+                  {rooms}R {adults}A
+                </p>
+                <p className="text-[8px] text-slate-500">{nights}N</p>
+              </div>
+            </button>
+          </div>
+
+          {/* Search Button */}
+          <div className="lg:col-span-2">
+            <button
+              onClick={handleSearch}
+              className="w-full h-full bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 lg:py-0 rounded-xl lg:rounded-none shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 uppercase tracking-wider text-sm lg:text-base"
+            >
+              <Search size={18} />
+              <span>Search</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Calendar Modal - Check In */}
+      {showCalendarModal === "in" && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end lg:items-center justify-center p-4">
+          <div className="bg-white rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
+              <h2 className="font-bold text-lg">Select Check-In Date</h2>
+              <button
+                onClick={() => setShowCalendarModal(null)}
+                className="hover:bg-blue-500 p-2 rounded-lg transition-colors"
+                aria-label="Close modal"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="p-4 lg:p-6">
+              <DatePicker
+                selectedDate={checkIn}
+                onSelectDate={(date) => {
+                  setCheckIn(date);
+                  setShowCalendarModal(null);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Calendar Modal - Check Out */}
+      {showCalendarModal === "out" && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end lg:items-center justify-center p-4">
+          <div className="bg-white rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-linear-to-r from-orange-600 to-orange-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
+              <h2 className="font-bold text-lg">Select Check-Out Date</h2>
+              <button
+                onClick={() => setShowCalendarModal(null)}
+                className="hover:bg-orange-500 p-2 rounded-lg transition-colors"
+                aria-label="Close modal"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="p-4 lg:p-6">
+              <DatePicker
+                selectedDate={checkOut}
+                onSelectDate={(date) => {
+                  setCheckOut(date);
+                  setShowCalendarModal(null);
+                }}
+                minDate={checkIn}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Guests Modal */}
+      {showGuestsModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end lg:items-center justify-center p-4">
+          <div className="bg-white rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl">
+            <div className="bg-linear-to-r from-purple-600 to-purple-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
+              <h2 className="font-bold text-lg">Select Guests</h2>
+              <button
+                onClick={() => setShowGuestsModal(false)}
+                className="hover:bg-purple-500 p-2 rounded-lg transition-colors"
+                aria-label="Close modal"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              <div>
+                <p className="text-sm font-bold text-slate-600 mb-4">Rooms</p>
+                <div className="flex items-center gap-4">
                   <button
-                    onClick={() => setGuests(Math.max(0, guests - 1))}
-                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 font-bold"
+                    onClick={() => setRooms(Math.max(1, rooms - 1))}
+                    className="w-10 h-10 border border-slate-300 rounded-lg hover:bg-slate-50 flex items-center justify-center font-bold"
                   >
-                    -
+                    −
                   </button>
-                  <span className="font-bold text-gray-900 w-4 text-center">
-                    {guests}
+                  <span className="text-2xl font-bold text-slate-900 flex-1 text-center">
+                    {rooms}
                   </span>
                   <button
-                    onClick={() => setGuests(guests + 1)}
-                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 font-bold"
+                    onClick={() => setRooms(rooms + 1)}
+                    className="w-10 h-10 border border-slate-300 rounded-lg hover:bg-slate-50 flex items-center justify-center font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-600 mb-4">Adults</p>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setAdults(Math.max(1, adults - 1))}
+                    className="w-10 h-10 border border-slate-300 rounded-lg hover:bg-slate-50 flex items-center justify-center font-bold"
+                  >
+                    −
+                  </button>
+                  <span className="text-2xl font-bold text-slate-900 flex-1 text-center">
+                    {adults}
+                  </span>
+                  <button
+                    onClick={() => setAdults(adults + 1)}
+                    className="w-10 h-10 border border-slate-300 rounded-lg hover:bg-slate-50 flex items-center justify-center font-bold"
                   >
                     +
                   </button>
                 </div>
               </div>
               <button
-                onClick={() => setActiveDropdown(null)}
-                className="w-full py-2 bg-purple-600 text-white rounded-md text-sm font-bold hover:bg-purple-700"
+                onClick={() => setShowGuestsModal(false)}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-colors"
               >
-                Apply
+                Done
               </button>
             </div>
-          )}
+          </div>
         </div>
-
-        {/* --- 5. Search Button --- */}
-        <div className="w-full lg:w-auto mt-2 lg:mt-0">
-          <button
-            onClick={handleSearch}
-            className="w-full h-14 bg-[#6200EA] hover:bg-[#5000ca] active:scale-95 transition-all duration-200 text-white rounded-lg px-8 flex items-center justify-center gap-2 font-bold text-base shadow-lg"
-          >
-            Search
-            <Search className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      {/* --- DatePicker Global Styles --- */}
-      <style jsx global>{`
-        .react-datepicker-wrapper {
-          width: 100%;
-        }
-        .react-datepicker {
-          font-family: inherit;
-          border: none;
-          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-          border-radius: 0.5rem;
-        }
-        .react-datepicker__header {
-          background-color: white;
-          border-bottom: 1px solid #f3f4f6;
-        }
-        .react-datepicker__day--selected,
-        .react-datepicker__day--keyboard-selected {
-          background-color: #6200ea !important;
-          color: white !important;
-          border-radius: 50%;
-        }
-        .react-datepicker__day:hover {
-          border-radius: 50%;
-          background-color: #f3f4f6;
-        }
-        .react-datepicker__day--today {
-          font-weight: bold;
-          color: #6200ea;
-        }
-      `}</style>
-    </div>
+      )}
+    </>
   );
 }
