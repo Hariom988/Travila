@@ -1,15 +1,10 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Phone, User, Menu, X, ChevronDown } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // 1. Import usePathname
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname(); // 2. Get the current route
-
-  // 3. Check if the current page is Home
-  const isHomePage = pathname === "/";
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -20,13 +15,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav
-      className={`
-        ${isHomePage ? "absolute" : "relative"} 
-        ${isHomePage ? "bg-black/10" : "bg-black/90"} 
-        top-0 left-0 right-0 z-50 px-4 py-4 md:px-8 md:py-6 w-full text-white backdrop-blur-md transition-all duration-300
-      `}
-    >
+    <nav className="absolute top-0 left-0 right-0 z-50 px-4 py-4 md:px-8 md:py-6 w-full text-white">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 z-50 relative">
           <div className="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-full flex items-center justify-center font-bold text-lg md:text-xl">
@@ -89,6 +78,7 @@ const Navbar = () => {
       </div>
 
       {/* --- Mobile Dropdown Menu --- */}
+      {/* This covers the screen on mobile when opened */}
       <div
         className={`fixed inset-0 bg-gray-900/95 backdrop-blur-lg z-40 flex flex-col items-center justify-center transition-transform duration-300 ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
