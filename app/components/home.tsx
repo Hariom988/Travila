@@ -22,7 +22,7 @@ export default function Home() {
   }) => {
     // Redirect to hotels page with search parameters
     router.push(
-      `/hotel?search=${params.searchQuery}&checkIn=${params.checkIn}&checkOut=${params.checkOut}&rooms=${params.rooms}&adults=${params.adults}`
+      `/hotel?search=${params.searchQuery}&checkIn=${params.checkIn}&checkOut=${params.checkOut}&rooms=${params.rooms}&adults=${params.adults}`,
     );
   };
 
@@ -58,7 +58,6 @@ export default function Home() {
       <ExploreSection />
       <LocationSection />
       <DiscoverSection />
-      <Footer />
     </main>
   );
 }

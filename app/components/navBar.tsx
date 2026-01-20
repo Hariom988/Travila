@@ -1,10 +1,14 @@
 "use client";
-import React, { useState } from "react";
-import { Phone, User, Menu, X, ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { Phone, User, Menu, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isHomePage = pathname === "/";
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -15,7 +19,11 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="absolute top-0 left-0 right-0 z-50 px-4 py-4 md:px-8 md:py-6 w-full text-white">
+    <nav
+      className={`${
+        isHomePage ? "absolute" : "relative bg-gray-900"
+      } top-0 left-0 right-0 z-50 px-4 py-4 md:px-8 md:py-6 w-full text-white`}
+    >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 z-50 relative">
           <div className="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-full flex items-center justify-center font-bold text-lg md:text-xl">
@@ -37,12 +45,9 @@ const Navbar = () => {
             <Link
               key={item.name}
               href={item.href}
-              className="flex items-center gap-1 hover:text-purple-300 transition-colors group"
+              className="flex items-center gap-1 hover:text-purple-300 transition-colors"
             >
               {item.name}
-              {item.name !== "Contact" && (
-                <ChevronDown className="w-3 h-3 group-hover:rotate-180 transition-transform" />
-              )}
             </Link>
           ))}
         </div>
@@ -78,7 +83,6 @@ const Navbar = () => {
       </div>
 
       {/* --- Mobile Dropdown Menu --- */}
-      {/* This covers the screen on mobile when opened */}
       <div
         className={`fixed inset-0 bg-gray-900/95 backdrop-blur-lg z-40 flex flex-col items-center justify-center transition-transform duration-300 ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
@@ -96,7 +100,7 @@ const Navbar = () => {
             </Link>
           ))}
           <hr className="w-20 border-gray-700" />
-          <p className="text-lg">123-343-4444</p>
+          <p className="text-lg">9878677770</p>
           <button className="bg-purple-600 px-8 py-3 rounded-full mt-4">
             Login
           </button>
