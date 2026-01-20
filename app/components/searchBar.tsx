@@ -52,13 +52,13 @@ const DatePicker = ({
 
   const handlePrevMonth = () => {
     setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1),
     );
   };
 
   const handleNextMonth = () => {
     setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1),
     );
   };
 
@@ -187,14 +187,14 @@ export default function SearchBar({
     1,
     Math.ceil(
       (new Date(checkOut).getTime() - new Date(checkIn).getTime()) /
-        (1000 * 60 * 60 * 24)
-    )
+        (1000 * 60 * 60 * 24),
+    ),
   );
 
   return (
     <>
       {/* Enhanced Search Form */}
-      <div className="bg-white rounded-2xl shadow-lg lg:shadow-xl border border-slate-100 p-3 lg:p-2 mb-8 sticky top-20 lg:top-0 z-30">
+      <div className="bg-white rounded-2xl shadow-lg lg:shadow-xl border border-slate-100 p-3 lg:p-2 mb-8 md:sticky top-20 lg:top-0 md:z-30">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
           {/* Destination */}
           <div className="lg:col-span-4">
