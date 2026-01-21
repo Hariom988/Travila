@@ -11,6 +11,7 @@ datasource db {
 }
 
 // 1. USERS
+// Handles both regular users and admins
 model User {
   id        String   @id @default(uuid())
   name      String?
@@ -86,16 +87,6 @@ model ActivityBooking {
   user       User          @relation(fields: [userId], references: [id])
   activityId String
   activity   Activity      @relation(fields: [activityId], references: [id])
-}
-
-// 6 Admin Credentials 
-model Admin {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 // ENUMS (Dropdown choices)
