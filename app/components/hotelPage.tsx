@@ -174,7 +174,7 @@ function HotelPageContent() {
     const fetchTours = async () => {
       try {
         const response = await fetch("/api/hotels");
-        if (!response.ok) throw new Error(`API error: ${response.status}`);
+        if (!response.ok) console.log(`API error: ${response.status}`);
         const data = await response.json();
         const formattedTours: Tour[] = data.map((hotel: any) => ({
           id: hotel.id,
