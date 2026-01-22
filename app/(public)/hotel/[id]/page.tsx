@@ -21,6 +21,7 @@ interface PageProps {
 async function getHotelData(id: string) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    console.log(baseUrl);
     const res = await fetch(`${baseUrl}/api/hotels/${id}`, {
       cache: "no-store",
     });
