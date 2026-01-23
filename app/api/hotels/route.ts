@@ -1,10 +1,17 @@
 // app/api/hotels/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 
-// GET all hotels (including inactive ones)
+// GET all hotels (admin only)
 export async function GET(request: NextRequest) {
   try {
+    // Verify authentication
+    const auth = await verifyAdminAuth(request);
+    if (!auth) {
+      return unauthorizedResponse();
+    }
+
     const hotels = await prisma.hotel.findMany({
       select: {
         id: true,
@@ -38,16 +45,13 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create new hotel
+// POST - Create new hotel (admin only)
 export async function POST(request: NextRequest) {
   try {
-    // Verify admin authentication
-    const token = request.cookies.get('adminToken')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    // Verify authentication
+    const auth = await verifyAdminAuth(request);
+    if (!auth) {
+      return unauthorizedResponse();
     }
 
     const body = await request.json();
