@@ -10,6 +10,8 @@ import {
   LogOut,
   AlertCircle,
   CheckCircle,
+  Upload,
+  Tag,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -19,6 +21,8 @@ interface Hotel {
   location: string;
   pricePerNight: string;
   available: boolean;
+  facilities: string[];
+  images: string[];
   createdAt: string;
 }
 
@@ -27,6 +31,8 @@ interface FormData {
   location: string;
   description: string;
   pricePerNight: string;
+  facilities: string;
+  images: string[];
 }
 
 export default function HotelManagementDashboard() {
@@ -39,14 +45,16 @@ export default function HotelManagementDashboard() {
   const [formError, setFormError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newFacility, setNewFacility] = useState("");
   const [formData, setFormData] = useState<FormData>({
     name: "",
     location: "",
     description: "",
     pricePerNight: "",
+    facilities: "",
+    images: [],
   });
 
-  // Fetch hotels on component mount
   useEffect(() => {
     fetchHotels();
   }, []);
@@ -67,8 +75,16 @@ export default function HotelManagementDashboard() {
   };
 
   const handleAddClick = () => {
-    setFormData({ name: "", location: "", description: "", pricePerNight: "" });
+    setFormData({
+      name: "",
+      location: "",
+      description: "",
+      pricePerNight: "",
+      facilities: "",
+      images: [],
+    });
     setEditingId(null);
+    setNewFacility("");
     setFormError("");
     setSuccessMessage("");
     setIsModalOpen(true);
@@ -80,8 +96,11 @@ export default function HotelManagementDashboard() {
       location: hotel.location,
       description: "",
       pricePerNight: hotel.pricePerNight,
+      facilities: hotel.facilities.join(", "),
+      images: hotel.images || [],
     });
     setEditingId(hotel.id);
+    setNewFacility("");
     setFormError("");
     setSuccessMessage("");
     setIsModalOpen(true);
@@ -108,11 +127,18 @@ export default function HotelManagementDashboard() {
 
     setIsSubmitting(true);
     try {
+      const facilitiesArray = formData.facilities
+        .split(",")
+        .map((f) => f.trim())
+        .filter((f) => f.length > 0);
+
       const payload = {
         name: formData.name.trim(),
         location: formData.location.trim(),
         description: formData.description.trim(),
         pricePerNight: parseFloat(formData.pricePerNight),
+        facilities: facilitiesArray,
+        images: formData.images,
       };
 
       const response = await fetch(
@@ -143,36 +169,59 @@ export default function HotelManagementDashboard() {
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!window.confirm(`Delete "${name}"? This action cannot be undone.`)) {
-      return;
-    }
-
+  const handleToggleAvailability = async (
+    id: string,
+    currentStatus: boolean,
+  ) => {
     try {
-      const response = await fetch(`/api/hotels/${id}`, {
-        method: "DELETE",
+      const response = await fetch(`/api/hotels/${id}/availability`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ available: !currentStatus }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to delete hotel");
+        throw new Error(error.error || "Failed to update availability");
       }
 
-      setSuccessMessage("Hotel deleted successfully!");
+      setSuccessMessage(
+        !currentStatus
+          ? "Hotel activated successfully!"
+          : "Hotel deactivated successfully!",
+      );
       fetchHotels();
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
-      setFormError(error instanceof Error ? error.message : "Delete failed");
+      setFormError(error instanceof Error ? error.message : "Operation failed");
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/admin-logout", { method: "POST" });
-      router.push("/admin/login");
-    } catch (error) {
-      console.error("Logout error:", error);
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      fileArray.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const result = event.target?.result;
+          if (result && typeof result === "string") {
+            setFormData((prev) => ({
+              ...prev,
+              images: [...prev.images, result],
+            }));
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     }
+  };
+
+  const removeImage = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
   };
 
   const filteredHotels = hotels.filter(
@@ -193,7 +242,10 @@ export default function HotelManagementDashboard() {
             </p>
           </div>
           <button
-            onClick={handleLogout}
+            onClick={async () => {
+              await fetch("/api/auth/admin-logout", { method: "POST" });
+              router.push("/admin/login");
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium"
           >
             <LogOut size={16} /> Logout
@@ -275,6 +327,9 @@ export default function HotelManagementDashboard() {
                       Price/Night
                     </th>
                     <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                      Facilities
+                    </th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-200">
                       Status
                     </th>
                     <th className="px-6 py-4 text-left font-semibold text-gray-200">
@@ -292,15 +347,37 @@ export default function HotelManagementDashboard() {
                         {hotel.location}
                       </td>
                       <td className="px-6 py-4 text-gray-300">
-                        ₹{hotel.pricePerNight}
+                        ${hotel.pricePerNight}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {hotel.facilities && hotel.facilities.length > 0 ? (
+                            hotel.facilities.map((facility, idx) => (
+                              <span
+                                key={idx}
+                                className="inline-block px-2 py-1 bg-purple-900/30 text-purple-300 text-xs rounded"
+                              >
+                                {facility}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-gray-500 text-xs">
+                              No facilities
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition ${
                             hotel.available
-                              ? "bg-green-900/30 text-green-300"
-                              : "bg-red-900/30 text-red-300"
+                              ? "bg-green-900/30 text-green-300 hover:bg-green-900/50"
+                              : "bg-red-900/30 text-red-300 hover:bg-red-900/50"
                           }`}
+                          onClick={() =>
+                            handleToggleAvailability(hotel.id, hotel.available)
+                          }
+                          title="Click to toggle status"
                         >
                           {hotel.available ? "Active" : "Inactive"}
                         </span>
@@ -315,9 +392,18 @@ export default function HotelManagementDashboard() {
                             <Edit2 size={16} />
                           </button>
                           <button
-                            onClick={() => handleDelete(hotel.id, hotel.name)}
-                            className="p-2 bg-gray-700 hover:bg-red-600 text-gray-300 hover:text-white rounded transition"
-                            title="Delete"
+                            onClick={() =>
+                              handleToggleAvailability(
+                                hotel.id,
+                                hotel.available,
+                              )
+                            }
+                            className={`p-2 rounded transition ${
+                              hotel.available
+                                ? "bg-gray-700 hover:bg-red-600 text-gray-300"
+                                : "bg-gray-700 hover:bg-green-600 text-gray-300"
+                            }`}
+                            title={hotel.available ? "Deactivate" : "Activate"}
                           >
                             <Trash2 size={16} />
                           </button>
@@ -335,7 +421,7 @@ export default function HotelManagementDashboard() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-white">
                 {editingId ? "Edit Hotel" : "Add New Hotel"}
@@ -357,36 +443,38 @@ export default function HotelManagementDashboard() {
             )}
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Hotel Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  disabled={isSubmitting}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
-                  placeholder="e.g., Azure Paradise Resort"
-                />
-              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Hotel Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
+                    placeholder="e.g., Azure Paradise Resort"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Location *
-                </label>
-                <input
-                  type="text"
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
-                  disabled={isSubmitting}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
-                  placeholder="e.g., Maldives"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Location *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.location}
+                    onChange={(e) =>
+                      setFormData({ ...formData, location: e.target.value })
+                    }
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
+                    placeholder="e.g., Maldives"
+                  />
+                </div>
               </div>
 
               <div>
@@ -405,21 +493,84 @@ export default function HotelManagementDashboard() {
                 />
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Price per Night *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.pricePerNight}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        pricePerNight: e.target.value,
+                      })
+                    }
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
+                    placeholder="0.00"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Facilities (comma-separated)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.facilities}
+                    onChange={(e) =>
+                      setFormData({ ...formData, facilities: e.target.value })
+                    }
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
+                    placeholder="e.g., WiFi, Pool, Gym, Spa"
+                  />
+                </div>
+              </div>
+
+              {/* Image Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Price per Night *
+                  Hotel Images
                 </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={formData.pricePerNight}
-                  onChange={(e) =>
-                    setFormData({ ...formData, pricePerNight: e.target.value })
-                  }
-                  disabled={isSubmitting}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
-                  placeholder="0.00"
-                />
+                <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-gray-500 transition">
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <Upload size={18} />
+                    <span className="text-sm">Click to upload images</span>
+                  </div>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={isSubmitting}
+                    className="hidden"
+                  />
+                </label>
+
+                {formData.images.length > 0 && (
+                  <div className="mt-4 grid grid-cols-3 gap-3">
+                    {formData.images.map((image, idx) => (
+                      <div key={idx} className="relative group">
+                        <img
+                          src={image}
+                          alt={`Hotel ${idx + 1}`}
+                          className="w-full h-24 object-cover rounded border border-gray-600"
+                        />
+                        <button
+                          onClick={() => removeImage(idx)}
+                          className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                          type="button"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 

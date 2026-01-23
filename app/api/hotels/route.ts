@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// GET all hotels
+// GET all hotels (including inactive ones)
 export async function GET(request: NextRequest) {
   try {
     const hotels = await prisma.hotel.findMany({
@@ -10,8 +10,11 @@ export async function GET(request: NextRequest) {
         id: true,
         name: true,
         location: true,
+        description: true,
         pricePerNight: true,
         available: true,
+        facilities: true,
+        images: true,
         createdAt: true,
       },
       orderBy: {
@@ -64,8 +67,8 @@ export async function POST(request: NextRequest) {
         location: location.trim(),
         description: description?.trim() || '',
         pricePerNight: parseFloat(pricePerNight),
-        images: images || [],
-        facilities: facilities || [],
+        images: Array.isArray(images) ? images : [],
+        facilities: Array.isArray(facilities) ? facilities : [],
         available: true,
       },
     });
