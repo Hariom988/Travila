@@ -1,8 +1,9 @@
 // app/api/hotels/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 
-// GET single hotel
+// GET single hotel (public - remove auth if you want public access)
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -36,19 +37,16 @@ export async function GET(
   }
 }
 
-// PUT - Update hotel
+// PUT - Update hotel (admin only)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Verify admin authentication
-    const token = request.cookies.get('adminToken')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    // Verify authentication
+    const auth = await verifyAdminAuth(request);
+    if (!auth) {
+      return unauthorizedResponse();
     }
 
     const { id } = await params;
@@ -95,6 +93,59 @@ export async function PUT(
     console.error('Error updating hotel:', error);
     return NextResponse.json(
       { error: 'Failed to update hotel' },
+      { status: 500 }
+    );
+  }
+}
+
+// app/api/hotels/[id]/availability/route.ts
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    // Verify authentication
+    const auth = await verifyAdminAuth(request);
+    if (!auth) {
+      return unauthorizedResponse();
+    }
+
+    const { id } = await params;
+    const body = await request.json();
+    const { available } = body;
+
+    if (typeof available !== 'boolean') {
+      return NextResponse.json(
+        { error: 'Invalid availability status' },
+        { status: 400 }
+      );
+    }
+
+    const hotel = await prisma.hotel.update({
+      where: { id },
+      data: { available },
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          ...hotel,
+          pricePerNight: hotel.pricePerNight.toString(),
+        },
+      },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      return NextResponse.json(
+        { error: 'Hotel not found' },
+        { status: 404 }
+      );
+    }
+    console.error('Error updating hotel availability:', error);
+    return NextResponse.json(
+      { error: 'Failed to update hotel availability' },
       { status: 500 }
     );
   }
