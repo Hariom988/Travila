@@ -29,7 +29,6 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Convert Decimal to string for JSON serialization
     const safeHotels = hotels.map(hotel => ({
       ...hotel,
       pricePerNight: hotel.pricePerNight.toString(),
