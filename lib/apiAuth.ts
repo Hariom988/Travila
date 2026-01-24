@@ -12,10 +12,7 @@ export interface AuthPayload {
   role: string;
 }
 
-/**
- * Verify admin authentication in API routes
- * Returns user data if valid, null if invalid
- */
+
 export async function verifyAdminAuth(
   request: NextRequest
 ): Promise<AuthPayload | null> {

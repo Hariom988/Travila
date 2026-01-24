@@ -347,7 +347,7 @@ export default function HotelManagementDashboard() {
                         {hotel.location}
                       </td>
                       <td className="px-6 py-4 text-gray-300">
-                        ${hotel.pricePerNight}
+                        ₹{hotel.pricePerNight}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-wrap gap-1">
