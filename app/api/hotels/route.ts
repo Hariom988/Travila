@@ -3,15 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 
-// GET all hotels (admin only)
+// GET all hotels - PUBLIC (no authentication required)
 export async function GET(request: NextRequest) {
   try {
-    // Verify authentication
-    const auth = await verifyAdminAuth(request);
-    if (!auth) {
-      return unauthorizedResponse();
-    }
-
     const hotels = await prisma.hotel.findMany({
       select: {
         id: true,
@@ -29,6 +23,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // Convert Decimal to string for JSON serialization
     const safeHotels = hotels.map(hotel => ({
       ...hotel,
       pricePerNight: hotel.pricePerNight.toString(),
@@ -44,10 +39,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create new hotel (admin only)
+// POST - Create new hotel - ADMIN ONLY
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
+    // Verify authentication - only admins can create
     const auth = await verifyAdminAuth(request);
     if (!auth) {
       return unauthorizedResponse();

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 
-// GET single hotel (public - remove auth if you want public access)
+// GET single hotel - PUBLIC (no authentication required)
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -37,13 +37,13 @@ export async function GET(
   }
 }
 
-// PUT - Update hotel (admin only)
+// PUT - Update hotel - ADMIN ONLY
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Verify authentication
+    // Verify authentication - only admins can update
     const auth = await verifyAdminAuth(request);
     if (!auth) {
       return unauthorizedResponse();
@@ -104,7 +104,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Verify authentication
+    // Verify authentication - only admins can toggle availability
     const auth = await verifyAdminAuth(request);
     if (!auth) {
       return unauthorizedResponse();
