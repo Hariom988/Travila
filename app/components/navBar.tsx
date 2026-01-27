@@ -63,10 +63,13 @@ const Navbar = () => {
               <p className="font-semibold text-white">9878677770</p>
             </div>
           </div>
-          <button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm transition px-5 py-2 rounded-lg flex items-center gap-2 text-sm font-medium">
+          <Link
+            href="/user/auth"
+            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm transition px-5 py-2 rounded-lg flex items-center gap-2 text-sm font-medium"
+          >
             <User className="w-4 h-4" />
             Login
-          </button>
+          </Link>
         </div>
 
         {/* --- Mobile Menu Toggle --- */}
@@ -101,9 +104,12 @@ const Navbar = () => {
           ))}
           <hr className="w-20 border-gray-700" />
           <p className="text-lg">9878677770</p>
-          <button className="bg-purple-600 px-8 py-3 rounded-full mt-4">
+          <Link
+            href="/user/auth"
+            className="bg-purple-600 px-8 py-3 rounded-full mt-4"
+          >
             Login
-          </button>
+          </Link>
         </div>
       </div>
     </nav>
