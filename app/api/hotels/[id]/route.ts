@@ -2,8 +2,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
+import { logActivity } from '@/lib/activity-logger';
 
-// GET single hotel - PUBLIC (no authentication required)
+// GET single hotel - PUBLIC
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -28,7 +29,7 @@ export async function GET(
     }));
 
     return NextResponse.json(safeData);
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching hotel:', error);
     return NextResponse.json(
       { error: 'Failed to fetch hotel' },
@@ -43,7 +44,6 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Verify authentication - only admins can update
     const auth = await verifyAdminAuth(request);
     if (!auth) {
       return unauthorizedResponse();
@@ -53,7 +53,6 @@ export async function PUT(
     const body = await request.json();
     const { name, location, description, pricePerNight, images, facilities } = body;
 
-    // Validation
     if (!name?.trim() || !location?.trim() || !pricePerNight) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -72,6 +71,13 @@ export async function PUT(
         facilities: Array.isArray(facilities) ? facilities : [],
       },
     });
+
+    // Log activity
+    await logActivity(
+      auth.id,
+      'UPDATE_HOTEL',
+      `Updated hotel: ${hotel.name}`
+    );
 
     return NextResponse.json(
       {
@@ -104,7 +110,6 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Verify authentication - only admins can toggle availability
     const auth = await verifyAdminAuth(request);
     if (!auth) {
       return unauthorizedResponse();
@@ -125,6 +130,13 @@ export async function PATCH(
       where: { id },
       data: { available },
     });
+
+    // Log activity
+    await logActivity(
+      auth.id,
+      'TOGGLE_HOTEL',
+      `${available ? 'Activated' : 'Deactivated'} hotel: ${hotel.name}`
+    );
 
     return NextResponse.json(
       {

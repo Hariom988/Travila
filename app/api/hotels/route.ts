@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
+import { logActivity } from '@/lib/activity-logger';
 
 // GET all hotels - PUBLIC (no authentication required)
 export async function GET(request: NextRequest) {
@@ -23,7 +24,6 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Convert Decimal to string for JSON serialization
     const safeHotels = hotels.map(hotel => ({
       ...hotel,
       pricePerNight: hotel.pricePerNight.toString(),
@@ -42,7 +42,6 @@ export async function GET(request: NextRequest) {
 // POST - Create new hotel - ADMIN ONLY
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication - only admins can create
     const auth = await verifyAdminAuth(request);
     if (!auth) {
       return unauthorizedResponse();
@@ -51,7 +50,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, location, description, pricePerNight, images, facilities } = body;
 
-    // Validation
     if (!name?.trim() || !location?.trim() || !pricePerNight) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -70,6 +68,13 @@ export async function POST(request: NextRequest) {
         available: true,
       },
     });
+
+    // Log activity
+    await logActivity(
+      auth.id,
+      'CREATE_HOTEL',
+      `Created hotel: ${hotel.name} in ${hotel.location}`
+    );
 
     return NextResponse.json(
       {

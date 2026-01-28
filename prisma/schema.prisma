@@ -11,20 +11,20 @@ datasource db {
 }
 
 // 1. USERS
-// Handles both regular users and admins
 model User {
   id        String   @id @default(uuid())
   name      String?
   email     String   @unique
   password  String
-  phone     String?  // ADD THIS
-  googleId  String?  @unique // ADD THIS
+  phone     String?
+  googleId  String?  @unique
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   hotelBookings    HotelBooking[]
   activityBookings ActivityBooking[]
+  activityLogs     ActivityLog[] // NEW: Link to activity logs
 }
 
 // 2. HOTELS
@@ -33,14 +33,14 @@ model Hotel {
   name          String
   location      String
   description   String
-  pricePerNight Decimal  // Better than Float for money
-  images        String[] // Array of image URLs
-  facilities    String[] // e.g. ["WiFi", "Pool"]
+  pricePerNight Decimal
+  images        String[]
+  facilities    String[]
   available     Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  bookings      HotelBooking[]
+  bookings HotelBooking[]
 }
 
 // 3. ACTIVITIES
@@ -50,12 +50,12 @@ model Activity {
   location       String
   description    String
   pricePerPerson Decimal
-  duration       String   // e.g. "2 hours", "Full Day"
+  duration       String
   images         String[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  bookings       ActivityBooking[]
+  bookings ActivityBooking[]
 }
 
 // 4. HOTEL BOOKINGS
@@ -65,14 +65,13 @@ model HotelBooking {
   endDate    DateTime
   totalPrice Decimal
   status     BookingStatus @default(PENDING)
-  paymentId  String?       // Razorpay Payment ID
+  paymentId  String?
   createdAt  DateTime      @default(now())
 
-  // Relationships
-  userId     String
-  user       User          @relation(fields: [userId], references: [id])
-  hotelId    String
-  hotel      Hotel         @relation(fields: [hotelId], references: [id])
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  hotelId String
+  hotel   Hotel  @relation(fields: [hotelId], references: [id])
 }
 
 // 5. ACTIVITY BOOKINGS
@@ -82,17 +81,29 @@ model ActivityBooking {
   totalPrice Decimal
   people     Int           @default(1)
   status     BookingStatus @default(PENDING)
-  paymentId  String?       // Razorpay Payment ID
+  paymentId  String?
   createdAt  DateTime      @default(now())
 
-  // Relationships
   userId     String
-  user       User          @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
   activityId String
-  activity   Activity      @relation(fields: [activityId], references: [id])
+  activity   Activity @relation(fields: [activityId], references: [id])
 }
 
-// ENUMS (Dropdown choices)
+// 6. ACTIVITY LOGS - NEW!
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String // LOGIN, CREATE_HOTEL, UPDATE_HOTEL, TOGGLE_HOTEL, DELETE_HOTEL, CREATE_ACTIVITY, UPDATE_ACTIVITY, DELETE_ACTIVITY
+  details   String   @default("") // What was created/updated
+  timestamp DateTime @default(now())
+
+  @@index([userId])
+  @@index([timestamp])
+}
+
+// ENUMS
 enum Role {
   USER
   ADMIN
