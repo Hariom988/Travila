@@ -1,25 +1,23 @@
+// lib/prisma.ts - PERMANENT FIX
 import { PrismaClient } from '@prisma/client';
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+// Declare global variable for Prisma Client
+declare global {
+  // eslint-disable-next-line no-var
+  var prisma: PrismaClient | undefined;
+}
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log:
-      process.env.NODE_ENV === 'development'
-        ? ['query', 'error', 'warn']
-        : ['error'],
-  });
-
-if (process.env.NODE_ENV !== 'production')
-  globalForPrisma.prisma = prisma;
-
-process.on('SIGINT', async () => {
-  await prisma.$disconnect();
-  process.exit(0);
+// Create Prisma Client instance with proper connection handling
+export const prisma = globalThis.prisma || new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
 });
 
-process.on('SIGTERM', async () => {
+// In development, store the client in global to prevent multiple instances
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.prisma = prisma;
+}
+
+// Add connection lifecycle management
+process.on('beforeExit', async () => {
   await prisma.$disconnect();
-  process.exit(0);
 });

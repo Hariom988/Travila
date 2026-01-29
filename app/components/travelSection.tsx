@@ -19,7 +19,6 @@ const TravelSection = () => {
       {/* Main Container */}
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* LEFT COLUMN: Images (Hidden on Mobile, Visible on Desktop) */}
           <div className="hidden lg:flex lg:col-span-3 flex-col gap-8 items-center lg:items-end">
             {/* Top Left Image */}
             <div className="relative group">

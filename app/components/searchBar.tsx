@@ -151,12 +151,11 @@ const DatePicker = ({
     </div>
   );
 };
-
 export default function SearchBar({
   onSearch,
   defaultSearchQuery = "",
-  defaultCheckIn = "2026-01-25",
-  defaultCheckOut = "2026-01-28",
+  defaultCheckIn = "2026-01-30",
+  defaultCheckOut = "2026-02-01",
   defaultRooms = 1,
   defaultAdults = 2,
 }: SearchBarProps) {

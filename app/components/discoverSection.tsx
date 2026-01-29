@@ -4,11 +4,17 @@ import { ArrowRight, Globe, ShieldCheck } from "lucide-react";
 // Replace with your actual asset imports
 import image1 from "@/public/assets/discover-section/image1.jpg"; // Couple Image
 import image2 from "@/public/assets/discover-section/image2.jpg"; // Aerial Beach Image
+import Link from "next/link";
 
 const DiscoverSection = () => {
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
   return (
     <section className="relative w-full py-12 px-4 lg:px-10 lg:py-10 overflow-hidden bg-white">
-      {/* 1. LEFT BACKGROUND WATERMARK (Map) */}
       <div className="absolute top-0 left-0 w-[40%] h-full z-0 hidden lg:block opacity-30 pointer-events-none">
         <div className="w-full h-full bg-linear-to-r from-gray-100 to-transparent mask-image-map"></div>
       </div>
@@ -66,7 +72,11 @@ const DiscoverSection = () => {
             </div>
 
             {/* CTA Button */}
-            <button className="bg-[#6300ee] hover:bg-[#5000cc] hover:cursor-pointer text-white font-bold py-3 px-8 rounded-lg flex items-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 w-full sm:w-auto justify-center">
+
+            <button
+              onClick={scrollToTop}
+              className="bg-[#6300ee] hover:bg-[#5000cc] hover:cursor-pointer text-white font-bold py-3 px-8 rounded-lg flex items-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 w-full sm:w-auto justify-center"
+            >
               BOOK YOUR TRIP
               <ArrowRight className="w-5 h-5" />
             </button>

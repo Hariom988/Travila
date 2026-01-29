@@ -25,9 +25,6 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Hotels", href: "/hotel" },
-    { name: "Pages", href: "/pages" },
-    { name: "Blogs", href: "/blogs" },
-    { name: "Contact", href: "/contact" },
   ];
 
   // Check if user is authenticated on component mount

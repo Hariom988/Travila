@@ -13,6 +13,7 @@ import {
   Info,
   Sparkles,
 } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -20,14 +21,31 @@ interface PageProps {
 
 async function getHotelData(id: string) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    console.log(baseUrl);
-    const res = await fetch(`${baseUrl}/api/hotels/${id}`, {
-      cache: "no-store",
+    // Direct database call instead of HTTP fetch
+    const hotel = await prisma.hotel.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        location: true,
+        description: true,
+        pricePerNight: true,
+        available: true,
+        facilities: true,
+        images: true,
+        createdAt: true,
+      },
     });
-    if (!res.ok) return null;
-    return await res.json();
+
+    if (!hotel) return null;
+
+    // Convert Decimal to string for serialization
+    return {
+      ...hotel,
+      pricePerNight: hotel.pricePerNight.toString(),
+    };
   } catch (error) {
+    console.error("Error fetching hotel:", error);
     return null;
   }
 }
@@ -99,7 +117,7 @@ export default async function HotelDetailPage({ params }: PageProps) {
                 src={hotel.images?.[0] || "/placeholder-hotel.jpg"}
                 alt={hotel.name}
                 fill
-                className="object-cover transition-transform duration-700 "
+                className="object-cover transition-transform duration-700"
                 priority
               />
               <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
