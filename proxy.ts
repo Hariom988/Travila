@@ -19,7 +19,6 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get('adminToken')?.value;
 
   if (!token) {
-    console.log('❌ No token found, redirecting to login');
     return NextResponse.redirect(new URL('/admin/login', request.url));
   }
 
@@ -27,14 +26,11 @@ export function proxy(request: NextRequest) {
     const decoded = verifyTokenSync(token);
     
     if (!decoded) {
-      console.log('❌ Token verification failed, redirecting to login');
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
-    console.log('✅ Token verified, allowing access');
     return NextResponse.next();
   } catch (error) {
-    console.log('❌ Token error:', error);
     return NextResponse.redirect(new URL('/admin/login', request.url));
   }
 }
@@ -51,14 +47,12 @@ function verifyTokenSync(token: string): boolean {
     if (payload.exp) {
       const expirationTime = payload.exp * 1000; 
       if (Date.now() > expirationTime) {
-        console.log('❌ Token expired');
         return false;
       }
     }
 
     return true;
   } catch (error) {
-    console.log('❌ Token parse error:', error);
     return false;
   }
 }

@@ -4,7 +4,6 @@ import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 import { logActivity } from '@/lib/activity-logger';
 
-// GET all hotels - PUBLIC (no authentication required)
 export async function GET(request: NextRequest) {
   try {
     const hotels = await prisma.hotel.findMany({

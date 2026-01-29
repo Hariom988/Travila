@@ -1,3 +1,4 @@
+
 // lib/activity-logger.ts
 import { prisma } from './prisma';
 

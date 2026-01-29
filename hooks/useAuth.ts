@@ -11,16 +11,13 @@ export function useAuth() {
   useEffect(() => {
     const verifyAuth = async () => {
       try {
-        console.log('Verifying authentication...');
         const response = await fetch('/api/auth/verify');
         
         if (response.ok) {
           const data = await response.json();
-          console.log('Auth verified:', data.user);
           setIsAuthenticated(true);
           setUser(data.user);
         } else {
-          console.log('Auth verification failed');
           setIsAuthenticated(false);
           router.push('/admin/login');
         }

@@ -28,6 +28,17 @@ interface Hotel {
 
 interface Activity {
   id: string;
+  name: string;
+  location: string;
+  description: string;
+  pricePerPerson: string;
+  duration: string;
+  images: string[];
+  createdAt: string;
+}
+
+interface ActivityLog {
+  id: string;
   action: string;
   details: string;
   timestamp: string;
@@ -41,16 +52,20 @@ interface FormData {
   name: string;
   location: string;
   description: string;
-  pricePerNight: string;
-  facilities: string;
+  price: string;
+  duration?: string;
+  facilities?: string;
   images: string[];
 }
 
+type TabType = "hotels" | "activities" | "logs";
+
 export default function AdminDashboard() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"hotels" | "activity">("hotels");
+  const [activeTab, setActiveTab] = useState<TabType>("hotels");
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -58,17 +73,74 @@ export default function AdminDashboard() {
   const [formError, setFormError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [expandedHotel, setExpandedHotel] = useState<string | null>(null);
-  const [expandedActivity, setExpandedActivity] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
     location: "",
     description: "",
-    pricePerNight: "",
+    price: "",
+    duration: "",
     facilities: "",
     images: [],
   });
+
+  // Tab configuration
+  const tabConfig = {
+    hotels: {
+      label: "Hotels",
+      endpoint: "/api/hotels",
+      addLabel: "Add Hotel",
+      modalTitle: (editing: boolean) =>
+        editing ? "Edit Hotel" : "Add New Hotel",
+      successMsg: (editing: boolean) =>
+        editing ? "Hotel updated successfully!" : "Hotel added successfully!",
+      fields: [
+        "name",
+        "location",
+        "description",
+        "price",
+        "facilities",
+        "images",
+      ] as const,
+      priceLabel: "Price per Night (₹)",
+      extraField: "facilities",
+      hasToggle: true,
+    },
+    activities: {
+      label: "Activities",
+      endpoint: "/api/activity-management",
+      addLabel: "Add Activity",
+      modalTitle: (editing: boolean) =>
+        editing ? "Edit Activity" : "Add New Activity",
+      successMsg: (editing: boolean) =>
+        editing
+          ? "Activity updated successfully!"
+          : "Activity added successfully!",
+      fields: [
+        "name",
+        "location",
+        "description",
+        "price",
+        "duration",
+        "images",
+      ] as const,
+      priceLabel: "Price per Person (₹)",
+      extraField: "duration",
+      hasToggle: false,
+    },
+    logs: {
+      label: "Activity Logs",
+      endpoint: "/api/activities",
+      addLabel: "",
+      modalTitle: () => "",
+      successMsg: () => "",
+      fields: [] as const,
+      priceLabel: "",
+      extraField: "",
+      hasToggle: false,
+    },
+  };
 
   useEffect(() => {
     fetchData();
@@ -78,36 +150,30 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       if (activeTab === "hotels") {
-        await fetchHotels();
+        await fetchItems("hotels");
+      } else if (activeTab === "activities") {
+        await fetchItems("activities");
       } else {
-        await fetchActivities();
+        await fetchItems("logs");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchHotels = async () => {
+  const fetchItems = async (type: TabType) => {
     try {
-      const response = await fetch("/api/hotels");
-      if (!response.ok) throw new Error("Failed to fetch hotels");
+      const endpoint = tabConfig[type].endpoint;
+      const response = await fetch(endpoint);
+      if (!response.ok) throw new Error(`Failed to fetch ${type}`);
       const data = await response.json();
-      setHotels(data);
-    } catch (error) {
-      console.error("Error fetching hotels:", error);
-      setFormError("Failed to load hotels");
-    }
-  };
 
-  const fetchActivities = async () => {
-    try {
-      const response = await fetch("/api/activities");
-      if (!response.ok) throw new Error("Failed to fetch activities");
-      const data = await response.json();
-      setActivities(data);
+      if (type === "hotels") setHotels(data);
+      else if (type === "activities") setActivities(data);
+      else setLogs(data);
     } catch (error) {
-      console.error("Error fetching activities:", error);
-      setFormError("Failed to load activities");
+      console.error(`Error fetching ${type}:`, error);
+      setFormError(`Failed to load ${type}`);
     }
   };
 
@@ -116,8 +182,9 @@ export default function AdminDashboard() {
       name: "",
       location: "",
       description: "",
-      pricePerNight: "",
-      facilities: "",
+      price: "",
+      duration: activeTab === "activities" ? "" : undefined,
+      facilities: activeTab === "hotels" ? "" : undefined,
       images: [],
     });
     setEditingId(null);
@@ -126,16 +193,29 @@ export default function AdminDashboard() {
     setIsModalOpen(true);
   };
 
-  const handleEditClick = (hotel: Hotel) => {
-    setFormData({
-      name: hotel.name,
-      location: hotel.location,
-      description: "",
-      pricePerNight: hotel.pricePerNight,
-      facilities: hotel.facilities.join(", "),
-      images: hotel.images || [],
-    });
-    setEditingId(hotel.id);
+  const handleEditClick = (item: Hotel | Activity) => {
+    if (activeTab === "hotels") {
+      const hotel = item as Hotel;
+      setFormData({
+        name: hotel.name,
+        location: hotel.location,
+        description: "",
+        price: hotel.pricePerNight,
+        facilities: (hotel.facilities || []).join(", "),
+        images: hotel.images || [],
+      });
+    } else {
+      const activity = item as Activity;
+      setFormData({
+        name: activity.name,
+        location: activity.location,
+        description: activity.description,
+        price: activity.pricePerPerson,
+        duration: activity.duration,
+        images: activity.images || [],
+      });
+    }
+    setEditingId(item.id);
     setFormError("");
     setSuccessMessage("");
     setIsModalOpen(true);
@@ -143,15 +223,19 @@ export default function AdminDashboard() {
 
   const validateForm = (): boolean => {
     if (!formData.name.trim()) {
-      setFormError("Hotel name is required");
+      setFormError("Name is required");
       return false;
     }
     if (!formData.location.trim()) {
       setFormError("Location is required");
       return false;
     }
-    if (!formData.pricePerNight || parseFloat(formData.pricePerNight) <= 0) {
+    if (!formData.price || parseFloat(formData.price) <= 0) {
       setFormError("Valid price is required");
+      return false;
+    }
+    if (activeTab === "activities" && !formData.duration?.trim()) {
+      setFormError("Duration is required");
       return false;
     }
     return true;
@@ -162,22 +246,29 @@ export default function AdminDashboard() {
 
     setIsSubmitting(true);
     try {
-      const facilitiesArray = formData.facilities
-        .split(",")
-        .map((f) => f.trim())
-        .filter((f) => f.length > 0);
+      const endpoint = tabConfig[activeTab].endpoint;
 
-      const payload = {
+      let payload: any = {
         name: formData.name.trim(),
         location: formData.location.trim(),
         description: formData.description.trim(),
-        pricePerNight: parseFloat(formData.pricePerNight),
-        facilities: facilitiesArray,
+        [activeTab === "hotels" ? "pricePerNight" : "pricePerPerson"]:
+          parseFloat(formData.price),
         images: formData.images,
       };
 
+      if (activeTab === "hotels") {
+        payload.facilities =
+          formData.facilities
+            ?.split(",")
+            .map((f) => f.trim())
+            .filter((f) => f.length > 0) || [];
+      } else {
+        payload.duration = formData.duration;
+      }
+
       const response = await fetch(
-        editingId ? `/api/hotels/${editingId}` : "/api/hotels",
+        editingId ? `${endpoint}/${editingId}` : endpoint,
         {
           method: editingId ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -190,12 +281,9 @@ export default function AdminDashboard() {
         throw new Error(error.error || "Operation failed");
       }
 
-      setSuccessMessage(
-        editingId ? "Hotel updated successfully!" : "Hotel added successfully!",
-      );
+      setSuccessMessage(tabConfig[activeTab].successMsg(!!editingId));
       setIsModalOpen(false);
-      await fetchHotels();
-
+      await fetchItems(activeTab);
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "Operation failed");
@@ -220,10 +308,27 @@ export default function AdminDashboard() {
       setSuccessMessage(
         !currentStatus ? "Hotel activated!" : "Hotel deactivated!",
       );
-      await fetchHotels();
+      await fetchItems("hotels");
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "Operation failed");
+    }
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
+
+    try {
+      const endpoint = tabConfig[activeTab].endpoint;
+      const response = await fetch(`${endpoint}/${id}`, { method: "DELETE" });
+
+      if (!response.ok) throw new Error("Failed to delete");
+
+      setSuccessMessage("Deleted successfully!");
+      await fetchItems(activeTab);
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : "Delete failed");
     }
   };
 
@@ -253,17 +358,31 @@ export default function AdminDashboard() {
     }));
   };
 
-  const filteredHotels = hotels.filter(
-    (hotel) =>
-      hotel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hotel.location.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  // Filter items based on search
+  const getFilteredItems = () => {
+    if (activeTab === "hotels") {
+      return hotels.filter(
+        (h) =>
+          h.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          h.location.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+    } else if (activeTab === "activities") {
+      return activities.filter(
+        (a) =>
+          a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          a.location.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+    } else {
+      return logs.filter(
+        (l) =>
+          l.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          l.action.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+    }
+  };
 
-  const filteredActivities = activities.filter(
-    (activity) =>
-      activity.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      activity.action.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredItems = getFilteredItems();
+  const currentConfig = tabConfig[activeTab];
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -289,29 +408,22 @@ export default function AdminDashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-gray-800 border-b border-gray-700 sticky top-[72px] z-30">
+      <div className="bg-gray-800 border-b border-gray-700 sticky top-18 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex gap-8">
-            <button
-              onClick={() => setActiveTab("hotels")}
-              className={`py-4 px-2 font-medium transition border-b-2 ${
-                activeTab === "hotels"
-                  ? "text-blue-400 border-blue-400"
-                  : "text-gray-400 border-transparent hover:text-gray-300"
-              }`}
-            >
-              Hotels
-            </button>
-            <button
-              onClick={() => setActiveTab("activity")}
-              className={`py-4 px-2 font-medium transition border-b-2 ${
-                activeTab === "activity"
-                  ? "text-blue-400 border-blue-400"
-                  : "text-gray-400 border-transparent hover:text-gray-300"
-              }`}
-            >
-              Activity
-            </button>
+          <div className="flex gap-8 overflow-x-auto">
+            {(["hotels", "activities", "logs"] as TabType[]).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`py-4 px-2 font-medium transition border-b-2 whitespace-nowrap ${
+                  activeTab === tab
+                    ? "text-blue-400 border-blue-400"
+                    : "text-gray-400 border-transparent hover:text-gray-300"
+                }`}
+              >
+                {tabConfig[tab].label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -333,8 +445,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Hotels Tab */}
-        {activeTab === "hotels" && (
+        {activeTab !== "logs" && (
           <>
             {/* Controls */}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
@@ -345,7 +456,7 @@ export default function AdminDashboard() {
                 />
                 <input
                   type="text"
-                  placeholder="Search hotels..."
+                  placeholder={`Search ${currentConfig.label.toLowerCase()}...`}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 text-sm"
@@ -355,7 +466,7 @@ export default function AdminDashboard() {
                 onClick={handleAddClick}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-medium text-sm whitespace-nowrap w-full sm:w-auto justify-center sm:justify-start"
               >
-                <Plus size={18} /> Add Hotel
+                <Plus size={18} /> {currentConfig.addLabel}
               </button>
             </div>
 
@@ -364,19 +475,22 @@ export default function AdminDashboard() {
               {loading ? (
                 <div className="p-12 text-center">
                   <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-gray-400">Loading hotels...</p>
+                  <p className="text-gray-400">Loading...</p>
                 </div>
-              ) : filteredHotels.length === 0 ? (
+              ) : filteredItems.length === 0 ? (
                 <div className="p-12 text-center">
                   <p className="text-gray-400 mb-4">
-                    {searchTerm ? "No hotels found" : "No hotels yet"}
+                    {searchTerm
+                      ? "No results found"
+                      : `No ${currentConfig.label.toLowerCase()} yet`}
                   </p>
                   {!searchTerm && (
                     <button
                       onClick={handleAddClick}
                       className="text-blue-400 hover:text-blue-300"
                     >
-                      Add your first hotel
+                      Add your first{" "}
+                      {currentConfig.label.toLowerCase().slice(0, -1)}
                     </button>
                   )}
                 </div>
@@ -392,93 +506,126 @@ export default function AdminDashboard() {
                           Location
                         </th>
                         <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                          Price/Night
+                          Price
                         </th>
-                        <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                          Facilities
-                        </th>
-                        <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                          Status
-                        </th>
+                        {activeTab === "hotels" && (
+                          <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                            Facilities
+                          </th>
+                        )}
+                        {activeTab === "activities" && (
+                          <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                            Duration
+                          </th>
+                        )}
+                        {activeTab === "hotels" && (
+                          <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                            Status
+                          </th>
+                        )}
                         <th className="px-6 py-4 text-left font-semibold text-gray-200">
                           Actions
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700">
-                      {filteredHotels.map((hotel) => (
+                      {filteredItems.map((item: any) => (
                         <tr
-                          key={hotel.id}
+                          key={item.id}
                           className="hover:bg-gray-750 transition"
                         >
                           <td className="px-6 py-4 text-white font-medium">
-                            {hotel.name}
+                            {item.name}
                           </td>
                           <td className="px-6 py-4 text-gray-300">
-                            {hotel.location}
+                            {item.location}
                           </td>
                           <td className="px-6 py-4 text-gray-300">
-                            ₹{hotel.pricePerNight}
+                            ₹
+                            {activeTab === "hotels"
+                              ? item.pricePerNight
+                              : item.pricePerPerson}
                           </td>
-                          <td className="px-6 py-4">
-                            <div className="flex flex-wrap gap-1">
-                              {hotel.facilities &&
-                              hotel.facilities.length > 0 ? (
-                                hotel.facilities.map((facility, idx) => (
-                                  <span
-                                    key={idx}
-                                    className="inline-block px-2 py-1 bg-purple-900/30 text-purple-300 text-xs rounded"
-                                  >
-                                    {facility}
+                          {activeTab === "hotels" && (
+                            <td className="px-6 py-4">
+                              <div className="flex flex-wrap gap-1">
+                                {item.facilities?.length > 0 ? (
+                                  item.facilities.map(
+                                    (f: string, idx: number) => (
+                                      <span
+                                        key={idx}
+                                        className="px-2 py-1 bg-purple-900/30 text-purple-300 text-xs rounded"
+                                      >
+                                        {f}
+                                      </span>
+                                    ),
+                                  )
+                                ) : (
+                                  <span className="text-gray-500 text-xs">
+                                    —
                                   </span>
-                                ))
-                              ) : (
-                                <span className="text-gray-500 text-xs">
-                                  No facilities
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition ${
-                                hotel.available
-                                  ? "bg-green-900/30 text-green-300 hover:bg-green-900/50"
-                                  : "bg-red-900/30 text-red-300 hover:bg-red-900/50"
-                              }`}
-                              onClick={() =>
-                                handleToggleAvailability(
-                                  hotel.id,
-                                  hotel.available,
-                                )
-                              }
-                            >
-                              {hotel.available ? "Active" : "Inactive"}
-                            </span>
-                          </td>
+                                )}
+                              </div>
+                            </td>
+                          )}
+                          {activeTab === "activities" && (
+                            <td className="px-6 py-4 text-gray-300">
+                              {item.duration}
+                            </td>
+                          )}
+                          {activeTab === "hotels" && (
+                            <td className="px-6 py-4">
+                              <span
+                                className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition ${
+                                  item.available
+                                    ? "bg-green-900/30 text-green-300 hover:bg-green-900/50"
+                                    : "bg-red-900/30 text-red-300 hover:bg-red-900/50"
+                                }`}
+                                onClick={() =>
+                                  handleToggleAvailability(
+                                    item.id,
+                                    item.available,
+                                  )
+                                }
+                              >
+                                {item.available ? "Active" : "Inactive"}
+                              </span>
+                            </td>
+                          )}
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
                               <button
-                                onClick={() => handleEditClick(hotel)}
+                                onClick={() => handleEditClick(item)}
                                 className="p-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition"
                               >
                                 <Edit2 size={16} />
                               </button>
-                              <button
-                                onClick={() =>
-                                  handleToggleAvailability(
-                                    hotel.id,
-                                    hotel.available,
-                                  )
-                                }
-                                className={`p-2 rounded transition ${
-                                  hotel.available
-                                    ? "bg-gray-700 hover:bg-red-600 text-gray-300"
-                                    : "bg-gray-700 hover:bg-green-600 text-gray-300"
-                                }`}
-                              >
-                                <Trash2 size={16} />
-                              </button>
+                              {activeTab === "hotels" ? (
+                                <button
+                                  onClick={() =>
+                                    handleToggleAvailability(
+                                      item.id,
+                                      item.available,
+                                    )
+                                  }
+                                  className={`p-2 rounded transition ${
+                                    item.available
+                                      ? "bg-gray-700 hover:bg-red-600 text-gray-300"
+                                      : "bg-gray-700 hover:bg-green-600 text-gray-300"
+                                  }`}
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() =>
+                                    handleDelete(item.id, item.name)
+                                  }
+                                  className="p-2 bg-gray-700 hover:bg-red-600 text-gray-300 rounded transition"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -494,125 +641,158 @@ export default function AdminDashboard() {
               {loading ? (
                 <div className="p-12 text-center">
                   <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-gray-400">Loading hotels...</p>
+                  <p className="text-gray-400">Loading...</p>
                 </div>
-              ) : filteredHotels.length === 0 ? (
+              ) : filteredItems.length === 0 ? (
                 <div className="p-8 text-center bg-gray-800 rounded-lg">
                   <p className="text-gray-400 mb-4">
-                    {searchTerm ? "No hotels found" : "No hotels yet"}
+                    {searchTerm
+                      ? "No results found"
+                      : `No ${currentConfig.label.toLowerCase()} yet`}
                   </p>
                 </div>
               ) : (
-                filteredHotels.map((hotel) => (
+                filteredItems.map((item: any) => (
                   <div
-                    key={hotel.id}
+                    key={item.id}
                     className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden"
                   >
                     {/* Collapsed View */}
                     <div
                       className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-750 transition"
                       onClick={() =>
-                        setExpandedHotel(
-                          expandedHotel === hotel.id ? null : hotel.id,
-                        )
+                        setExpandedId(expandedId === item.id ? null : item.id)
                       }
                     >
                       <div className="flex-1 min-w-0">
                         <h3 className="text-white font-medium truncate">
-                          {hotel.name}
+                          {item.name}
                         </h3>
                         <p className="text-gray-400 text-sm">
-                          ₹{hotel.pricePerNight}/night
+                          ₹
+                          {activeTab === "hotels"
+                            ? item.pricePerNight
+                            : item.pricePerPerson}
                         </p>
                       </div>
 
                       <div className="flex items-center gap-3 ml-4">
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
-                            hotel.available
-                              ? "bg-green-900/30 text-green-300"
-                              : "bg-red-900/30 text-red-300"
-                          }`}
-                        >
-                          {hotel.available ? "Active" : "Inactive"}
-                        </span>
+                        {activeTab === "hotels" && (
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
+                              item.available
+                                ? "bg-green-900/30 text-green-300"
+                                : "bg-red-900/30 text-red-300"
+                            }`}
+                          >
+                            {item.available ? "Active" : "Inactive"}
+                          </span>
+                        )}
                         <ChevronDown
                           size={20}
-                          className={`text-gray-400 transition ${
-                            expandedHotel === hotel.id ? "rotate-180" : ""
-                          }`}
+                          className={`text-gray-400 transition ${expandedId === item.id ? "rotate-180" : ""}`}
                         />
                       </div>
                     </div>
 
                     {/* Expanded View */}
-                    {expandedHotel === hotel.id && (
+                    {expandedId === item.id && (
                       <div className="border-t border-gray-700 p-4 space-y-4 bg-gray-750">
                         <div>
                           <p className="text-gray-400 text-sm">Location</p>
                           <p className="text-white font-medium">
-                            {hotel.location}
+                            {item.location}
                           </p>
                         </div>
 
-                        <div>
-                          <p className="text-gray-400 text-sm">Facilities</p>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {hotel.facilities && hotel.facilities.length > 0 ? (
-                              hotel.facilities.map((facility, idx) => (
-                                <span
-                                  key={idx}
-                                  className="px-2 py-1 bg-purple-900/30 text-purple-300 text-xs rounded"
-                                >
-                                  {facility}
-                                </span>
-                              ))
-                            ) : (
-                              <span className="text-gray-500 text-xs">
-                                No facilities
-                              </span>
-                            )}
+                        {activeTab === "activities" && (
+                          <div>
+                            <p className="text-gray-400 text-sm">Duration</p>
+                            <p className="text-white font-medium">
+                              {item.duration}
+                            </p>
                           </div>
-                        </div>
+                        )}
 
-                        {hotel.images && hotel.images.length > 0 && (
+                        {item.description && (
+                          <div>
+                            <p className="text-gray-400 text-sm">Description</p>
+                            <p className="text-gray-300 text-sm">
+                              {item.description}
+                            </p>
+                          </div>
+                        )}
+
+                        {activeTab === "hotels" &&
+                          item.facilities?.length > 0 && (
+                            <div>
+                              <p className="text-gray-400 text-sm mb-2">
+                                Facilities
+                              </p>
+                              <div className="flex flex-wrap gap-1">
+                                {item.facilities.map(
+                                  (f: string, idx: number) => (
+                                    <span
+                                      key={idx}
+                                      className="px-2 py-1 bg-purple-900/30 text-purple-300 text-xs rounded"
+                                    >
+                                      {f}
+                                    </span>
+                                  ),
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                        {item.images?.length > 0 && (
                           <div>
                             <p className="text-gray-400 text-sm mb-2">Images</p>
                             <div className="grid grid-cols-2 gap-2">
-                              {hotel.images.slice(0, 4).map((image, idx) => (
-                                <img
-                                  key={idx}
-                                  src={image}
-                                  alt={`Hotel ${idx + 1}`}
-                                  className="h-20 object-cover rounded border border-gray-600"
-                                />
-                              ))}
+                              {item.images
+                                .slice(0, 4)
+                                .map((img: string, idx: number) => (
+                                  <img
+                                    key={idx}
+                                    src={img}
+                                    alt={`${item.name} ${idx + 1}`}
+                                    className="h-20 object-cover rounded border border-gray-600"
+                                  />
+                                ))}
                             </div>
                           </div>
                         )}
 
                         <div className="flex gap-2 pt-2">
                           <button
-                            onClick={() => handleEditClick(hotel)}
+                            onClick={() => handleEditClick(item)}
                             className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition flex items-center justify-center gap-2"
                           >
                             <Edit2 size={16} /> Edit
                           </button>
-                          <button
-                            onClick={() =>
-                              handleToggleAvailability(
-                                hotel.id,
-                                hotel.available,
-                              )
-                            }
-                            className={`flex-1 py-2 rounded text-sm font-medium transition ${
-                              hotel.available
-                                ? "bg-red-600 hover:bg-red-700 text-white"
-                                : "bg-green-600 hover:bg-green-700 text-white"
-                            }`}
-                          >
-                            {hotel.available ? "Deactivate" : "Activate"}
-                          </button>
+                          {activeTab === "hotels" ? (
+                            <button
+                              onClick={() =>
+                                handleToggleAvailability(
+                                  item.id,
+                                  item.available,
+                                )
+                              }
+                              className={`flex-1 py-2 rounded text-sm font-medium transition ${
+                                item.available
+                                  ? "bg-red-600 hover:bg-red-700 text-white"
+                                  : "bg-green-600 hover:bg-green-700 text-white"
+                              }`}
+                            >
+                              {item.available ? "Deactivate" : "Activate"}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleDelete(item.id, item.name)}
+                              className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-medium transition"
+                            >
+                              Delete
+                            </button>
+                          )}
                         </div>
                       </div>
                     )}
@@ -623,24 +803,21 @@ export default function AdminDashboard() {
           </>
         )}
 
-        {/* Activity Tab */}
-        {activeTab === "activity" && (
+        {/* Activity Logs Tab */}
+        {activeTab === "logs" && (
           <>
-            {/* Controls */}
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
-              <div className="relative w-full sm:w-64">
-                <Search
-                  className="absolute left-3 top-3 text-gray-500"
-                  size={18}
-                />
-                <input
-                  type="text"
-                  placeholder="Search by admin or action..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 text-sm"
-                />
-              </div>
+            <div className="relative w-full sm:w-64 mb-6">
+              <Search
+                className="absolute left-3 top-3 text-gray-500"
+                size={18}
+              />
+              <input
+                type="text"
+                placeholder="Search logs..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 text-sm"
+              />
             </div>
 
             {/* Desktop Table */}
@@ -648,11 +825,11 @@ export default function AdminDashboard() {
               {loading ? (
                 <div className="p-12 text-center">
                   <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-gray-400">Loading activities...</p>
+                  <p className="text-gray-400">Loading activity logs...</p>
                 </div>
-              ) : filteredActivities.length === 0 ? (
+              ) : filteredItems.length === 0 ? (
                 <div className="p-12 text-center">
-                  <p className="text-gray-400">No activities yet</p>
+                  <p className="text-gray-400">No activity logs yet</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -674,32 +851,32 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700">
-                      {filteredActivities.map((activity) => (
+                      {filteredItems.map((log: any) => (
                         <tr
-                          key={activity.id}
+                          key={log.id}
                           className="hover:bg-gray-750 transition"
                         >
                           <td className="px-6 py-4">
                             <div>
                               <p className="text-white font-medium">
-                                {activity.user.name || "Admin"}
+                                {log.user.name || "Admin"}
                               </p>
                               <p className="text-gray-400 text-xs">
-                                {activity.user.email}
+                                {log.user.email}
                               </p>
                             </div>
                           </td>
                           <td className="px-6 py-4">
                             <span className="px-3 py-1 bg-blue-900/30 text-blue-300 text-xs rounded font-medium">
-                              {activity.action}
+                              {log.action}
                             </span>
                           </td>
                           <td className="px-6 py-4 text-gray-300 max-w-xs truncate">
-                            {activity.details || "—"}
+                            {log.details || "—"}
                           </td>
                           <td className="px-6 py-4 text-gray-400 text-sm">
-                            {new Date(activity.timestamp).toLocaleDateString()}{" "}
-                            {new Date(activity.timestamp).toLocaleTimeString()}
+                            {new Date(log.timestamp).toLocaleDateString()}{" "}
+                            {new Date(log.timestamp).toLocaleTimeString()}
                           </td>
                         </tr>
                       ))}
@@ -714,63 +891,59 @@ export default function AdminDashboard() {
               {loading ? (
                 <div className="p-12 text-center">
                   <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-gray-400">Loading activities...</p>
+                  <p className="text-gray-400">Loading logs...</p>
                 </div>
-              ) : filteredActivities.length === 0 ? (
+              ) : filteredItems.length === 0 ? (
                 <div className="p-8 text-center bg-gray-800 rounded-lg">
-                  <p className="text-gray-400">No activities yet</p>
+                  <p className="text-gray-400">No activity logs yet</p>
                 </div>
               ) : (
-                filteredActivities.map((activity) => (
+                filteredItems.map((log: any) => (
                   <div
-                    key={activity.id}
+                    key={log.id}
                     className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden"
                   >
                     <div
                       className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-750 transition"
                       onClick={() =>
-                        setExpandedActivity(
-                          expandedActivity === activity.id ? null : activity.id,
-                        )
+                        setExpandedId(expandedId === log.id ? null : log.id)
                       }
                     >
                       <div className="flex-1 min-w-0">
                         <h3 className="text-white font-medium truncate">
-                          {activity.action}
+                          {log.action}
                         </h3>
                         <p className="text-gray-400 text-sm">
-                          {activity.user.email}
+                          {log.user.email}
                         </p>
                       </div>
                       <ChevronDown
                         size={20}
-                        className={`text-gray-400 transition ml-2 ${
-                          expandedActivity === activity.id ? "rotate-180" : ""
-                        }`}
+                        className={`text-gray-400 transition ml-2 ${expandedId === log.id ? "rotate-180" : ""}`}
                       />
                     </div>
 
-                    {expandedActivity === activity.id && (
+                    {expandedId === log.id && (
                       <div className="border-t border-gray-700 p-4 space-y-3 bg-gray-750">
                         <div>
                           <p className="text-gray-400 text-sm">Admin Name</p>
                           <p className="text-white font-medium">
-                            {activity.user.name || "Admin"}
+                            {log.user.name || "Admin"}
                           </p>
                         </div>
 
                         <div>
                           <p className="text-gray-400 text-sm">Details</p>
                           <p className="text-gray-300">
-                            {activity.details || "No details"}
+                            {log.details || "No details"}
                           </p>
                         </div>
 
                         <div>
                           <p className="text-gray-400 text-sm">Time</p>
                           <p className="text-gray-300">
-                            {new Date(activity.timestamp).toLocaleDateString()}{" "}
-                            {new Date(activity.timestamp).toLocaleTimeString()}
+                            {new Date(log.timestamp).toLocaleDateString()}{" "}
+                            {new Date(log.timestamp).toLocaleTimeString()}
                           </p>
                         </div>
                       </div>
@@ -783,13 +956,13 @@ export default function AdminDashboard() {
         )}
       </div>
 
-      {/* Modal - Same as before */}
-      {isModalOpen && (
+      {/* Modal */}
+      {isModalOpen && activeTab !== "logs" && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-white">
-                {editingId ? "Edit Hotel" : "Add New Hotel"}
+                {currentConfig.modalTitle(!!editingId)}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -811,7 +984,7 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Hotel Name *
+                    {activeTab === "hotels" ? "Hotel" : "Activity"} Name *
                   </label>
                   <input
                     type="text"
@@ -821,7 +994,11 @@ export default function AdminDashboard() {
                     }
                     disabled={isSubmitting}
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
-                    placeholder="e.g., Azure Paradise Resort"
+                    placeholder={
+                      activeTab === "hotels"
+                        ? "e.g., Azure Paradise Resort"
+                        : "e.g., Taj Mahal Sunrise Tour"
+                    }
                   />
                 </div>
 
@@ -837,7 +1014,7 @@ export default function AdminDashboard() {
                     }
                     disabled={isSubmitting}
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
-                    placeholder="e.g., Maldives"
+                    placeholder="e.g., Agra, Uttar Pradesh"
                   />
                 </div>
               </div>
@@ -854,24 +1031,21 @@ export default function AdminDashboard() {
                   disabled={isSubmitting}
                   rows={3}
                   className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
-                  placeholder="Hotel description..."
+                  placeholder="Description..."
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Price per Night *
+                    {currentConfig.priceLabel} *
                   </label>
                   <input
                     type="number"
                     step="0.01"
-                    value={formData.pricePerNight}
+                    value={formData.price}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        pricePerNight: e.target.value,
-                      })
+                      setFormData({ ...formData, price: e.target.value })
                     }
                     disabled={isSubmitting}
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
@@ -881,17 +1055,31 @@ export default function AdminDashboard() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Facilities (comma-separated)
+                    {activeTab === "activities" ? "Duration" : "Facilities"}{" "}
+                    {activeTab === "activities" ? "*" : ""}
                   </label>
                   <input
                     type="text"
-                    value={formData.facilities}
+                    value={
+                      activeTab === "activities"
+                        ? formData.duration
+                        : formData.facilities
+                    }
                     onChange={(e) =>
-                      setFormData({ ...formData, facilities: e.target.value })
+                      activeTab === "activities"
+                        ? setFormData({ ...formData, duration: e.target.value })
+                        : setFormData({
+                            ...formData,
+                            facilities: e.target.value,
+                          })
                     }
                     disabled={isSubmitting}
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
-                    placeholder="e.g., WiFi, Pool, Gym, Spa"
+                    placeholder={
+                      activeTab === "activities"
+                        ? "e.g., 4 hours, Full Day"
+                        : "e.g., WiFi, Pool, Gym, Spa"
+                    }
                   />
                 </div>
               </div>
@@ -899,7 +1087,7 @@ export default function AdminDashboard() {
               {/* Image Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Hotel Images
+                  {activeTab === "hotels" ? "Hotel" : "Activity"} Images
                 </label>
                 <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-gray-500 transition">
                   <div className="flex items-center gap-2 text-gray-400">
@@ -922,7 +1110,7 @@ export default function AdminDashboard() {
                       <div key={idx} className="relative group">
                         <img
                           src={image}
-                          alt={`Hotel ${idx + 1}`}
+                          alt={`Image ${idx + 1}`}
                           className="w-full h-24 object-cover rounded border border-gray-600"
                         />
                         <button
@@ -955,7 +1143,8 @@ export default function AdminDashboard() {
                 {isSubmitting && (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 )}
-                {editingId ? "Update" : "Add"} Hotel
+                {editingId ? "Update" : "Add"}{" "}
+                {activeTab === "hotels" ? "Hotel" : "Activity"}
               </button>
             </div>
           </div>
