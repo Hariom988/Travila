@@ -1,6 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Calendar, Users, ShieldCheck, X } from "lucide-react";
+import {
+  Calendar,
+  Users,
+  ShieldCheck,
+  X,
+  Check,
+  AlertCircle,
+} from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
 
 // Client-only wrapper to prevent hydration errors
 function ClientOnly({ children }: { children: React.ReactNode }) {
@@ -40,7 +48,7 @@ const getTodayDate = (): string => {
 
 const getTomorrowDate = (): string => {
   const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 2);
+  tomorrow.setDate(tomorrow.getDate() + 1);
   return formatDateToLocal(tomorrow);
 };
 
@@ -73,13 +81,13 @@ const DatePicker = ({
 
   const handlePrevMonth = () => {
     setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1),
     );
   };
 
   const handleNextMonth = () => {
     setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1),
     );
   };
 
@@ -97,17 +105,6 @@ const DatePicker = ({
     month: "long",
     year: "numeric",
   });
-
-  const colorClasses = {
-    green: {
-      header: "bg-linear-to-r from-green-600 to-green-700",
-      hover: "hover:bg-green-500",
-    },
-    orange: {
-      header: "bg-linear-to-r from-orange-600 to-orange-700",
-      hover: "hover:bg-orange-500",
-    },
-  };
 
   return (
     <div className="bg-[#1D2939] rounded-xl shadow-2xl p-4 border border-[#344054]">
@@ -185,18 +182,30 @@ const DatePicker = ({
 };
 
 interface BookingCardProps {
-  hotelPrice: string; // e.g., "600" or "600.00"
+  hotelPrice: string;
   hotelName: string;
+  hotelId: string;
 }
 
-export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps) {
-  // Initialize from localStorage
+export default function BookingCard({
+  hotelPrice,
+  hotelName,
+  hotelId,
+}: BookingCardProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Initialize from localStorage with Try/Catch safety
   const [checkIn, setCheckIn] = useState(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("hotelSearch");
       if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.checkIn || getTodayDate();
+        try {
+          const parsed = JSON.parse(stored);
+          return parsed.checkIn || getTodayDate();
+        } catch {
+          return getTodayDate();
+        }
       }
     }
     return getTodayDate();
@@ -206,8 +215,12 @@ export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps)
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("hotelSearch");
       if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.checkOut || getTomorrowDate();
+        try {
+          const parsed = JSON.parse(stored);
+          return parsed.checkOut || getTomorrowDate();
+        } catch {
+          return getTomorrowDate();
+        }
       }
     }
     return getTomorrowDate();
@@ -217,8 +230,12 @@ export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps)
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("hotelSearch");
       if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.rooms || 1;
+        try {
+          const parsed = JSON.parse(stored);
+          return parsed.rooms || 1;
+        } catch {
+          return 1;
+        }
       }
     }
     return 1;
@@ -228,8 +245,12 @@ export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps)
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("hotelSearch");
       if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.adults || 2;
+        try {
+          const parsed = JSON.parse(stored);
+          return parsed.adults || 2;
+        } catch {
+          return 2;
+        }
       }
     }
     return 2;
@@ -239,12 +260,21 @@ export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps)
     "in" | "out" | null
   >(null);
   const [showGuestsModal, setShowGuestsModal] = useState(false);
+  const [isBooking, setIsBooking] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState<any>(null);
 
   // Sync with localStorage when values change
   useEffect(() => {
     const stored = localStorage.getItem("hotelSearch");
-    const currentSearch = stored ? JSON.parse(stored) : {};
-    
+    let currentSearch = {};
+    try {
+      currentSearch = stored ? JSON.parse(stored) : {};
+    } catch {
+      currentSearch = {};
+    }
+
     const updatedSearch = {
       ...currentSearch,
       checkIn,
@@ -252,9 +282,8 @@ export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps)
       rooms,
       adults,
     };
-    
+
     localStorage.setItem("hotelSearch", JSON.stringify(updatedSearch));
-    // Dispatch event to notify SearchBar
     window.dispatchEvent(new Event("hotelSearchUpdate"));
   }, [checkIn, checkOut, rooms, adults]);
 
@@ -263,11 +292,15 @@ export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps)
     const handleStorageChange = () => {
       const stored = localStorage.getItem("hotelSearch");
       if (stored) {
-        const parsed = JSON.parse(stored);
-        setCheckIn(parsed.checkIn || getTodayDate());
-        setCheckOut(parsed.checkOut || getTomorrowDate());
-        setRooms(parsed.rooms || 1);
-        setAdults(parsed.adults || 2);
+        try {
+          const parsed = JSON.parse(stored);
+          setCheckIn(parsed.checkIn || getTodayDate());
+          setCheckOut(parsed.checkOut || getTomorrowDate());
+          setRooms(parsed.rooms || 1);
+          setAdults(parsed.adults || 2);
+        } catch (e) {
+          console.error("Error parsing storage update");
+        }
       }
     };
 
@@ -276,18 +309,120 @@ export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps)
       window.removeEventListener("hotelSearchUpdate", handleStorageChange);
   }, []);
 
+  // Check for booking success message on mount
+  useEffect(() => {
+    const bookingSuccess = sessionStorage.getItem("bookingSuccess");
+    if (bookingSuccess) {
+      try {
+        const details = JSON.parse(bookingSuccess);
+        setBookingDetails(details);
+        setShowSuccessModal(true);
+        sessionStorage.removeItem("bookingSuccess");
+      } catch (e) {
+        console.error("Error parsing booking success");
+      }
+    }
+  }, []);
+
   // Calculate nights
   const nights = Math.max(
     1,
     Math.ceil(
       (new Date(checkOut).getTime() - new Date(checkIn).getTime()) /
-        (1000 * 60 * 60 * 24)
-    )
+        (1000 * 60 * 60 * 24),
+    ),
   );
 
   // Calculate total price
   const pricePerNight = parseFloat(hotelPrice);
   const totalPrice = pricePerNight * nights * rooms;
+
+  const handleReservation = async () => {
+    setBookingError(null);
+    setIsBooking(true);
+
+    const bookingPayload = {
+      hotelId,
+      hotelName,
+      checkIn,
+      checkOut,
+      rooms,
+      adults,
+      totalPrice,
+    };
+
+    const handleAuthRedirect = () => {
+      sessionStorage.setItem("redirectAfterLogin", pathname);
+      sessionStorage.setItem("pendingBooking", JSON.stringify(bookingPayload));
+      router.push("/user/auth");
+    };
+
+    try {
+      const response = await fetch("/api/bookings/hotel", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingPayload),
+      });
+
+      // 1. Check if the browser followed a redirect automatically (Standard Middleware behavior)
+      if (response.redirected) {
+        handleAuthRedirect();
+        return;
+      }
+
+      // 2. Get text first to safely handle HTML vs JSON
+      const responseText = await response.text();
+      let data;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        // --- FIX IS HERE ---
+        // If JSON parse fails, check if we received HTML.
+        // If status is 200 (OK) AND it's HTML, it means we were redirected to the Login Page successfully.
+        if (response.ok && responseText.trim().startsWith("<")) {
+          console.log("Received HTML login page, redirecting to auth...");
+          handleAuthRedirect();
+          return;
+        }
+
+        // Also check if it's a 401/403 (Auth Error) that returned HTML
+        if (response.status === 401 || response.status === 403) {
+          handleAuthRedirect();
+          return;
+        }
+
+        // Otherwise, it's a genuine server error (500 or 404)
+        console.error("API Error (Not JSON):", responseText.slice(0, 100));
+        throw new Error(
+          "Something went wrong with the server. Please try again.",
+        );
+      }
+
+      // 3. Handle JSON-based errors
+      if (!response.ok) {
+        if (data.requiresAuth || response.status === 401) {
+          handleAuthRedirect();
+          return;
+        }
+
+        setBookingError(data.error || "Failed to create booking");
+        setIsBooking(false);
+        return;
+      }
+
+      // Success
+      setBookingDetails(data.booking);
+      setShowSuccessModal(true);
+      setIsBooking(false);
+    } catch (error: any) {
+      console.error("Booking process error:", error);
+      setBookingError(error.message || "An error occurred. Please try again.");
+      setIsBooking(false);
+    }
+  };
 
   return (
     <>
@@ -304,15 +439,19 @@ export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps)
             </span>
           </div>
           <div className="flex items-center gap-1 text-orange-500 font-black text-sm">
-            <svg
-              className="w-4 h-4 fill-orange-500"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4 fill-orange-500" viewBox="0 0 24 24">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
             <span>4.9</span>
           </div>
         </div>
+
+        {bookingError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2">
+            <AlertCircle size={18} className="text-red-600 shrink-0 mt-0.5" />
+            <p className="text-sm text-red-700">{bookingError}</p>
+          </div>
+        )}
 
         <div className="space-y-4 mb-8">
           {/* Dates Button */}
@@ -347,7 +486,8 @@ export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps)
               Guests
             </span>
             <span className="text-sm font-bold text-slate-800">
-              {adults} Adult{adults > 1 ? "s" : ""}, {rooms} Room{rooms > 1 ? "s" : ""}
+              {adults} Adult{adults > 1 ? "s" : ""}, {rooms} Room
+              {rooms > 1 ? "s" : ""}
             </span>
           </button>
         </div>
@@ -357,16 +497,30 @@ export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps)
           <div className="mb-6 p-4 bg-slate-50 rounded-2xl space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-slate-600">
-                ₹{hotelPrice} × {nights} night{nights > 1 ? "s" : ""} × {rooms} room{rooms > 1 ? "s" : ""}
+                ₹{hotelPrice} × {nights} night{nights > 1 ? "s" : ""} × {rooms}{" "}
+                room{rooms > 1 ? "s" : ""}
               </span>
-              <span className="font-bold text-slate-900">₹{totalPrice.toLocaleString("en-IN")}</span>
+              <span className="font-bold text-slate-900">
+                ₹{totalPrice.toLocaleString("en-IN")}
+              </span>
             </div>
           </div>
         </ClientOnly>
 
         {/* Reserve Button */}
-        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-3">
-          Reserve Property
+        <button
+          onClick={handleReservation}
+          disabled={isBooking}
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-3 disabled:cursor-not-allowed"
+        >
+          {isBooking ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              Processing...
+            </>
+          ) : (
+            "Reserve Property"
+          )}
         </button>
 
         <div className="mt-8 pt-8 border-t border-dashed border-slate-200 space-y-4">
@@ -381,6 +535,110 @@ export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps)
           </p>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && bookingDetails && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl">
+            <div className="bg-linear-to-r from-green-600 to-green-700 text-white p-6 flex items-center justify-center rounded-t-3xl">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                <Check size={32} className="text-white" />
+              </div>
+            </div>
+            <div className="p-8 text-center">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                Booking Confirmed!
+              </h2>
+              <p className="text-slate-600 mb-6">
+                Your hotel reservation has been successfully confirmed
+              </p>
+
+              <div className="bg-slate-50 p-6 rounded-2xl text-left space-y-4 mb-6">
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+                    Hotel
+                  </p>
+                  <p className="text-sm font-bold text-slate-900">
+                    {bookingDetails.hotelName}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {bookingDetails.hotelLocation}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+                      Check-in
+                    </p>
+                    <p className="text-sm font-bold text-slate-900">
+                      {new Date(bookingDetails.checkIn).toLocaleDateString(
+                        "en-IN",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        },
+                      )}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+                      Check-out
+                    </p>
+                    <p className="text-sm font-bold text-slate-900">
+                      {new Date(bookingDetails.checkOut).toLocaleDateString(
+                        "en-IN",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        },
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+                    Total Amount
+                  </p>
+                  <p className="text-2xl font-black text-blue-600">
+                    ₹
+                    {parseFloat(bookingDetails.totalPrice).toLocaleString(
+                      "en-IN",
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+                    Booking ID
+                  </p>
+                  <p className="text-xs font-mono text-slate-700 bg-slate-100 p-2 rounded">
+                    {bookingDetails.id}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => router.push("/")}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors"
+                >
+                  Go Home
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Calendar Modal - Check In */}
       {showCalendarModal === "in" && (
@@ -402,7 +660,6 @@ export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps)
                 onSelectDate={(date) => {
                   setCheckIn(date);
                   setShowCalendarModal("out");
-                  // Auto-adjust checkout if it's before new checkin
                   if (new Date(date) >= new Date(checkOut)) {
                     const newCheckout = new Date(date);
                     newCheckout.setDate(newCheckout.getDate() + 2);

@@ -14,7 +14,9 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useGoogleLogin } from "@react-oauth/google";
+
 type AuthMode = "login" | "register";
+
 interface FormErrors {
   name?: string;
   email?: string;
@@ -23,6 +25,7 @@ interface FormErrors {
   confirmPassword?: string;
   general?: string;
 }
+
 const Page = () => {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>("login");
@@ -31,6 +34,8 @@ const Page = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Form states
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [registerName, setRegisterName] = useState("");
@@ -38,16 +43,72 @@ const Page = () => {
   const [registerPhone, setRegisterPhone] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(email);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
+
   const validatePhone = (phone: string) => {
     return /^[0-9]{10}$/.test(phone.replace(/\D/g, ""));
   };
+
+  // --- NEW FUNCTION: Handle Redirect and Auto-Booking after Login ---
+  const handlePostLoginRedirect = async () => {
+    // 1. Get stored URL and pending booking data
+    const redirectUrl = sessionStorage.getItem("redirectAfterLogin");
+    const pendingBooking = sessionStorage.getItem("pendingBooking");
+
+    // 2. Scenario: User was trying to book a hotel
+    if (pendingBooking && redirectUrl) {
+      try {
+        const bookingData = JSON.parse(pendingBooking);
+
+        // Execute the booking automatically now that user is logged in
+        // The cookies set by the login API will be sent automatically
+        const response = await fetch("/api/bookings/hotel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(bookingData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Store success data so BookingCard can display the modal upon return
+          sessionStorage.setItem(
+            "bookingSuccess",
+            JSON.stringify(data.booking),
+          );
+        } else {
+          console.error("Auto-booking failed:", data.error);
+          // We still redirect, but maybe without the success flag
+        }
+      } catch (error) {
+        console.error("Auto-booking network error:", error);
+      } finally {
+        // Cleanup storage
+        sessionStorage.removeItem("pendingBooking");
+        sessionStorage.removeItem("redirectAfterLogin");
+        // Redirect back to Hotel Page
+        router.push(redirectUrl);
+      }
+    }
+    // 3. Scenario: User clicked Login from somewhere else, but had a redirect URL
+    else if (redirectUrl) {
+      sessionStorage.removeItem("redirectAfterLogin");
+      router.push(redirectUrl);
+    }
+    // 4. Scenario: Normal Login from Home/Nav
+    else {
+      router.push("/");
+    }
+  };
+
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
     setSuccessMessage(null);
+
     const newErrors: FormErrors = {};
     if (!loginEmail.trim()) newErrors.email = "Email is required";
     else if (!validateEmail(loginEmail))
@@ -83,18 +144,22 @@ const Page = () => {
       }
 
       setSuccessMessage("Login successful! Redirecting...");
+
+      // Call the redirect handler after short delay
       setTimeout(() => {
-        router.push("/");
-      }, 1500);
+        handlePostLoginRedirect();
+      }, 1000);
     } catch (error) {
       setErrors({ general: "An error occurred. Please try again." });
       setIsLoading(false);
     }
   };
+
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
     setSuccessMessage(null);
+
     const newErrors: FormErrors = {};
 
     if (!registerName.trim()) newErrors.name = "Name is required";
@@ -145,14 +210,16 @@ const Page = () => {
 
       setSuccessMessage("Registration successful! Logging you in...");
 
+      // Call the redirect handler after short delay
       setTimeout(() => {
-        router.push("/");
-      }, 1500);
+        handlePostLoginRedirect();
+      }, 1000);
     } catch (error) {
       setErrors({ general: "An error occurred. Please try again." });
       setIsLoading(false);
     }
   };
+
   const handleModeSwitch = (newMode: AuthMode) => {
     setMode(newMode);
     setErrors({});
@@ -167,6 +234,7 @@ const Page = () => {
     setShowPassword(false);
     setShowConfirmPassword(false);
   };
+
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (codeResponse) => {
       try {
@@ -205,9 +273,11 @@ const Page = () => {
         }
 
         setSuccessMessage("Google login successful! Redirecting...");
+
+        // Call the redirect handler after short delay
         setTimeout(() => {
-          router.push("/");
-        }, 1500);
+          handlePostLoginRedirect();
+        }, 1000);
       } catch (error) {
         console.error("Google auth error:", error);
         setErrors({ general: "Google login failed" });
@@ -219,6 +289,7 @@ const Page = () => {
       setIsLoading(false);
     },
   });
+
   return (
     <div className="min-h-screen w-full bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -228,6 +299,7 @@ const Page = () => {
           style={{ animationDelay: "1s" }}
         ></div>
       </div>
+
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-linear-to-br from-blue-500 to-purple-600 mb-4 shadow-lg">
@@ -578,4 +650,5 @@ const Page = () => {
     </div>
   );
 };
+
 export default Page;
