@@ -452,7 +452,7 @@ export default function SearchBar({
             <div className="lg:col-span-2">
               <button
                 onClick={handleSearch}
-                className="w-full h-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 lg:py-0 rounded-xl lg:rounded-none shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 uppercase tracking-wider text-sm lg:text-base"
+                className="w-full h-full bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 lg:py-0 rounded-xl lg:rounded-none shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 uppercase tracking-wider text-sm lg:text-base"
               >
                 <Search size={18} />
                 <span>Search</span>
@@ -466,7 +466,7 @@ export default function SearchBar({
       {showCalendarModal === "in" && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
           <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl max-h-[90vh] overflow-y-auto border border-[#1F2937]">
-            <div className="sticky top-0 bg-gradient-to-r from-green-600 to-green-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
+            <div className="sticky top-0 bg-linear-to-r from-green-600 to-green-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
               <h2 className="font-bold text-lg">Select Check-In Date</h2>
               <button
                 onClick={() => setShowCalendarModal(null)}
@@ -510,7 +510,7 @@ export default function SearchBar({
       {showCalendarModal === "out" && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
           <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl max-h-[90vh] overflow-y-auto border border-[#1F2937]">
-            <div className="sticky top-0 bg-gradient-to-r from-orange-600 to-orange-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
+            <div className="sticky top-0 bg-linear-to-r from-orange-600 to-orange-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
               <h2 className="font-bold text-lg">Select Check-Out Date</h2>
               <button
                 onClick={() => setShowCalendarModal(null)}
@@ -548,7 +548,7 @@ export default function SearchBar({
       {showGuestsModal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
           <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl border border-[#1F2937]">
-            <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
+            <div className="bg-linear-to-r from-purple-600 to-purple-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
               <h2 className="font-bold text-lg">Select Guests</h2>
               <button
                 onClick={() => setShowGuestsModal(false)}

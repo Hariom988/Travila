@@ -172,7 +172,7 @@ function HotelPageContent() {
   }, [tours, searchQuery, selectedRangeIdx, minBudget, maxBudget, sortBy]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-20">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 pb-20">
       <header className="lg:hidden bg-white px-4 py-3 flex items-center gap-4 sticky top-0 z-40 shadow-sm border-b border-slate-200">
         <ArrowLeft className="text-slate-700 cursor-pointer" size={24} />
         <div>
