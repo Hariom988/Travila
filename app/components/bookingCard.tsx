@@ -2,6 +2,21 @@
 import { useState, useEffect } from "react";
 import { Calendar, Users, ShieldCheck, X } from "lucide-react";
 
+// Client-only wrapper to prevent hydration errors
+function ClientOnly({ children }: { children: React.ReactNode }) {
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) {
+    return null;
+  }
+
+  return <>{children}</>;
+}
+
 interface DatePickerProps {
   selectedDate: string;
   onSelectDate: (date: string) => void;
@@ -58,13 +73,13 @@ const DatePicker = ({
 
   const handlePrevMonth = () => {
     setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1),
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
     );
   };
 
   const handleNextMonth = () => {
     setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1),
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
     );
   };
 
@@ -85,11 +100,11 @@ const DatePicker = ({
 
   const colorClasses = {
     green: {
-      header: "bg-gradient-to-r from-green-600 to-green-700",
+      header: "bg-linear-to-r from-green-600 to-green-700",
       hover: "hover:bg-green-500",
     },
     orange: {
-      header: "bg-gradient-to-r from-orange-600 to-orange-700",
+      header: "bg-linear-to-r from-orange-600 to-orange-700",
       hover: "hover:bg-orange-500",
     },
   };
@@ -174,10 +189,7 @@ interface BookingCardProps {
   hotelName: string;
 }
 
-export default function BookingCard({
-  hotelPrice,
-  hotelName,
-}: BookingCardProps) {
+export default function BookingCard({ hotelPrice, hotelName }: BookingCardProps) {
   // Initialize from localStorage
   const [checkIn, setCheckIn] = useState(() => {
     if (typeof window !== "undefined") {
@@ -232,7 +244,7 @@ export default function BookingCard({
   useEffect(() => {
     const stored = localStorage.getItem("hotelSearch");
     const currentSearch = stored ? JSON.parse(stored) : {};
-
+    
     const updatedSearch = {
       ...currentSearch,
       checkIn,
@@ -240,7 +252,7 @@ export default function BookingCard({
       rooms,
       adults,
     };
-
+    
     localStorage.setItem("hotelSearch", JSON.stringify(updatedSearch));
     // Dispatch event to notify SearchBar
     window.dispatchEvent(new Event("hotelSearchUpdate"));
@@ -269,8 +281,8 @@ export default function BookingCard({
     1,
     Math.ceil(
       (new Date(checkOut).getTime() - new Date(checkIn).getTime()) /
-        (1000 * 60 * 60 * 24),
-    ),
+        (1000 * 60 * 60 * 24)
+    )
   );
 
   // Calculate total price
@@ -292,7 +304,10 @@ export default function BookingCard({
             </span>
           </div>
           <div className="flex items-center gap-1 text-orange-500 font-black text-sm">
-            <svg className="w-4 h-4 fill-orange-500" viewBox="0 0 24 24">
+            <svg
+              className="w-4 h-4 fill-orange-500"
+              viewBox="0 0 24 24"
+            >
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
             <span>4.9</span>
@@ -308,17 +323,19 @@ export default function BookingCard({
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
               Dates
             </span>
-            <span className="text-sm font-bold text-slate-800">
-              {new Date(checkIn).toLocaleDateString("en-IN", {
-                day: "2-digit",
-                month: "short",
-              })}{" "}
-              -{" "}
-              {new Date(checkOut).toLocaleDateString("en-IN", {
-                day: "2-digit",
-                month: "short",
-              })}
-            </span>
+            <ClientOnly>
+              <span className="text-sm font-bold text-slate-800">
+                {new Date(checkIn).toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "short",
+                })}{" "}
+                -{" "}
+                {new Date(checkOut).toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "short",
+                })}
+              </span>
+            </ClientOnly>
           </button>
 
           {/* Guests Button */}
@@ -330,24 +347,22 @@ export default function BookingCard({
               Guests
             </span>
             <span className="text-sm font-bold text-slate-800">
-              {adults} Adult{adults > 1 ? "s" : ""}, {rooms} Room
-              {rooms > 1 ? "s" : ""}
+              {adults} Adult{adults > 1 ? "s" : ""}, {rooms} Room{rooms > 1 ? "s" : ""}
             </span>
           </button>
         </div>
 
         {/* Price Breakdown */}
-        <div className="mb-6 p-4 bg-slate-50 rounded-2xl space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-slate-600">
-              ₹{hotelPrice} × {nights} night{nights > 1 ? "s" : ""} × {rooms}{" "}
-              room{rooms > 1 ? "s" : ""}
-            </span>
-            <span className="font-bold text-slate-900">
-              ₹{totalPrice.toLocaleString("en-IN")}
-            </span>
+        <ClientOnly>
+          <div className="mb-6 p-4 bg-slate-50 rounded-2xl space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-600">
+                ₹{hotelPrice} × {nights} night{nights > 1 ? "s" : ""} × {rooms} room{rooms > 1 ? "s" : ""}
+              </span>
+              <span className="font-bold text-slate-900">₹{totalPrice.toLocaleString("en-IN")}</span>
+            </div>
           </div>
-        </div>
+        </ClientOnly>
 
         {/* Reserve Button */}
         <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-3">
@@ -371,7 +386,7 @@ export default function BookingCard({
       {showCalendarModal === "in" && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
           <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl max-h-[90vh] overflow-y-auto border border-[#1F2937]">
-            <div className="sticky top-0 bg-gradient-to-r from-green-600 to-green-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
+            <div className="sticky top-0 bg-linear-to-r from-green-600 to-green-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
               <h2 className="font-bold text-lg">Select Check-In Date</h2>
               <button
                 onClick={() => setShowCalendarModal(null)}
@@ -407,7 +422,7 @@ export default function BookingCard({
       {showCalendarModal === "out" && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
           <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl max-h-[90vh] overflow-y-auto border border-[#1F2937]">
-            <div className="sticky top-0 bg-gradient-to-r from-orange-600 to-orange-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
+            <div className="sticky top-0 bg-linear-to-r from-orange-600 to-orange-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
               <h2 className="font-bold text-lg">Select Check-Out Date</h2>
               <button
                 onClick={() => setShowCalendarModal(null)}
@@ -437,7 +452,7 @@ export default function BookingCard({
       {showGuestsModal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
           <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl border border-[#1F2937]">
-            <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
+            <div className="bg-linear-to-r from-purple-600 to-purple-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
               <h2 className="font-bold text-lg">Select Guests</h2>
               <button
                 onClick={() => setShowGuestsModal(false)}
