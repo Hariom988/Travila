@@ -105,12 +105,12 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="min-h-screen bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
       {/* Hero Section */}
       <section className="relative min-h-[40vh] sm:min-h-[50vh] flex items-center justify-center overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(139,_92,_246,_0.3),_transparent_50%)]"></div>
+          <div className="absolute inset-0 bg-[radial-linear(circle_at_50%_50%,rgba(139,92,246,0.3),transparent_50%)]"></div>
           <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxIDEuNzktNCAzLjk5LTRDNDIuMiAzMCA0NCAzMS43OSA0NCAzNGMwIDIuMjEtMS44IDQtNC4wMSA0LTIuMiAwLTMuOTktMS43OS0zLjk5LTR6bTAgMjBjMC0yLjIxIDEuNzktNCAzLjk5LTRDNDIuMiA1MCA0NCA1MS43OSA0NCA1NGMwIDIuMjEtMS44IDQtNC4wMSA0LTIuMiAwLTMuOTktMS43OS0zLjk5LTR6TTIwIDM0YzAtMi4yMSAxLjc5LTQgMy45OS00QzI2LjIgMzAgMjggMzEuNzkgMjggMzRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00em0wIDIwYzAtMi4yMSAxLjc5LTQgMy45OS00QzI2LjIgNTAgMjggNTEuNzkgMjggNTRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00ek00IDM0YzAtMi4yMSAxLjc5LTQgMy45OS00QzEwLjIgMzAgMTIgMzEuNzkgMTIgMzRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00em0wIDIwYzAtMi4yMSAxLjc5LTQgMy45OS00QzEwLjIgNTAgMTIgNTEuNzkgMTIgNTRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00ek01MiAzNGMwLTIuMjEgMS43OS00IDMuOTktNEM1OC4yIDMwIDYwIDMxLjc5IDYwIDM0YzAgMi4yMS0xLjggNC00LjAxIDQtMi4yIDAtMy45OS0xLjc5LTMuOTktNHptMCAyMGMwLTIuMjEgMS43OS00IDMuOTktNEM1OC4yIDUwIDYwIDUxLjc5IDYwIDU0YzAgMi4yMS0xLjggNC00LjAxIDQtMi4yIDAtMy45OS0xLjc5LTMuOTktNHoiLz48L2c+PC9nPjwvc3ZnPg==')]"></div>
         </div>
 
@@ -123,7 +123,7 @@ const ContactPage = () => {
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-black mb-4 sm:mb-6 leading-tight">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600">
+            <span className="bg-clip-text text-transparent bg-linear-to-r from-purple-400 via-pink-400 to-purple-600">
               Get In Touch
             </span>
             <br />
@@ -147,7 +147,7 @@ const ContactPage = () => {
                 className="group bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:bg-slate-800/50 transition-all hover:scale-105"
               >
                 <div
-                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br ${info.color} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}
+                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-linear-to-br ${info.color} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}
                 >
                   <info.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
@@ -300,7 +300,7 @@ const ContactPage = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all shadow-lg shadow-purple-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                    className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all shadow-lg shadow-purple-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
                       <>
@@ -321,7 +321,7 @@ const ContactPage = () => {
             {/* Additional Info */}
             <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               {/* Quick Response */}
-              <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-sm border border-purple-500/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
+              <div className="bg-linear-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-sm border border-purple-500/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
                 <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">
                   Quick Response Guarantee
                 </h3>

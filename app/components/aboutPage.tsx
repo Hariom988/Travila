@@ -88,12 +88,12 @@ const AboutPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="min-h-screen bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
       {/* Hero Section */}
       <section className="relative min-h-[60vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(139,_92,_246,_0.3),_transparent_50%)]"></div>
+          <div className="absolute inset-0 bg-[radial-linear(circle_at_50%_50%,rgba(139,92,246,0.3),transparent_50%)]"></div>
           <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxIDEuNzktNCAzLjk5LTRDNDIuMiAzMCA0NCAzMS43OSA0NCAzNGMwIDIuMjEtMS44IDQtNC4wMSA0LTIuMiAwLTMuOTktMS43OS0zLjk5LTR6bTAgMjBjMC0yLjIxIDEuNzktNCAzLjk5LTRDNDIuMiA1MCA0NCA1MS43OSA0NCA1NGMwIDIuMjEtMS44IDQtNC4wMSA0LTIuMiAwLTMuOTktMS43OS0zLjk5LTR6TTIwIDM0YzAtMi4yMSAxLjc5LTQgMy45OS00QzI2LjIgMzAgMjggMzEuNzkgMjggMzRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00em0wIDIwYzAtMi4yMSAxLjc5LTQgMy45OS00QzI2LjIgNTAgMjggNTEuNzkgMjggNTRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00ek00IDM0YzAtMi4yMSAxLjc5LTQgMy45OS00QzEwLjIgMzAgMTIgMzEuNzkgMTIgMzRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00em0wIDIwYzAtMi4yMSAxLjc5LTQgMy45OS00QzEwLjIgNTAgMTIgNTEuNzkgMTIgNTRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00ek01MiAzNGMwLTIuMjEgMS43OS00IDMuOTktNEM1OC4yIDMwIDYwIDMxLjc5IDYwIDM0YzAgMi4yMS0xLjggNC00LjAxIDQtMi4yIDAtMy45OS0xLjc5LTMuOTktNHptMCAyMGMwLTIuMjEgMS43OS00IDMuOTktNEM1OC4yIDUwIDYwIDUxLjc5IDYwIDU0YzAgMi4yMS0xLjggNC00LjAxIDQtMi4yIDAtMy45OS0xLjc5LTMuOTktNHoiLz48L2c+PC9nPjwvc3ZnPg==')]"></div>
         </div>
 
@@ -106,7 +106,7 @@ const AboutPage = () => {
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black mb-4 sm:mb-6 leading-tight">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600">
+            <span className="bg-clip-text text-transparent bg-linear-to-r from-purple-400 via-pink-400 to-purple-600">
               We Make Travel
             </span>
             <br />
@@ -147,7 +147,7 @@ const AboutPage = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 min-w-[100px] sm:min-w-0 px-4 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all ${
+                className={`flex-1 min-w-25 sm:min-w-0 px-4 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all ${
                   activeTab === tab
                     ? "bg-purple-600 text-white shadow-lg shadow-purple-500/50"
                     : "bg-slate-800/50 text-slate-400 hover:bg-slate-800"
@@ -257,7 +257,7 @@ const AboutPage = () => {
                     fill
                     className="rounded-full object-cover border-4 border-purple-500/30 group-hover:border-purple-500 transition-all"
                   />
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-600/20 to-transparent"></div>
+                  <div className="absolute inset-0 rounded-full bg-linear-to-tr from-purple-600/20 to-transparent"></div>
                 </div>
                 <h3 className="text-xs sm:text-sm md:text-base font-bold text-white mb-1 text-center">
                   {member.name}
@@ -309,7 +309,7 @@ const AboutPage = () => {
       </section>
 
       {/* Testimonial */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 bg-gradient-to-r from-purple-900/20 to-pink-900/20">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 bg-linear-to-r from-purple-900/20 to-pink-900/20">
         <div className="container mx-auto max-w-4xl">
           <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center">
             <Quote className="w-10 h-10 sm:w-16 sm:h-16 text-purple-400 mx-auto mb-4 sm:mb-6" />
