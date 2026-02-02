@@ -7,13 +7,13 @@ import {
   Wifi,
   Waves,
   Coffee,
-  ShieldCheck,
   ArrowLeft,
   CheckCircle2,
   Info,
   Sparkles,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import BookingCard from "@/app/components/bookingCard";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -120,7 +120,7 @@ export default async function HotelDetailPage({ params }: PageProps) {
                 className="object-cover transition-transform duration-700"
                 priority
               />
-              <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
             </div>
 
             {/* Description Section */}
@@ -158,58 +158,10 @@ export default async function HotelDetailPage({ params }: PageProps) {
 
           {/* Right Side: Booking Card (4 Columns) */}
           <aside className="lg:col-span-4">
-            <div className="sticky top-28 bg-white border border-slate-200 p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 ring-1 ring-slate-100">
-              <div className="flex justify-between items-baseline mb-8">
-                <div>
-                  <span className="text-4xl font-black text-slate-900">
-                    ₹{hotel.pricePerNight}
-                  </span>
-                  <span className="text-slate-400 font-bold text-sm tracking-tighter">
-                    {" "}
-                    / night
-                  </span>
-                </div>
-                <div className="flex items-center gap-1 text-orange-500 font-black text-sm">
-                  <Star size={16} className="fill-orange-500" />
-                  <span>4.9</span>
-                </div>
-              </div>
-
-              <div className="space-y-4 mb-8">
-                <button className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-blue-200 transition-all">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
-                    Dates
-                  </span>
-                  <span className="text-sm font-bold text-slate-800">
-                    Select Dates
-                  </span>
-                </button>
-                <button className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-blue-200 transition-all">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
-                    Guests
-                  </span>
-                  <span className="text-sm font-bold text-slate-800">
-                    2 Adults, 1 Room
-                  </span>
-                </button>
-              </div>
-
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-3">
-                Reserve Property
-              </button>
-
-              <div className="mt-8 pt-8 border-t border-dashed border-slate-200 space-y-4">
-                <div className="flex items-center gap-3 text-slate-500">
-                  <ShieldCheck size={18} className="text-emerald-500" />
-                  <span className="text-xs font-bold leading-tight">
-                    Secure Payment & Best Price Policy
-                  </span>
-                </div>
-                <p className="text-[10px] text-center text-slate-400 font-medium">
-                  Free cancellation up to 48 hours before check-in
-                </p>
-              </div>
-            </div>
+            <BookingCard
+              hotelPrice={hotel.pricePerNight}
+              hotelName={hotel.name}
+            />
           </aside>
         </div>
       </main>
