@@ -18,9 +18,9 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-async function getHotelData(id: string) {
+async function getActivityData(id: string) {
   try {
-    const hotel = await prisma.activity.findUnique({
+    const activity = await prisma.activity.findUnique({
       where: { id },
       select: {
         id: true,
@@ -35,32 +35,30 @@ async function getHotelData(id: string) {
       },
     });
 
-    if (!hotel) return null;
+    if (!activity) return null;
 
-    // Convert Decimal to string for serialization
     return {
-      ...hotel,
-      pricePerPerson: hotel.pricePerPerson.toString(),
+      ...activity,
+      pricePerPerson: activity.pricePerPerson.toString(),
     };
   } catch (error) {
-    console.error("Error fetching hotel:", error);
+    console.error("Error fetching activity:", error);
     return null;
   }
 }
 
-export default async function HotelDetailPage({ params }: PageProps) {
+export default async function ActivityDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const hotel = await getHotelData(id);
+  const activity = await getActivityData(id);
 
-  if (!hotel) return notFound();
-
+  if (!activity) return notFound();
   return (
     <div className="min-h-screen bg-slate-50/50 pb-20">
       {/* Sticky Navigation Header */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link
-            href="/hotel"
+            href="/activities"
             className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-all group"
           >
             <ArrowLeft
@@ -92,19 +90,19 @@ export default async function HotelDetailPage({ params }: PageProps) {
                 <span className="bg-blue-600 text-white text-[10px] font-black px-2.5 py-1 rounded-sm uppercase tracking-tighter flex items-center gap-1">
                   <Sparkles size={10} /> Rare Find
                 </span>
-                {hotel.available && (
+                {activity.available && (
                   <span className="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2.5 py-1 rounded-sm uppercase tracking-tighter flex items-center gap-1">
                     <CheckCircle2 size={10} /> Instant Booking
                   </span>
                 )}
               </div>
               <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1]">
-                {hotel.name}
+                {activity.name}
               </h1>
               <div className="flex items-center gap-2 text-slate-500">
                 <MapPin size={18} className="text-blue-600 shrink-0" />
                 <span className="text-sm font-semibold tracking-wide capitalize underline decoration-blue-200 underline-offset-4">
-                  {hotel.location}
+                  {activity.location}
                 </span>
               </div>
             </section>
@@ -112,8 +110,8 @@ export default async function HotelDetailPage({ params }: PageProps) {
             {/* Main Image Gallery */}
             <div className="relative aspect-video w-full rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/10 group">
               <Image
-                src={hotel.images?.[0] || "/placeholder-hotel.jpg"}
-                alt={hotel.name}
+                src={activity.images?.[0] || "/placeholder-activity.jpg"}
+                alt={activity.name}
                 fill
                 className="object-cover transition-transform duration-700"
                 priority
@@ -127,38 +125,16 @@ export default async function HotelDetailPage({ params }: PageProps) {
                 <Info size={20} className="text-blue-600" /> About Property
               </h2>
               <p className="text-slate-600 leading-relaxed text-base md:text-lg font-medium">
-                {hotel.description}
+                {activity.description}
               </p>
-            </section>
-
-            {/* Facilities Section */}
-            <section className="space-y-4">
-              <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">
-                Premium Facilities
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {hotel.facilities?.map((facility: string, idx: number) => (
-                  <div
-                    key={idx}
-                    className="bg-white border border-slate-100 p-4 rounded-2xl flex flex-col items-center gap-3 text-center hover:border-blue-200 hover:shadow-md transition-all group"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                      {getIcon(facility)}
-                    </div>
-                    <span className="text-[11px] font-bold text-slate-700 uppercase tracking-tight">
-                      {facility}
-                    </span>
-                  </div>
-                ))}
-              </div>
             </section>
           </div>
 
           {/* Right Side: Booking Card (4 Columns) */}
           <aside className="lg:col-span-4">
             <BookingCard
-              hotelPrice={hotel.pricePerNight}
-              hotelName={hotel.name}
+              hotelPrice={activity.pricePerPerson}
+              hotelName={activity.name}
             />
           </aside>
         </div>

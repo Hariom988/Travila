@@ -1,7 +1,7 @@
-import HotelPage from "@/app/components/activityPage";
+import ActivityPage from "@/app/components/activityPage";
 
 const Page = () => {
-  return <HotelPage />;
+  return <ActivityPage />;
 };
 
 export default Page;

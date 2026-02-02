@@ -19,10 +19,7 @@ interface ActivityCardProps {
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
   return (
-    <Link
-      href={`/api/activity-management/${activity.id}`}
-      className="block h-full"
-    >
+    <Link href={`/activities/${activity.id}`} className="block h-full">
       <div className="group hover:cursor-pointer bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full">
         <div className="relative h-48 w-full overflow-hidden">
           {activity.image ? (

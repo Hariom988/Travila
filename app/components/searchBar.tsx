@@ -18,7 +18,7 @@ interface SearchBarProps {
   defaultCheckOut?: string;
   defaultRooms?: number;
   defaultAdults?: number;
-  instantSearch?: boolean; // New prop for instant search on hotel page
+  instantSearch?: boolean;
 }
 
 export interface SearchParams {
@@ -47,6 +47,38 @@ const getTomorrowDate = (): string => {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 2);
   return formatDateToLocal(tomorrow);
+};
+
+// Format date for display (prevents hydration mismatch)
+const formatDateForDisplay = (
+  dateString: string,
+): { day: string; month: string } => {
+  try {
+    const date = new Date(dateString + "T00:00:00"); // Ensure it's treated as local date
+    if (isNaN(date.getTime())) {
+      // Fallback if date is invalid
+      return { day: "00", month: "---" };
+    }
+    const day = String(date.getDate()).padStart(2, "0");
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const month = months[date.getMonth()];
+    return { day, month };
+  } catch (error) {
+    return { day: "00", month: "---" };
+  }
 };
 
 const DatePicker = ({
@@ -187,70 +219,56 @@ export default function SearchBar({
 }: SearchBarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [mounted, setMounted] = useState(false);
 
-  // Initialize state from localStorage or defaults
-  const [searchQuery, setSearchQuery] = useState(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("hotelSearch");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.searchQuery || defaultSearchQuery;
-      }
-    }
-    return searchParams.get("search") || defaultSearchQuery;
-  });
-
-  const [checkIn, setCheckIn] = useState(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("hotelSearch");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.checkIn || defaultCheckIn;
-      }
-    }
-    return searchParams.get("checkIn") || defaultCheckIn;
-  });
-
-  const [checkOut, setCheckOut] = useState(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("hotelSearch");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.checkOut || defaultCheckOut;
-      }
-    }
-    return searchParams.get("checkOut") || defaultCheckOut;
-  });
-
-  const [rooms, setRooms] = useState(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("hotelSearch");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.rooms || defaultRooms;
-      }
-    }
-    return Number(searchParams.get("rooms")) || defaultRooms;
-  });
-
-  const [adults, setAdults] = useState(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("hotelSearch");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.adults || defaultAdults;
-      }
-    }
-    return Number(searchParams.get("adults")) || defaultAdults;
-  });
+  // Initialize state with defaults first (same on server and client)
+  const [searchQuery, setSearchQuery] = useState(defaultSearchQuery);
+  const [checkIn, setCheckIn] = useState(defaultCheckIn);
+  const [checkOut, setCheckOut] = useState(defaultCheckOut);
+  const [rooms, setRooms] = useState(defaultRooms);
+  const [adults, setAdults] = useState(defaultAdults);
 
   const [showCalendarModal, setShowCalendarModal] = useState<
     "in" | "out" | null
   >(null);
   const [showGuestsModal, setShowGuestsModal] = useState(false);
 
-  // Save to localStorage whenever search params change
+  // Load from localStorage only after mounting (client-side only)
   useEffect(() => {
+    setMounted(true);
+
+    const stored = localStorage.getItem("hotelSearch");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setSearchQuery(parsed.searchQuery || defaultSearchQuery);
+        setCheckIn(parsed.checkIn || defaultCheckIn);
+        setCheckOut(parsed.checkOut || defaultCheckOut);
+        setRooms(parsed.rooms || defaultRooms);
+        setAdults(parsed.adults || defaultAdults);
+      } catch (e) {
+        console.error("Error parsing stored search:", e);
+      }
+    } else {
+      // If no localStorage, check URL params
+      const urlSearch = searchParams.get("search");
+      const urlCheckIn = searchParams.get("checkIn");
+      const urlCheckOut = searchParams.get("checkOut");
+      const urlRooms = searchParams.get("rooms");
+      const urlAdults = searchParams.get("adults");
+
+      if (urlSearch) setSearchQuery(urlSearch);
+      if (urlCheckIn) setCheckIn(urlCheckIn);
+      if (urlCheckOut) setCheckOut(urlCheckOut);
+      if (urlRooms) setRooms(Number(urlRooms));
+      if (urlAdults) setAdults(Number(urlAdults));
+    }
+  }, []);
+
+  // Save to localStorage whenever search params change (only after mounted)
+  useEffect(() => {
+    if (!mounted) return;
+
     const searchData = {
       searchQuery,
       checkIn,
@@ -259,31 +277,37 @@ export default function SearchBar({
       adults,
     };
     localStorage.setItem("hotelSearch", JSON.stringify(searchData));
-    // Dispatch event to notify other components (like BookingCard)
     window.dispatchEvent(new Event("hotelSearchUpdate"));
-  }, [searchQuery, checkIn, checkOut, rooms, adults]);
+  }, [searchQuery, checkIn, checkOut, rooms, adults, mounted]);
 
   // Listen for changes from BookingCard
   useEffect(() => {
+    if (!mounted) return;
+
     const handleStorageChange = () => {
       const stored = localStorage.getItem("hotelSearch");
       if (stored) {
-        const parsed = JSON.parse(stored);
-        setCheckIn(parsed.checkIn || defaultCheckIn);
-        setCheckOut(parsed.checkOut || defaultCheckOut);
-        setRooms(parsed.rooms || defaultRooms);
-        setAdults(parsed.adults || defaultAdults);
-        // Don't update searchQuery from storage to avoid clearing user's typing
+        try {
+          const parsed = JSON.parse(stored);
+          setCheckIn(parsed.checkIn || defaultCheckIn);
+          setCheckOut(parsed.checkOut || defaultCheckOut);
+          setRooms(parsed.rooms || defaultRooms);
+          setAdults(parsed.adults || defaultAdults);
+        } catch (e) {
+          console.error("Error parsing storage update:", e);
+        }
       }
     };
 
     window.addEventListener("hotelSearchUpdate", handleStorageChange);
     return () =>
       window.removeEventListener("hotelSearchUpdate", handleStorageChange);
-  }, [defaultCheckIn, defaultCheckOut, defaultRooms, defaultAdults]);
+  }, [defaultCheckIn, defaultCheckOut, defaultRooms, defaultAdults, mounted]);
 
   // Instant search effect (only on hotel page)
   useEffect(() => {
+    if (!mounted) return;
+
     if (instantSearch && onSearch) {
       const timeoutId = setTimeout(() => {
         onSearch({
@@ -293,11 +317,20 @@ export default function SearchBar({
           rooms,
           adults,
         });
-      }, 300); // Debounce for 300ms
+      }, 300);
 
       return () => clearTimeout(timeoutId);
     }
-  }, [searchQuery, checkIn, checkOut, rooms, adults, instantSearch, onSearch]);
+  }, [
+    searchQuery,
+    checkIn,
+    checkOut,
+    rooms,
+    adults,
+    instantSearch,
+    onSearch,
+    mounted,
+  ]);
 
   const handleSearch = () => {
     if (onSearch) {
@@ -332,6 +365,10 @@ export default function SearchBar({
     ),
   );
 
+  // Format dates for display
+  const checkInDisplay = formatDateForDisplay(checkIn);
+  const checkOutDisplay = formatDateForDisplay(checkOut);
+
   return (
     <>
       {/* Enhanced Search Form - Dark Theme */}
@@ -365,100 +402,90 @@ export default function SearchBar({
           </div>
 
           {/* Dates & Guests */}
-          <div className="lg:col-span-6 grid grid-cols-3 gap-2">
-            {/* Check In */}
-            <button
-              onClick={() => setShowCalendarModal("in")}
-              className="flex items-center gap-2 p-3 lg:px-5 bg-[#1D2939] lg:bg-transparent rounded-xl lg:rounded-none border lg:border-none border-[#344054] hover:border-green-500 transition-colors"
-            >
-              <Calendar size={18} className="text-green-500 shrink-0" />
-              <div className="flex-1 text-left hidden lg:block">
-                <p className="text-[9px] uppercase font-bold text-green-400">
-                  Check-In
-                </p>
-                <p className="text-sm font-bold text-white">
-                  {new Date(checkIn).toLocaleDateString("en-IN", {
-                    day: "2-digit",
-                    month: "short",
-                  })}
-                </p>
-              </div>
-              <div className="lg:hidden">
-                <p className="text-xs font-bold text-white">
-                  {new Date(checkIn).getDate()}
-                </p>
-                <p className="text-[8px] text-gray-400">
-                  {new Date(checkIn).toLocaleDateString("en-IN", {
-                    month: "short",
-                  })}
-                </p>
-              </div>
-            </button>
+          <div className="lg:col-span-6">
+            <div className="grid grid-cols-3 gap-2">
+              {/* Check In */}
+              <button
+                onClick={() => setShowCalendarModal("in")}
+                className="flex items-center gap-2 p-3 lg:px-5 bg-[#1D2939] lg:bg-transparent rounded-xl lg:rounded-none border lg:border-none border-[#344054] hover:border-green-500 transition-colors"
+              >
+                <Calendar size={18} className="text-green-500 shrink-0" />
+                <div className="flex-1 text-left hidden lg:block">
+                  <p className="text-[9px] uppercase font-bold text-green-400">
+                    Check-In
+                  </p>
+                  <p className="text-sm font-bold text-white">
+                    {checkInDisplay.day} {checkInDisplay.month}
+                  </p>
+                </div>
+                <div className="lg:hidden">
+                  <p className="text-xs font-bold text-white">
+                    {checkInDisplay.day}
+                  </p>
+                  <p className="text-[8px] text-gray-400">
+                    {checkInDisplay.month}
+                  </p>
+                </div>
+              </button>
 
-            {/* Check Out */}
-            <button
-              onClick={() => setShowCalendarModal("out")}
-              className="flex items-center gap-2 p-3 lg:px-5 bg-[#1D2939] lg:bg-transparent rounded-xl lg:rounded-none border lg:border-none border-[#344054] hover:border-orange-500 transition-colors"
-            >
-              <Calendar size={18} className="text-orange-500 shrink-0" />
-              <div className="flex-1 text-left hidden lg:block">
-                <p className="text-[9px] uppercase font-bold text-orange-400">
-                  Check-Out
-                </p>
-                <p className="text-sm font-bold text-white">
-                  {new Date(checkOut).toLocaleDateString("en-IN", {
-                    day: "2-digit",
-                    month: "short",
-                  })}
-                </p>
-              </div>
-              <div className="lg:hidden">
-                <p className="text-xs font-bold text-white">
-                  {new Date(checkOut).getDate()}
-                </p>
-                <p className="text-[8px] text-gray-400">
-                  {new Date(checkOut).toLocaleDateString("en-IN", {
-                    month: "short",
-                  })}
-                </p>
-              </div>
-            </button>
+              {/* Check Out */}
+              <button
+                onClick={() => setShowCalendarModal("out")}
+                className="flex items-center gap-2 p-3 lg:px-5 bg-[#1D2939] lg:bg-transparent rounded-xl lg:rounded-none border lg:border-none border-[#344054] hover:border-orange-500 transition-colors"
+              >
+                <Calendar size={18} className="text-orange-500 shrink-0" />
+                <div className="flex-1 text-left hidden lg:block">
+                  <p className="text-[9px] uppercase font-bold text-orange-400">
+                    Check-Out
+                  </p>
+                  <p className="text-sm font-bold text-white">
+                    {checkOutDisplay.day} {checkOutDisplay.month}
+                  </p>
+                </div>
+                <div className="lg:hidden">
+                  <p className="text-xs font-bold text-white">
+                    {checkOutDisplay.day}
+                  </p>
+                  <p className="text-[8px] text-gray-400">
+                    {checkOutDisplay.month}
+                  </p>
+                </div>
+              </button>
 
-            {/* Guests */}
-            <button
-              onClick={() => setShowGuestsModal(true)}
-              className="flex items-center gap-2 p-3 lg:px-5 bg-[#1D2939] lg:bg-transparent rounded-xl lg:rounded-none border lg:border-none border-[#344054] hover:border-purple-500 transition-colors"
-            >
-              <Users size={18} className="text-purple-500 shrink-0" />
-              <div className="flex-1 text-left hidden lg:block">
-                <p className="text-[9px] uppercase font-bold text-purple-400">
-                  Guests
-                </p>
-                <p className="text-sm font-bold text-white">
-                  {rooms} Room, {adults} Adult
-                </p>
-              </div>
-              <div className="lg:hidden text-left">
-                <p className="text-xs font-bold text-white">
-                  {rooms}R {adults}A
-                </p>
-                <p className="text-[8px] text-gray-400">{nights}N</p>
-              </div>
-            </button>
+              {/* Guests */}
+              <button
+                onClick={() => setShowGuestsModal(true)}
+                className="flex items-center gap-2 p-3 lg:px-5 bg-[#1D2939] lg:bg-transparent rounded-xl lg:rounded-none border lg:border-none border-[#344054] hover:border-purple-500 transition-colors"
+              >
+                <Users size={18} className="text-purple-500 shrink-0" />
+                <div className="flex-1 text-left hidden lg:block">
+                  <p className="text-[9px] uppercase font-bold text-purple-400">
+                    Guests
+                  </p>
+                  <p className="text-sm font-bold text-white">
+                    {rooms} Room, {adults} Adult
+                  </p>
+                </div>
+                <div className="lg:hidden text-left">
+                  <p className="text-xs font-bold text-white">
+                    {rooms}R {adults}A
+                  </p>
+                  <p className="text-[8px] text-gray-400">{nights}N</p>
+                </div>
+              </button>
+            </div>
           </div>
 
           {/* Search Button */}
-          {!instantSearch && (
-            <div className="lg:col-span-2">
-              <button
-                onClick={handleSearch}
-                className="w-full h-full bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 lg:py-0 rounded-xl lg:rounded-none shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 uppercase tracking-wider text-sm lg:text-base"
-              >
-                <Search size={18} />
-                <span>Search</span>
-              </button>
-            </div>
-          )}
+          <div className="lg:col-span-2">
+            <button
+              onClick={handleSearch}
+              className="w-full h-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 lg:py-0 rounded-xl lg:rounded-none shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 uppercase tracking-wider text-sm lg:text-base"
+            >
+              <Search size={18} />
+              <span>Search</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -466,7 +493,7 @@ export default function SearchBar({
       {showCalendarModal === "in" && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
           <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl max-h-[90vh] overflow-y-auto border border-[#1F2937]">
-            <div className="sticky top-0 bg-linear-to-r from-green-600 to-green-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
+            <div className="sticky top-0 bg-green-600 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
               <h2 className="font-bold text-lg">Select Check-In Date</h2>
               <button
                 onClick={() => setShowCalendarModal(null)}
@@ -510,7 +537,7 @@ export default function SearchBar({
       {showCalendarModal === "out" && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
           <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl max-h-[90vh] overflow-y-auto border border-[#1F2937]">
-            <div className="sticky top-0 bg-linear-to-r from-orange-600 to-orange-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
+            <div className="sticky top-0 bg-orange-600 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
               <h2 className="font-bold text-lg">Select Check-Out Date</h2>
               <button
                 onClick={() => setShowCalendarModal(null)}
@@ -548,7 +575,7 @@ export default function SearchBar({
       {showGuestsModal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
           <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl border border-[#1F2937]">
-            <div className="bg-linear-to-r from-purple-600 to-purple-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
+            <div className="bg-purple-600 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
               <h2 className="font-bold text-lg">Select Guests</h2>
               <button
                 onClick={() => setShowGuestsModal(false)}
