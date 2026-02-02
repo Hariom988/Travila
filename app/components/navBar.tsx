@@ -132,7 +132,7 @@ const Navbar = () => {
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >
                 {/* Avatar */}
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-sm font-bold">
+                <div className="w-8 h-8 rounded-full bg-linear-to-br from-purple-500 to-purple-700 flex items-center justify-center text-sm font-bold">
                   {getInitials(user.name)}
                 </div>
                 {/* User Name */}
@@ -216,7 +216,7 @@ const Navbar = () => {
             <div className="flex flex-col items-center gap-4 w-full px-8 mt-4">
               {/* User Avatar and Name */}
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-lg font-bold">
+                <div className="w-12 h-12 rounded-full bg-linear-to-br from-purple-500 to-purple-700 flex items-center justify-center text-lg font-bold">
                   {getInitials(user.name)}
                 </div>
                 <div className="text-left">
