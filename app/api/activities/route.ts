@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Format timestamp
-    const formattedActivities = activities.map(activity => ({
+    const formattedActivities = activities.map((activity: typeof activities[0]) => ({
       ...activity,
       timestamp: activity.timestamp.toISOString(),
     }));
