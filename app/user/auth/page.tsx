@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Mail,
   Lock,
@@ -12,9 +12,11 @@ import {
   LogIn,
   UserPlus,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useGoogleLogin } from "@react-oauth/google";
+
 type AuthMode = "login" | "register";
+
 interface FormErrors {
   name?: string;
   email?: string;
@@ -23,32 +25,46 @@ interface FormErrors {
   confirmPassword?: string;
   general?: string;
 }
+
 const Page = () => {
   const router = useRouter();
-  const [mode, setMode] = useState<AuthMode>("login");
+  const searchParams = useSearchParams();
+
+  // Get the referrer URL from query params (passed from booking card)
+  const referrerUrl = searchParams.get("redirect") || "/";
+
+  const [currentYear] = useState(new Date().getFullYear());
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+
   const [registerName, setRegisterName] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPhone, setRegisterPhone] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [mode, setMode] = useState<AuthMode>("login");
+
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(email);
   };
+
   const validatePhone = (phone: string) => {
     return /^[0-9]{10}$/.test(phone.replace(/\D/g, ""));
   };
+
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
     setSuccessMessage(null);
     const newErrors: FormErrors = {};
+
     if (!loginEmail.trim()) newErrors.email = "Email is required";
     else if (!validateEmail(loginEmail))
       newErrors.email = "Invalid email format";
@@ -83,14 +99,17 @@ const Page = () => {
       }
 
       setSuccessMessage("Login successful! Redirecting...");
+
+      // Redirect to referrer URL after short delay
       setTimeout(() => {
-        router.push("/");
+        router.push(referrerUrl);
       }, 1500);
     } catch (error) {
       setErrors({ general: "An error occurred. Please try again." });
       setIsLoading(false);
     }
   };
+
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -145,14 +164,16 @@ const Page = () => {
 
       setSuccessMessage("Registration successful! Logging you in...");
 
+      // Redirect to referrer URL after short delay
       setTimeout(() => {
-        router.push("/");
+        router.push(referrerUrl);
       }, 1500);
     } catch (error) {
       setErrors({ general: "An error occurred. Please try again." });
       setIsLoading(false);
     }
   };
+
   const handleModeSwitch = (newMode: AuthMode) => {
     setMode(newMode);
     setErrors({});
@@ -167,6 +188,7 @@ const Page = () => {
     setShowPassword(false);
     setShowConfirmPassword(false);
   };
+
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (codeResponse) => {
       try {
@@ -174,7 +196,6 @@ const Page = () => {
         setErrors({});
         setSuccessMessage(null);
 
-        // Get user info from Google token
         const response = await fetch(
           "https://www.googleapis.com/oauth2/v2/userinfo",
           {
@@ -184,7 +205,6 @@ const Page = () => {
 
         const googleUser = await response.json();
 
-        // Send to your backend
         const backendResponse = await fetch("/api/auth/user/google", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -205,8 +225,10 @@ const Page = () => {
         }
 
         setSuccessMessage("Google login successful! Redirecting...");
+
+        // Redirect to referrer URL after short delay
         setTimeout(() => {
-          router.push("/");
+          router.push(referrerUrl);
         }, 1500);
       } catch (error) {
         console.error("Google auth error:", error);
@@ -219,6 +241,7 @@ const Page = () => {
       setIsLoading(false);
     },
   });
+
   return (
     <div className="min-h-screen w-full bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -578,4 +601,5 @@ const Page = () => {
     </div>
   );
 };
+
 export default Page;

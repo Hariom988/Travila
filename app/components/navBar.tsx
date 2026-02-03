@@ -79,6 +79,11 @@ const Navbar = () => {
       .slice(0, 2);
   };
 
+  const getDisplayName = (user: UserData) => {
+    if (user.name) return user.name;
+    return user.email.split("@")[0];
+  };
+
   return (
     <nav
       className={`${
@@ -138,9 +143,9 @@ const Navbar = () => {
                 <div className="w-8 h-8 rounded-full bg-linear-to-br from-purple-500 to-purple-700 flex items-center justify-center text-sm font-bold">
                   {getInitials(user.name)}
                 </div>
-                {/* User Name */}
+                {/* User Name or Email */}
                 <span className="text-sm font-medium">
-                  {user.name || user.email}
+                  {getDisplayName(user)}
                 </span>
               </button>
 
@@ -170,7 +175,7 @@ const Navbar = () => {
                 </button>
               </div>
             </div>
-          ) : (
+          ) : !isLoading ? (
             <Link
               href="/user/auth"
               className="bg-white/20 hover:bg-white/30 backdrop-blur-sm transition px-5 py-2 rounded-lg flex items-center gap-2 text-sm font-medium"
@@ -178,7 +183,7 @@ const Navbar = () => {
               <User className="w-4 h-4" />
               Login
             </Link>
-          )}
+          ) : null}
         </div>
 
         {/* --- Mobile Menu Toggle --- */}
@@ -237,7 +242,7 @@ const Navbar = () => {
                 Logout
               </button>
             </div>
-          ) : (
+          ) : !isLoading ? (
             <Link
               href="/user/auth"
               onClick={() => setIsMobileMenuOpen(false)}
@@ -245,7 +250,7 @@ const Navbar = () => {
             >
               Login
             </Link>
-          )}
+          ) : null}
         </div>
       </div>
     </nav>

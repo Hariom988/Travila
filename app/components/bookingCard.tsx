@@ -1,7 +1,8 @@
-// app/components/bookingCardV2.tsx
+// app/components/bookingCard.tsx - UPDATED with referrer tracking
 "use client";
 import { useState, useEffect } from "react";
 import { Calendar, Users, ShieldCheck, X } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
 import HotelBookingModal from "./hotelBookingModal";
 import ActivityBookingModal from "./activityBookingModal";
 
@@ -101,17 +102,6 @@ const DatePicker = ({
     year: "numeric",
   });
 
-  const colorClasses = {
-    green: {
-      header: "bg-linear-to-r from-green-600 to-green-700",
-      hover: "hover:bg-green-500",
-    },
-    orange: {
-      header: "bg-linear-to-r from-orange-600 to-orange-700",
-      hover: "hover:bg-orange-500",
-    },
-  };
-
   return (
     <div className="bg-[#1D2939] rounded-xl shadow-2xl p-4 border border-[#344054]">
       <div className="flex items-center justify-between mb-6">
@@ -208,6 +198,9 @@ export default function BookingCardV2({
   activityDuration,
   type,
 }: BookingCardV2Props) {
+  const router = useRouter();
+  const pathname = usePathname(); // Get current page path
+
   // Initialize from localStorage
   const [checkIn, setCheckIn] = useState(() => {
     if (typeof window !== "undefined") {
@@ -319,12 +312,28 @@ export default function BookingCardV2({
   const pricePerPerson = activityPrice ? parseFloat(activityPrice) : 0;
   const activityTotalPrice = pricePerPerson * people;
 
-  // Handle booking based on type
-  const handleReserveClick = () => {
-    if (type === "hotel") {
-      setShowHotelBookingModal(true);
-    } else {
-      setShowActivityBookingModal(true);
+  // Handle booking - check authentication before opening modal
+  const handleReserveClick = async () => {
+    try {
+      // Check if user is authenticated
+      const response = await fetch("/api/auth/verify");
+
+      if (!response.ok) {
+        // User not authenticated - redirect to login with referrer
+        router.push(`/user/auth?redirect=${encodeURIComponent(pathname)}`);
+        return;
+      }
+
+      // User is authenticated - open booking modal
+      if (type === "hotel") {
+        setShowHotelBookingModal(true);
+      } else {
+        setShowActivityBookingModal(true);
+      }
+    } catch (error) {
+      console.error("Auth check error:", error);
+      // Redirect to login on error
+      router.push(`/user/auth?redirect=${encodeURIComponent(pathname)}`);
     }
   };
 
@@ -453,7 +462,7 @@ export default function BookingCardV2({
           </div>
         </ClientOnly>
 
-        {/* Reserve Button */}
+        {/* Reserve Button - Updated to check auth */}
         <button
           onClick={handleReserveClick}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-3"
