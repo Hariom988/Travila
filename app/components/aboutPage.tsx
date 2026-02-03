@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Quote,
 } from "lucide-react";
+import Link from "next/link";
 
 const AboutPage = () => {
   const [activeTab, setActiveTab] = useState("mission");
@@ -98,15 +99,8 @@ const AboutPage = () => {
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-purple-600/20 border border-purple-500/30 px-4 py-2 rounded-full mb-6 backdrop-blur-sm">
-            <Globe className="w-4 h-4 text-purple-400" />
-            <span className="text-xs sm:text-sm font-medium text-purple-300">
-              Est. 2018
-            </span>
-          </div>
-
           <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black mb-4 sm:mb-6 leading-tight">
-            <span className="bg-clip-text text-transparent bg-linear-to-r from-purple-400 via-pink-400 to-purple-600">
+            <span className="bg-clip-text text-transparent bg-linear-to-tr from-purple-200 via-purple-400 to-purple-200">
               We Make Travel
             </span>
             <br />
@@ -125,7 +119,7 @@ const AboutPage = () => {
                 key={idx}
                 className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-6 hover:bg-slate-800/70 transition-all group"
               >
-                <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400 mx-auto mb-2 sm:mb-3 group-hover:scale-110 transition-transform" />
+                <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400 mx-auto mb-2 sm:mb-3  transition-transform" />
                 <div className="text-xl sm:text-2xl md:text-3xl font-black text-white mb-1">
                   {stat.value}
                 </div>
@@ -147,9 +141,9 @@ const AboutPage = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 min-w-25 sm:min-w-0 px-4 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all ${
+                className={`flex-1 hover:cursor-pointer min-w-25 sm:min-w-0 px-4 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all ${
                   activeTab === tab
-                    ? "bg-purple-600 text-white shadow-lg shadow-purple-500/50"
+                    ? "bg-purple-600 text-white shadow-lg"
                     : "bg-slate-800/50 text-slate-400 hover:bg-slate-800"
                 }`}
               >
@@ -209,7 +203,7 @@ const AboutPage = () => {
                       key={idx}
                       className="bg-slate-900/50 border border-slate-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:bg-slate-900/70 transition-all group"
                     >
-                      <value.icon className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400 mb-3 sm:mb-4 group-hover:scale-110 transition-transform" />
+                      <value.icon className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400 mb-3 sm:mb-4  transition-transform" />
                       <h3 className="text-base sm:text-lg md:text-xl font-bold mb-2 text-white">
                         {value.title}
                       </h3>
@@ -244,7 +238,7 @@ const AboutPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+          <div className="grid hover:cursor-pointer grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             {team.map((member, idx) => (
               <div
                 key={idx}
@@ -286,18 +280,18 @@ const AboutPage = () => {
             </p>
           </div>
 
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-4  sm:space-y-6">
             {milestones.map((milestone, idx) => (
               <div key={idx} className="flex gap-3 sm:gap-6 items-start group">
                 <div className="flex flex-col items-center shrink-0">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-purple-600 flex items-center justify-center font-black text-xs sm:text-sm text-white group-hover:scale-110 transition-transform">
+                  <div className="w-10 cursor-pointer h-10 sm:w-12 sm:h-12 rounded-full bg-purple-600 flex items-center justify-center font-black text-xs sm:text-sm text-white   transition-transform">
                     {milestone.year}
                   </div>
                   {idx < milestones.length - 1 && (
-                    <div className="w-0.5 h-12 sm:h-16 bg-slate-700 mt-2"></div>
+                    <div className="w-0.5  h-12 sm:h-16 bg-slate-700 mt-2"></div>
                   )}
                 </div>
-                <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-6 flex-1 group-hover:bg-slate-800/50 transition-all">
+                <div className="bg-slate-800/30 cursor-pointer backdrop-blur-sm border border-slate-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-6 flex-1 group-hover:bg-slate-800/50 transition-all">
                   <p className="text-sm sm:text-base text-white font-semibold">
                     {milestone.event}
                   </p>
@@ -349,12 +343,16 @@ const AboutPage = () => {
             Join thousands of happy travelers and discover your next adventure
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <button className="bg-purple-600 hover:bg-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all shadow-lg shadow-purple-500/50 hover:scale-105">
-              Explore Hotels
-            </button>
-            <button className="bg-slate-800 hover:bg-slate-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all border border-slate-600">
-              Contact Us
-            </button>
+            <Link href="/hotel">
+              <button className="bg-purple-700 cursor-pointer hover:bg-purple-800 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all shadow-lg  ">
+                Explore Hotels
+              </button>
+            </Link>
+            <Link href="/contact">
+              <button className="bg-slate-800 cursor-pointer hover:bg-slate-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all border border-slate-600">
+                Contact Us
+              </button>
+            </Link>
           </div>
         </div>
       </section>
