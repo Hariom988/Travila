@@ -293,7 +293,7 @@ const ContactPage = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all shadow-lg shadow-purple-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                    className="w-full bg-linear-to-r bg-purple-700 hover:bg-purple-800  text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all disabled:opacity-50 cursor-pointer  flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
                       <>
@@ -382,15 +382,14 @@ const ContactPage = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl sm:rounded-3xl overflow-hidden">
             <div className="aspect-video bg-slate-900/50 flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="w-12 h-12 sm:w-16 sm:h-16 text-purple-400 mx-auto mb-3 sm:mb-4" />
-                <h3 className="text-base sm:text-lg font-bold text-white mb-2">
-                  Visit Our Office
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-400">
-                  Connaught Place, New Delhi
-                </p>
-              </div>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d56092.516073928455!2d77.27210433305079!3d28.51619823620842!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce65f77cae949%3A0x7c768dbb3f78e57!2sBadarpur%2C%20New%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1770118041625!5m2!1sen!2sin"
+                width="100%"
+                height="100%"
+                className="border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
             </div>
           </div>
         </div>
@@ -408,7 +407,7 @@ const ContactPage = () => {
             </p>
           </div>
 
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-8 sm:space-y-4">
             {[
               {
                 q: "How do I make a booking?",
@@ -429,9 +428,9 @@ const ContactPage = () => {
             ].map((faq, idx) => (
               <details
                 key={idx}
-                className="group bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-xl sm:rounded-2xl overflow-hidden"
+                className="group  bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-xl sm:rounded-2xl overflow-hidden"
               >
-                <summary className="px-4 sm:px-6 py-3 sm:py-4 cursor-pointer list-none flex items-center justify-between hover:bg-slate-800/50 transition-all">
+                <summary className="px-4 p-2 sm:px-6 py-3 sm:py-4 cursor-pointer list-none flex items-center justify-between hover:bg-slate-800/50 transition-all">
                   <span className="text-xs sm:text-sm md:text-base font-bold text-white pr-4">
                     {faq.q}
                   </span>
