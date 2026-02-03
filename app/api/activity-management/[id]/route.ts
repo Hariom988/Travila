@@ -4,6 +4,42 @@ import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 import { logActivity } from '@/lib/activity-logger';
 
+// ✅ GET single activity - PUBLIC (NO authentication required)
+// Users need to see activity details before booking
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    const activity = await prisma.activity.findUnique({
+      where: { id },
+    });
+
+    if (!activity) {
+      return NextResponse.json(
+        { error: 'Activity not found' },
+        { status: 404 }
+      );
+    }
+
+    const safeData = JSON.parse(JSON.stringify({
+      ...activity,
+      pricePerPerson: activity.pricePerPerson.toString(),
+    }));
+
+    return NextResponse.json(safeData);
+  } catch (error) {
+    console.error('Error fetching activity:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch activity' },
+      { status: 500 }
+    );
+  }
+}
+
+// ✅ PUT - Update activity - ADMIN ONLY
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -69,6 +105,7 @@ export async function PUT(
   }
 }
 
+// ✅ DELETE - Delete activity - ADMIN ONLY
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -117,40 +154,6 @@ export async function DELETE(
     console.error('Error deleting activity:', error);
     return NextResponse.json(
       { error: 'Failed to delete activity' },
-      { status: 500 }
-    );
-  }
-}
-
-// GET single hotel - PUBLIC
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
-
-    const activity = await prisma.activity.findUnique({
-      where: { id },
-    });
-
-    if (!activity) {
-      return NextResponse.json(
-        { error: 'Hotel not found' },
-        { status: 404 }
-      );
-    }
-
-    const safeData = JSON.parse(JSON.stringify({
-      ...activity,
-      pricePerPerson: activity.pricePerPerson.toString(),
-    }));
-
-    return NextResponse.json(safeData);
-  } catch (error) {
-    console.error('Error fetching activity:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch activity' },
       { status: 500 }
     );
   }

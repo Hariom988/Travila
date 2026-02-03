@@ -1,3 +1,5 @@
+// EXAMPLE: How to update app/(public)/hotel/[id]/page.tsx
+
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,7 +23,6 @@ interface PageProps {
 
 async function getHotelData(id: string) {
   try {
-    // Direct database call instead of HTTP fetch
     const hotel = await prisma.hotel.findUnique({
       where: { id },
       select: {
@@ -39,7 +40,6 @@ async function getHotelData(id: string) {
 
     if (!hotel) return null;
 
-    // Convert Decimal to string for serialization
     return {
       ...hotel,
       pricePerNight: hotel.pricePerNight.toString(),
@@ -156,11 +156,13 @@ export default async function HotelDetailPage({ params }: PageProps) {
             </section>
           </div>
 
-          {/* Right Side: Booking Card (4 Columns) */}
+          {/* Right Side: Booking Card (4 Columns) - UPDATED COMPONENT */}
           <aside className="lg:col-span-4">
             <BookingCard
-              hotelPrice={hotel.pricePerNight}
+              type="hotel"
+              hotelId={hotel.id}
               hotelName={hotel.name}
+              hotelPrice={hotel.pricePerNight}
             />
           </aside>
         </div>

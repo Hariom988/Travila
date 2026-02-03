@@ -4,7 +4,8 @@ import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 import { logActivity } from '@/lib/activity-logger';
 
-// GET all activities - PUBLIC (for displaying on website)
+// ✅ GET all activities - PUBLIC (NO authentication required)
+// Anyone can view activities to browse before booking
 export async function GET(request: NextRequest) {
   try {
     const activities = await prisma.activity.findMany({
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create new activity - ADMIN ONLY
+// ✅ POST - Create new activity - ADMIN ONLY
 export async function POST(request: NextRequest) {
   try {
     const auth = await verifyAdminAuth(request);

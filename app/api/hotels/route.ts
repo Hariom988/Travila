@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 import { logActivity } from '@/lib/activity-logger';
 
+// ✅ GET all hotels - PUBLIC (NO authentication required)
+// Anyone can view hotels to browse and see prices
 export async function GET(request: NextRequest) {
   try {
     const hotels = await prisma.hotel.findMany({
@@ -38,7 +40,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create new hotel - ADMIN ONLY
+// ✅ POST - Create new hotel - ADMIN ONLY
 export async function POST(request: NextRequest) {
   try {
     const auth = await verifyAdminAuth(request);
