@@ -1,8 +1,8 @@
-// app/components/bookingCard.tsx - UPDATED with referrer tracking
+// app/components/bookingCard.tsx - UPDATED with booking intent
 "use client";
 import { useState, useEffect } from "react";
 import { Calendar, Users, ShieldCheck, X } from "lucide-react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import HotelBookingModal from "./hotelBookingModal";
 import ActivityBookingModal from "./activityBookingModal";
 
@@ -199,8 +199,26 @@ export default function BookingCardV2({
   type,
 }: BookingCardV2Props) {
   const router = useRouter();
-  const pathname = usePathname(); // Get current page path
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
+  // Check if we should auto-open booking modal after login
+  const shouldAutoOpenBooking = searchParams.get("showBooking") === "true";
+
+  // Auto-open booking modal when returning from auth with showBooking=true
+  useEffect(() => {
+    if (shouldAutoOpenBooking) {
+      // Open the appropriate booking modal
+      if (type === "hotel") {
+        setShowHotelBookingModal(true);
+      } else {
+        setShowActivityBookingModal(true);
+      }
+
+      // Clean up the URL by removing the showBooking parameter
+      router.replace(pathname);
+    }
+  }, [shouldAutoOpenBooking, type, pathname, router]);
   // Initialize from localStorage
   const [checkIn, setCheckIn] = useState(() => {
     if (typeof window !== "undefined") {
@@ -261,6 +279,19 @@ export default function BookingCardV2({
   const [showActivityBookingModal, setShowActivityBookingModal] =
     useState(false);
 
+  // Auto-open booking modal if redirected from login
+  useEffect(() => {
+    if (shouldAutoOpenBooking) {
+      if (type === "hotel") {
+        setShowHotelBookingModal(true);
+      } else {
+        setShowActivityBookingModal(true);
+      }
+      // Remove the query param to clean up URL
+      router.replace(pathname);
+    }
+  }, [shouldAutoOpenBooking, type, pathname, router]);
+
   // Sync with localStorage when values change
   useEffect(() => {
     const stored = localStorage.getItem("hotelSearch");
@@ -319,8 +350,9 @@ export default function BookingCardV2({
       const response = await fetch("/api/auth/verify");
 
       if (!response.ok) {
-        // User not authenticated - redirect to login with referrer
-        router.push(`/user/auth?redirect=${encodeURIComponent(pathname)}`);
+        // User not authenticated - redirect to login with referrer and booking intent
+        const loginUrl = `/user/auth?redirect=${encodeURIComponent(pathname)}&bookingIntent=true`;
+        router.push(loginUrl);
         return;
       }
 
@@ -333,7 +365,8 @@ export default function BookingCardV2({
     } catch (error) {
       console.error("Auth check error:", error);
       // Redirect to login on error
-      router.push(`/user/auth?redirect=${encodeURIComponent(pathname)}`);
+      const loginUrl = `/user/auth?redirect=${encodeURIComponent(pathname)}&bookingIntent=true`;
+      router.push(loginUrl);
     }
   };
 

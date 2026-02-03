@@ -1,3 +1,4 @@
+// app/user/auth/page.tsx - UPDATED with booking intent handling
 "use client";
 import React, { useState, useEffect } from "react";
 import {
@@ -29,10 +30,6 @@ interface FormErrors {
 const Page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  // Get the referrer URL from query params (passed from booking card)
-  const referrerUrl = searchParams.get("redirect") || "/";
-
   const [currentYear] = useState(new Date().getFullYear());
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -51,6 +48,28 @@ const Page = () => {
 
   const [mode, setMode] = useState<AuthMode>("login");
 
+  // Get the referrer URL and booking intent from query params
+  const referrerUrl = searchParams.get("redirect") || "/";
+  const bookingIntent = searchParams.get("bookingIntent") === "true";
+  let finalUrl = referrerUrl;
+  if (bookingIntent) {
+    // Append showBooking=true to trigger modal auto-open on the detail page
+    const separator = referrerUrl.includes("?") ? "&" : "?";
+    finalUrl = `${referrerUrl}${separator}showBooking=true`;
+  }
+
+  // Then redirect
+  router.push(finalUrl);
+  // Helper function to build the final redirect URL
+  const buildRedirectUrl = (baseUrl: string): string => {
+    if (!bookingIntent) {
+      // If no booking intent, just redirect to the referrer URL as-is
+      return baseUrl;
+    }
+    // If booking intent is true, append showBooking=true to trigger modal auto-open
+    const separator = baseUrl.includes("?") ? "&" : "?";
+    return `${baseUrl}${separator}showBooking=true`;
+  };
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(email);
   };
@@ -100,9 +119,16 @@ const Page = () => {
 
       setSuccessMessage("Login successful! Redirecting...");
 
-      // Redirect to referrer URL after short delay
+      // Build redirect URL with booking intent if applicable
+      let redirectUrl = referrerUrl;
+      if (bookingIntent) {
+        const separator = referrerUrl.includes("?") ? "&" : "?";
+        redirectUrl = `${referrerUrl}${separator}showBooking=true`;
+      }
+
+      const finalUrl = buildRedirectUrl(referrerUrl);
       setTimeout(() => {
-        router.push(referrerUrl);
+        router.push(finalUrl);
       }, 1500);
     } catch (error) {
       setErrors({ general: "An error occurred. Please try again." });
@@ -164,9 +190,17 @@ const Page = () => {
 
       setSuccessMessage("Registration successful! Logging you in...");
 
+      // Build redirect URL with booking intent if applicable
+      let redirectUrl = referrerUrl;
+      if (bookingIntent) {
+        const separator = referrerUrl.includes("?") ? "&" : "?";
+        redirectUrl = `${referrerUrl}${separator}showBooking=true`;
+      }
+
       // Redirect to referrer URL after short delay
+      const finalUrl = buildRedirectUrl(referrerUrl);
       setTimeout(() => {
-        router.push(referrerUrl);
+        router.push(finalUrl);
       }, 1500);
     } catch (error) {
       setErrors({ general: "An error occurred. Please try again." });
@@ -226,9 +260,17 @@ const Page = () => {
 
         setSuccessMessage("Google login successful! Redirecting...");
 
+        // Build redirect URL with booking intent if applicable
+        let redirectUrl = referrerUrl;
+        if (bookingIntent) {
+          const separator = referrerUrl.includes("?") ? "&" : "?";
+          redirectUrl = `${referrerUrl}${separator}showBooking=true`;
+        }
+
         // Redirect to referrer URL after short delay
+        const finalUrl = buildRedirectUrl(referrerUrl);
         setTimeout(() => {
-          router.push(referrerUrl);
+          router.push(finalUrl);
         }, 1500);
       } catch (error) {
         console.error("Google auth error:", error);
@@ -257,7 +299,16 @@ const Page = () => {
             <span className="text-2xl">✈️</span>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">TravelHub</h1>
-          <p className="text-slate-400">Discover your next adventure</p>
+          <p className="text-slate-400">
+            {bookingIntent
+              ? "Sign in to complete your booking"
+              : "Discover your next adventure"}
+          </p>
+          {bookingIntent && (
+            <p className="text-sm text-blue-400 mt-2">
+              Sign in to complete your booking
+            </p>
+          )}
         </div>
 
         <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-2xl p-8">

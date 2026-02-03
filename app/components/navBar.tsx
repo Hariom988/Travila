@@ -1,3 +1,4 @@
+// app/components/navBar.tsx - UPDATED to show user email
 "use client";
 import { useState, useEffect } from "react";
 import { Phone, User, Menu, X, LogOut } from "lucide-react";
@@ -79,9 +80,9 @@ const Navbar = () => {
       .slice(0, 2);
   };
 
-  const getDisplayName = (user: UserData) => {
-    if (user.name) return user.name;
-    return user.email.split("@")[0];
+  // Get display email - always show email, not name
+  const getDisplayEmail = (user: UserData) => {
+    return user.email;
   };
 
   return (
@@ -143,9 +144,10 @@ const Navbar = () => {
                 <div className="w-8 h-8 rounded-full bg-linear-to-br from-purple-500 to-purple-700 flex items-center justify-center text-sm font-bold">
                   {getInitials(user.name)}
                 </div>
-                {/* User Name or Email */}
-                <span className="text-sm font-medium">
-                  {getDisplayName(user)}
+                {/* User Email */}
+                <span className="text-sm font-medium">{user.email}</span>
+                <span className="text-sm font-medium max-w-xs truncate">
+                  {getDisplayEmail(user)}
                 </span>
               </button>
 
@@ -153,7 +155,7 @@ const Navbar = () => {
               <div
                 onMouseEnter={() => setIsDropdownOpen(true)}
                 onMouseLeave={() => setIsDropdownOpen(false)}
-                className={`absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden transition-all duration-200 ${
+                className={`absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden transition-all duration-200 ${
                   isDropdownOpen ? "opacity-100 visible" : "opacity-0 invisible"
                 }`}
               >
@@ -162,7 +164,17 @@ const Navbar = () => {
                   <p className="text-sm font-medium text-white">
                     {user.name || "User"}
                   </p>
-                  <p className="text-xs text-gray-400">{user.email}</p>
+                  <p className="text-xs text-gray-300 mt-1">{user.email}</p>
+                  {user.phone && (
+                    <p className="text-xs text-gray-400 mt-1">{user.phone}</p>
+                  )}
+                </div>
+
+                {/* Account Role Badge */}
+                <div className="px-4 py-2 border-b border-gray-700">
+                  <span className="inline-block px-2 py-1 bg-blue-600/20 text-blue-300 text-xs rounded font-medium">
+                    {user.role === "ADMIN" ? "Admin Account" : "User Account"}
+                  </span>
                 </div>
 
                 {/* Logout Button */}
@@ -222,14 +234,17 @@ const Navbar = () => {
           {/* Mobile User Section */}
           {!isLoading && user ? (
             <div className="flex flex-col items-center gap-4 w-full px-8 mt-4">
-              {/* User Avatar and Name */}
+              {/* User Avatar and Email */}
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-linear-to-br from-purple-500 to-purple-700 flex items-center justify-center text-lg font-bold">
                   {getInitials(user.name)}
                 </div>
                 <div className="text-left">
                   <p className="text-sm font-medium">{user.name || "User"}</p>
-                  <p className="text-xs text-gray-400">{user.email}</p>
+                  <p className="text-sm font-medium">{user.email}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {user.role === "ADMIN" ? "Admin Account" : "User Account"}
+                  </p>
                 </div>
               </div>
 
