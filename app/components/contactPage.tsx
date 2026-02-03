@@ -35,7 +35,7 @@ const ContactPage = () => {
     {
       icon: Phone,
       title: "Call Us",
-      details: ["+91 78568 39450", "+91 98786 77770"],
+      details: ["+91 7856839450", "+91 9878677770"],
       color: "from-blue-500 to-blue-600",
     },
     {
@@ -115,15 +115,8 @@ const ContactPage = () => {
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-purple-600/20 border border-purple-500/30 px-4 py-2 rounded-full mb-6 backdrop-blur-sm">
-            <MessageCircle className="w-4 h-4 text-purple-400" />
-            <span className="text-xs sm:text-sm font-medium text-purple-300">
-              We're Here to Help
-            </span>
-          </div>
-
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-black mb-4 sm:mb-6 leading-tight">
-            <span className="bg-clip-text text-transparent bg-linear-to-r from-purple-400 via-pink-400 to-purple-600">
+            <span className="bg-clip-text text-transparent bg-linear-to-tr from-purple-200 via-purple-400 to-purple-200">
               Get In Touch
             </span>
             <br />
@@ -144,7 +137,7 @@ const ContactPage = () => {
             {contactInfo.map((info, idx) => (
               <div
                 key={idx}
-                className="group bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:bg-slate-800/50 transition-all hover:scale-105"
+                className="group cursor-pointer bg-slate-800/30 flex flex-col justify-center items-center backdrop-blur-sm border border-slate-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:bg-slate-800/50 transition-all hover:scale-102"
               >
                 <div
                   className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-linear-to-br ${info.color} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}
