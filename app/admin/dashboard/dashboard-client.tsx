@@ -1,3 +1,4 @@
+// app/admin/dashboard/dashboard-client-updated.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -12,6 +13,11 @@ import {
   CheckCircle,
   Upload,
   ChevronDown,
+  BookOpen,
+  Users,
+  Calendar,
+  MapPin,
+  DollarSign,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -37,6 +43,31 @@ interface Activity {
   createdAt: string;
 }
 
+interface Booking {
+  id: string;
+  bookingType: "HOTEL" | "ACTIVITY";
+  itemId: string;
+  itemName: string;
+  itemLocation: string;
+  itemImage: string | null;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  userPhone: string;
+  startDate?: string; // Hotel booking
+  endDate?: string; // Hotel booking
+  nights?: number;
+  rooms?: number;
+  date?: string; // Activity booking
+  people?: number;
+  duration?: string; // Activity booking
+  pricePerUnit: string;
+  totalPrice: string;
+  status: "PENDING" | "CONFIRMED" | "CANCELLED";
+  paymentId: string | null;
+  createdAt: string;
+}
+
 interface ActivityLog {
   id: string;
   action: string;
@@ -58,7 +89,7 @@ interface FormData {
   images: string[];
 }
 
-type TabType = "hotels" | "activities" | "logs";
+type TabType = "hotels" | "activities" | "bookings";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -66,6 +97,7 @@ export default function AdminDashboard() {
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [logs, setLogs] = useState<ActivityLog[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -74,6 +106,12 @@ export default function AdminDashboard() {
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [bookingFilter, setBookingFilter] = useState<
+    "all" | "hotel" | "activity"
+  >("all");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "PENDING" | "CONFIRMED" | "CANCELLED"
+  >("all");
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -129,9 +167,9 @@ export default function AdminDashboard() {
       extraField: "duration",
       hasToggle: false,
     },
-    logs: {
-      label: "Activity Logs",
-      endpoint: "/api/activities",
+    bookings: {
+      label: "Bookings",
+      endpoint: "/api/admin/booking",
       addLabel: "",
       modalTitle: () => "",
       successMsg: () => "",
@@ -144,7 +182,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchData();
-  }, [activeTab]);
+  }, [activeTab, bookingFilter, statusFilter]);
 
   const fetchData = async () => {
     try {
@@ -153,15 +191,15 @@ export default function AdminDashboard() {
         await fetchItems("hotels");
       } else if (activeTab === "activities") {
         await fetchItems("activities");
-      } else {
-        await fetchItems("logs");
+      } else if (activeTab === "bookings") {
+        await fetchBookings();
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchItems = async (type: TabType) => {
+  const fetchItems = async (type: Exclude<TabType, "bookings">) => {
     try {
       const endpoint = tabConfig[type].endpoint;
       const response = await fetch(endpoint);
@@ -174,6 +212,33 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error(`Error fetching ${type}:`, error);
       setFormError(`Failed to load ${type}`);
+    }
+  };
+
+  const fetchBookings = async () => {
+    try {
+      let url = "/api/admin/booking";
+      const params = new URLSearchParams();
+
+      if (bookingFilter !== "all") {
+        params.append("type", bookingFilter);
+      }
+      if (statusFilter !== "all") {
+        params.append("status", statusFilter);
+      }
+
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to fetch bookings");
+
+      const data = await response.json();
+      setBookings(data.data || []);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      setFormError("Failed to load bookings");
     }
   };
 
@@ -283,7 +348,7 @@ export default function AdminDashboard() {
 
       setSuccessMessage(tabConfig[activeTab].successMsg(!!editingId));
       setIsModalOpen(false);
-      await fetchItems(activeTab);
+      await fetchItems(activeTab as Exclude<TabType, "bookings">);
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "Operation failed");
@@ -325,7 +390,7 @@ export default function AdminDashboard() {
       if (!response.ok) throw new Error("Failed to delete");
 
       setSuccessMessage("Deleted successfully!");
-      await fetchItems(activeTab);
+      await fetchItems(activeTab as Exclude<TabType, "bookings">);
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "Delete failed");
@@ -372,13 +437,15 @@ export default function AdminDashboard() {
           a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           a.location.toLowerCase().includes(searchTerm.toLowerCase()),
       );
-    } else {
-      return logs.filter(
-        (l) =>
-          l.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          l.action.toLowerCase().includes(searchTerm.toLowerCase()),
+    } else if (activeTab === "bookings") {
+      return bookings.filter(
+        (b) =>
+          b.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          b.userEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          b.userName.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
+    return [];
   };
 
   const filteredItems = getFilteredItems();
@@ -411,19 +478,21 @@ export default function AdminDashboard() {
       <div className="bg-gray-800 border-b border-gray-700 sticky top-18 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex gap-8 overflow-x-auto">
-            {(["hotels", "activities", "logs"] as TabType[]).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`py-4 px-2 font-medium transition border-b-2 whitespace-nowrap ${
-                  activeTab === tab
-                    ? "text-blue-400 border-blue-400"
-                    : "text-gray-400 border-transparent hover:text-gray-300"
-                }`}
-              >
-                {tabConfig[tab].label}
-              </button>
-            ))}
+            {(["hotels", "activities","bookings"] as TabType[]).map(
+              (tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`py-4 px-2 font-medium transition border-b-2 whitespace-nowrap ${
+                    activeTab === tab
+                      ? "text-blue-400 border-blue-400"
+                      : "text-gray-400 border-transparent hover:text-gray-300"
+                  }`}
+                >
+                  {tabConfig[tab].label}
+                </button>
+              ),
+            )}
           </div>
         </div>
       </div>
@@ -445,7 +514,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {activeTab !== "logs" && (
+        {activeTab !== "bookings" && (
           <>
             {/* Controls */}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
@@ -804,20 +873,47 @@ export default function AdminDashboard() {
         )}
 
         {/* Activity Logs Tab */}
-        {activeTab === "logs" && (
+
+        {/* Bookings Tab */}
+        {activeTab === "bookings" && (
           <>
-            <div className="relative w-full sm:w-64 mb-6">
-              <Search
-                className="absolute left-3 top-3 text-gray-500"
-                size={18}
-              />
-              <input
-                type="text"
-                placeholder="Search logs..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 text-sm"
-              />
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
+              <div className="relative w-full sm:w-64">
+                <Search
+                  className="absolute left-3 top-3 text-gray-500"
+                  size={18}
+                />
+                <input
+                  type="text"
+                  placeholder="Search bookings..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 text-sm"
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <select
+                  value={bookingFilter}
+                  onChange={(e) => setBookingFilter(e.target.value as any)}
+                  className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none"
+                >
+                  <option value="all">All Types</option>
+                  <option value="hotel">Hotels</option>
+                  <option value="activity">Activities</option>
+                </select>
+
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as any)}
+                  className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none"
+                >
+                  <option value="all">All Status</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="CONFIRMED">Confirmed</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
+              </div>
             </div>
 
             {/* Desktop Table */}
@@ -825,11 +921,12 @@ export default function AdminDashboard() {
               {loading ? (
                 <div className="p-12 text-center">
                   <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-gray-400">Loading activity logs...</p>
+                  <p className="text-gray-400">Loading bookings...</p>
                 </div>
               ) : filteredItems.length === 0 ? (
                 <div className="p-12 text-center">
-                  <p className="text-gray-400">No activity logs yet</p>
+                  <BookOpen className="w-16 h-16 mx-auto text-gray-600 mb-4" />
+                  <p className="text-gray-400">No bookings found</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -837,46 +934,115 @@ export default function AdminDashboard() {
                     <thead>
                       <tr className="bg-gray-700 border-b border-gray-700">
                         <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                          Admin
+                          Booking Type
                         </th>
                         <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                          Action
+                          Item
                         </th>
                         <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                          Details
+                          Customer
                         </th>
                         <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                          Time
+                          Dates/Info
+                        </th>
+                        <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                          Amount
+                        </th>
+                        <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                          Status
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700">
-                      {filteredItems.map((log: any) => (
+                      {(filteredItems as Booking[]).map((booking: Booking) => (
                         <tr
-                          key={log.id}
+                          key={booking.id}
                           className="hover:bg-gray-750 transition"
                         >
                           <td className="px-6 py-4">
+                            <span
+                              className={`px-3 py-1 rounded text-xs font-bold ${
+                                booking.bookingType === "HOTEL"
+                                  ? "bg-blue-900/30 text-blue-300"
+                                  : "bg-purple-900/30 text-purple-300"
+                              }`}
+                            >
+                              {booking.bookingType}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
                             <div>
                               <p className="text-white font-medium">
-                                {log.user.name || "Admin"}
+                                {booking.itemName}
                               </p>
                               <p className="text-gray-400 text-xs">
-                                {log.user.email}
+                                {booking.itemLocation}
                               </p>
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="px-3 py-1 bg-blue-900/30 text-blue-300 text-xs rounded font-medium">
-                              {log.action}
+                            <div>
+                              <p className="text-white font-medium">
+                                {booking.userName}
+                              </p>
+                              <p className="text-gray-400 text-xs">
+                                {booking.userEmail}
+                              </p>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-gray-300">
+                            {booking.bookingType === "HOTEL" ? (
+                              <div className="text-xs">
+                                <p>
+                                  {booking.startDate &&
+                                    new Date(
+                                      booking.startDate,
+                                    ).toLocaleDateString()}
+                                  {" - "}
+                                  {booking.endDate &&
+                                    new Date(
+                                      booking.endDate,
+                                    ).toLocaleDateString()}
+                                </p>
+                                <p className="text-gray-400">
+                                  {booking.nights} nights, {booking.rooms}{" "}
+                                  room(s)
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="text-xs">
+                                <p>
+                                  {booking.date &&
+                                    new Date(booking.date).toLocaleDateString()}
+                                </p>
+                                <p className="text-gray-400">
+                                  {booking.people} people • {booking.duration}
+                                </p>
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-white font-bold">
+                              ₹{booking.totalPrice}
+                            </p>
+                            <p className="text-gray-400 text-xs">
+                              {booking.bookingType === "HOTEL"
+                                ? `₹${booking.pricePerUnit}/night`
+                                : `₹${booking.pricePerUnit}/person`}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                booking.status === "PENDING"
+                                  ? "bg-yellow-900/30 text-yellow-300"
+                                  : booking.status === "CONFIRMED"
+                                    ? "bg-green-900/30 text-green-300"
+                                    : "bg-red-900/30 text-red-300"
+                              }`}
+                            >
+                              {booking.status}
                             </span>
-                          </td>
-                          <td className="px-6 py-4 text-gray-300 max-w-xs truncate">
-                            {log.details || "—"}
-                          </td>
-                          <td className="px-6 py-4 text-gray-400 text-sm">
-                            {new Date(log.timestamp).toLocaleDateString()}{" "}
-                            {new Date(log.timestamp).toLocaleTimeString()}
                           </td>
                         </tr>
                       ))}
@@ -891,60 +1057,213 @@ export default function AdminDashboard() {
               {loading ? (
                 <div className="p-12 text-center">
                   <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-gray-400">Loading logs...</p>
+                  <p className="text-gray-400">Loading bookings...</p>
                 </div>
               ) : filteredItems.length === 0 ? (
                 <div className="p-8 text-center bg-gray-800 rounded-lg">
-                  <p className="text-gray-400">No activity logs yet</p>
+                  <BookOpen className="w-12 h-12 mx-auto text-gray-600 mb-2" />
+                  <p className="text-gray-400">No bookings found</p>
                 </div>
               ) : (
-                filteredItems.map((log: any) => (
+                (filteredItems as Booking[]).map((booking: Booking) => (
                   <div
-                    key={log.id}
+                    key={booking.id}
                     className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden"
                   >
                     <div
                       className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-750 transition"
                       onClick={() =>
-                        setExpandedId(expandedId === log.id ? null : log.id)
+                        setExpandedId(
+                          expandedId === booking.id ? null : booking.id,
+                        )
                       }
                     >
                       <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span
+                            className={`px-2 py-0.5 rounded text-xs font-bold ${
+                              booking.bookingType === "HOTEL"
+                                ? "bg-blue-900/30 text-blue-300"
+                                : "bg-purple-900/30 text-purple-300"
+                            }`}
+                          >
+                            {booking.bookingType}
+                          </span>
+                          <span
+                            className={`px-2 py-0.5 rounded text-xs font-medium ${
+                              booking.status === "PENDING"
+                                ? "bg-yellow-900/30 text-yellow-300"
+                                : booking.status === "CONFIRMED"
+                                  ? "bg-green-900/30 text-green-300"
+                                  : "bg-red-900/30 text-red-300"
+                            }`}
+                          >
+                            {booking.status}
+                          </span>
+                        </div>
                         <h3 className="text-white font-medium truncate">
-                          {log.action}
+                          {booking.itemName}
                         </h3>
                         <p className="text-gray-400 text-sm">
-                          {log.user.email}
+                          {booking.userName}
                         </p>
                       </div>
-                      <ChevronDown
-                        size={20}
-                        className={`text-gray-400 transition ml-2 ${expandedId === log.id ? "rotate-180" : ""}`}
-                      />
+
+                      <div className="text-right ml-2">
+                        <p className="text-white font-bold">
+                          ₹{booking.totalPrice}
+                        </p>
+                        <ChevronDown
+                          size={18}
+                          className={`text-gray-400 transition mt-1 ${
+                            expandedId === booking.id ? "rotate-180" : ""
+                          }`}
+                        />
+                      </div>
                     </div>
 
-                    {expandedId === log.id && (
-                      <div className="border-t border-gray-700 p-4 space-y-3 bg-gray-750">
+                    {expandedId === booking.id && (
+                      <div className="border-t border-gray-700 p-4 space-y-4 bg-gray-750">
+                        {/* Item Info */}
                         <div>
-                          <p className="text-gray-400 text-sm">Admin Name</p>
+                          <p className="text-gray-400 text-xs font-semibold uppercase mb-1">
+                            Item Details
+                          </p>
                           <p className="text-white font-medium">
-                            {log.user.name || "Admin"}
+                            {booking.itemName}
+                          </p>
+                          <p className="text-gray-400 text-sm">
+                            {booking.itemLocation}
                           </p>
                         </div>
 
+                        {/* Customer Info */}
                         <div>
-                          <p className="text-gray-400 text-sm">Details</p>
-                          <p className="text-gray-300">
-                            {log.details || "No details"}
+                          <p className="text-gray-400 text-xs font-semibold uppercase mb-1">
+                            Customer
+                          </p>
+                          <p className="text-white font-medium">
+                            {booking.userName}
+                          </p>
+                          <p className="text-gray-400 text-sm">
+                            {booking.userEmail}
+                          </p>
+                          {booking.userPhone && (
+                            <p className="text-gray-400 text-sm">
+                              {booking.userPhone}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Booking Info */}
+                        {booking.bookingType === "HOTEL" ? (
+                          <div>
+                            <p className="text-gray-400 text-xs font-semibold uppercase mb-1">
+                              Booking Details
+                            </p>
+                            <div className="space-y-1 text-sm">
+                              <p>
+                                <span className="text-gray-400">Check-in:</span>{" "}
+                                <span className="text-white">
+                                  {booking.startDate &&
+                                    new Date(
+                                      booking.startDate,
+                                    ).toLocaleDateString()}
+                                </span>
+                              </p>
+                              <p>
+                                <span className="text-gray-400">
+                                  Check-out:
+                                </span>{" "}
+                                <span className="text-white">
+                                  {booking.endDate &&
+                                    new Date(
+                                      booking.endDate,
+                                    ).toLocaleDateString()}
+                                </span>
+                              </p>
+                              <p>
+                                <span className="text-gray-400">Duration:</span>{" "}
+                                <span className="text-white">
+                                  {booking.nights} nights
+                                </span>
+                              </p>
+                              <p>
+                                <span className="text-gray-400">Rooms:</span>{" "}
+                                <span className="text-white">
+                                  {booking.rooms}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <p className="text-gray-400 text-xs font-semibold uppercase mb-1">
+                              Booking Details
+                            </p>
+                            <div className="space-y-1 text-sm">
+                              <p>
+                                <span className="text-gray-400">Date:</span>{" "}
+                                <span className="text-white">
+                                  {booking.date &&
+                                    new Date(booking.date).toLocaleDateString()}
+                                </span>
+                              </p>
+                              <p>
+                                <span className="text-gray-400">
+                                  Participants:
+                                </span>{" "}
+                                <span className="text-white">
+                                  {booking.people}
+                                </span>
+                              </p>
+                              <p>
+                                <span className="text-gray-400">Duration:</span>{" "}
+                                <span className="text-white">
+                                  {booking.duration}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Pricing Info */}
+                        <div className="border-t border-gray-600 pt-3">
+                          <p className="text-gray-400 text-xs font-semibold uppercase mb-2">
+                            Pricing
+                          </p>
+                          <div className="flex justify-between mb-2">
+                            <span className="text-gray-300">
+                              {booking.bookingType === "HOTEL"
+                                ? `₹${booking.pricePerUnit}/night × ${booking.nights} nights`
+                                : `₹${booking.pricePerUnit} × ${booking.people} people`}
+                            </span>
+                            <span className="text-white font-medium">
+                              ₹{booking.totalPrice}
+                            </span>
+                          </div>
+                          <p className="text-gray-400 text-xs">
+                            Status:{" "}
+                            <span
+                              className={`font-medium ${
+                                booking.status === "PENDING"
+                                  ? "text-yellow-300"
+                                  : booking.status === "CONFIRMED"
+                                    ? "text-green-300"
+                                    : "text-red-300"
+                              }`}
+                            >
+                              {booking.status}
+                            </span>
                           </p>
                         </div>
 
-                        <div>
-                          <p className="text-gray-400 text-sm">Time</p>
-                          <p className="text-gray-300">
-                            {new Date(log.timestamp).toLocaleDateString()}{" "}
-                            {new Date(log.timestamp).toLocaleTimeString()}
-                          </p>
+                        {/* Timestamp */}
+                        <div className="text-xs text-gray-500">
+                          Booked on{" "}
+                          {new Date(booking.createdAt).toLocaleDateString() +
+                            " " +
+                            new Date(booking.createdAt).toLocaleTimeString()}
                         </div>
                       </div>
                     )}
@@ -957,7 +1276,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Modal */}
-      {isModalOpen && activeTab !== "logs" && (
+      {isModalOpen && activeTab !== "bookings" && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">

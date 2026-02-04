@@ -64,7 +64,7 @@ model HotelBooking {
   startDate  DateTime
   endDate    DateTime
   totalPrice Decimal
-  status     BookingStatus @default(PENDING)
+  status     BookingStatus @default(CONFIRMED)
   paymentId  String?
   createdAt  DateTime      @default(now())
 
@@ -80,7 +80,7 @@ model ActivityBooking {
   date       DateTime
   totalPrice Decimal
   people     Int           @default(1)
-  status     BookingStatus @default(PENDING)
+  status     BookingStatus @default(CONFIRMED)
   paymentId  String?
   createdAt  DateTime      @default(now())
 
