@@ -30,15 +30,23 @@ const Navbar = () => {
     { name: "Contact US", href: "/contact" },
   ];
 
-  // Check if user is authenticated on component mount
+  // Check if user is authenticated on component mount and on pathname change
   useEffect(() => {
     const verifyAuth = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch("/api/auth/verify");
 
         if (response.ok) {
           const data = await response.json();
-          setUser(data.user);
+          console.log("Auth verification response:", data); // Debug log
+
+          // Set user data if authenticated
+          if (data.authenticated && data.user) {
+            setUser(data.user);
+          } else {
+            setUser(null);
+          }
         } else {
           setUser(null);
         }
@@ -51,7 +59,7 @@ const Navbar = () => {
     };
 
     verifyAuth();
-  }, []);
+  }, [pathname]); // Re-check on pathname change
 
   // Handle logout
   const handleLogout = async () => {
@@ -59,12 +67,14 @@ const Navbar = () => {
       await fetch("/api/auth/user/logout", {
         method: "POST",
       });
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // Clear user state and redirect
       setUser(null);
       setIsDropdownOpen(false);
       setIsMobileMenuOpen(false);
       router.push("/");
-    } catch (error) {
-      console.error("Logout error:", error);
     }
   };
 
@@ -183,7 +193,9 @@ const Navbar = () => {
               <User className="w-4 h-4" />
               Login
             </Link>
-          ) : null}
+          ) : (
+            <div className="w-24 h-8 bg-gray-700/50 rounded-lg animate-pulse"></div>
+          )}
         </div>
 
         {/* --- Mobile Menu Toggle --- */}
