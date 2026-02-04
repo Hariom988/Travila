@@ -53,7 +53,7 @@ const POPULAR_ROUTES = [
     time: "12h 30m",
     price: "₹800",
     image:
-      "https://images.unsplash.com/photo-1544634076-a90160daae49?q=80&w=800&auto=format&fit=crop", // Mountains
+      "https://hips.hearstapps.com/hmg-prod/images/alpe-di-siusi-sunrise-with-sassolungo-or-langkofel-royalty-free-image-1623254127.jpg", // Mountains
     tag: "Heritage",
     color: "bg-purple-600",
   },
