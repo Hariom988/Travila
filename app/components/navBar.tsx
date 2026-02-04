@@ -26,19 +26,26 @@ const Navbar = () => {
     { name: "Home", href: "/" },
     { name: "Hotels", href: "/hotel" },
     { name: "Activities", href: "/activities" },
-    { name: "About Us", href: "/about" },
-    { name: "Contact Us", href: "/contact" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
   ];
 
-  // Check if user is authenticated on component mount
   useEffect(() => {
     const verifyAuth = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch("/api/auth/verify");
 
         if (response.ok) {
           const data = await response.json();
-          setUser(data.user);
+          console.log("Auth verification response:", data); // Debug log
+
+          // Set user data if authenticated
+          if (data.authenticated && data.user) {
+            setUser(data.user);
+          } else {
+            setUser(null);
+          }
         } else {
           setUser(null);
         }
@@ -51,24 +58,22 @@ const Navbar = () => {
     };
 
     verifyAuth();
-  }, []);
+  }, [pathname]);
 
-  // Handle logout
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/user/logout", {
         method: "POST",
       });
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
       setUser(null);
       setIsDropdownOpen(false);
       setIsMobileMenuOpen(false);
       router.push("/");
-    } catch (error) {
-      console.error("Logout error:", error);
     }
   };
-
-  // Get initials from user name for avatar
   const getInitials = (name: string | null) => {
     if (!name) return "U";
     return name
@@ -77,6 +82,11 @@ const Navbar = () => {
       .join("")
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const getDisplayName = (user: UserData) => {
+    if (user.name) return user.name;
+    return user.email.split("@")[0];
   };
 
   return (
@@ -113,7 +123,6 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* --- Desktop Right Actions --- */}
         <div className="hidden md:flex items-center gap-6">
           <div className="flex items-center gap-3">
             <div className="bg-white/10 p-2 rounded-full">
@@ -134,17 +143,15 @@ const Navbar = () => {
                 onMouseLeave={() => setIsDropdownOpen(false)}
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >
-                {/* Avatar */}
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-sm font-bold">
+                <div className="w-8 h-8 rounded-full bg-linear-to-br from-purple-500 to-purple-700 flex items-center justify-center text-sm font-bold">
                   {getInitials(user.name)}
                 </div>
-                {/* User Name */}
+                {/* User Name or Email */}
                 <span className="text-sm font-medium">
-                  {user.name || user.email}
+                  {getDisplayName(user)}
                 </span>
               </button>
 
-              {/* Dropdown Menu */}
               <div
                 onMouseEnter={() => setIsDropdownOpen(true)}
                 onMouseLeave={() => setIsDropdownOpen(false)}
@@ -152,7 +159,6 @@ const Navbar = () => {
                   isDropdownOpen ? "opacity-100 visible" : "opacity-0 invisible"
                 }`}
               >
-                {/* User Info */}
                 <div className="px-4 py-3 border-b border-gray-700">
                   <p className="text-sm font-medium text-white">
                     {user.name || "User"}
@@ -170,7 +176,7 @@ const Navbar = () => {
                 </button>
               </div>
             </div>
-          ) : (
+          ) : !isLoading ? (
             <Link
               href="/user/auth"
               className="bg-white/20 hover:bg-white/30 backdrop-blur-sm transition px-5 py-2 rounded-lg flex items-center gap-2 text-sm font-medium"
@@ -178,6 +184,8 @@ const Navbar = () => {
               <User className="w-4 h-4" />
               Login
             </Link>
+          ) : (
+            <div className="w-24 h-8 bg-gray-700/50 rounded-lg animate-pulse"></div>
           )}
         </div>
 
@@ -219,7 +227,7 @@ const Navbar = () => {
             <div className="flex flex-col items-center gap-4 w-full px-8 mt-4">
               {/* User Avatar and Name */}
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-lg font-bold">
+                <div className="w-12 h-12 rounded-full bg-linear-to-br from-purple-500 to-purple-700 flex items-center justify-center text-lg font-bold">
                   {getInitials(user.name)}
                 </div>
                 <div className="text-left">
@@ -237,7 +245,7 @@ const Navbar = () => {
                 Logout
               </button>
             </div>
-          ) : (
+          ) : !isLoading ? (
             <Link
               href="/user/auth"
               onClick={() => setIsMobileMenuOpen(false)}
@@ -245,7 +253,7 @@ const Navbar = () => {
             >
               Login
             </Link>
-          )}
+          ) : null}
         </div>
       </div>
     </nav>

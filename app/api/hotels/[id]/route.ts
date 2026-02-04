@@ -4,7 +4,8 @@ import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 import { logActivity } from '@/lib/activity-logger';
 
-// GET single hotel - PUBLIC
+// ✅ GET single hotel - PUBLIC (NO authentication required)
+// Users need to see hotel details before booking
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -38,7 +39,7 @@ export async function GET(
   }
 }
 
-// PUT - Update hotel - ADMIN ONLY
+// ✅ PUT - Update hotel - ADMIN ONLY
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -104,7 +105,7 @@ export async function PUT(
   }
 }
 
-// app/api/hotels/[id]/availability/route.ts
+// ✅ PATCH - Update hotel availability - ADMIN ONLY
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

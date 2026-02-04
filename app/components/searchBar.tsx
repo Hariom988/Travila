@@ -29,7 +29,6 @@ export interface SearchParams {
   adults: number;
 }
 
-// Helper function to format date to YYYY-MM-DD in local timezone
 const formatDateToLocal = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -37,26 +36,22 @@ const formatDateToLocal = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-// Helper function to get today's date in local timezone
 const getTodayDate = (): string => {
   return formatDateToLocal(new Date());
 };
 
-// Helper function to get tomorrow's date in local timezone
 const getTomorrowDate = (): string => {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 2);
   return formatDateToLocal(tomorrow);
 };
 
-// Format date for display (prevents hydration mismatch)
 const formatDateForDisplay = (
   dateString: string,
 ): { day: string; month: string } => {
   try {
-    const date = new Date(dateString + "T00:00:00"); // Ensure it's treated as local date
+    const date = new Date(dateString + "T00:00:00");
     if (isNaN(date.getTime())) {
-      // Fallback if date is invalid
       return { day: "00", month: "---" };
     }
     const day = String(date.getDate()).padStart(2, "0");
@@ -221,7 +216,6 @@ export default function SearchBar({
   const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
 
-  // Initialize state with defaults first (same on server and client)
   const [searchQuery, setSearchQuery] = useState(defaultSearchQuery);
   const [checkIn, setCheckIn] = useState(defaultCheckIn);
   const [checkOut, setCheckOut] = useState(defaultCheckOut);
@@ -233,7 +227,6 @@ export default function SearchBar({
   >(null);
   const [showGuestsModal, setShowGuestsModal] = useState(false);
 
-  // Load from localStorage only after mounting (client-side only)
   useEffect(() => {
     setMounted(true);
 
@@ -250,7 +243,6 @@ export default function SearchBar({
         console.error("Error parsing stored search:", e);
       }
     } else {
-      // If no localStorage, check URL params
       const urlSearch = searchParams.get("search");
       const urlCheckIn = searchParams.get("checkIn");
       const urlCheckOut = searchParams.get("checkOut");
@@ -265,7 +257,6 @@ export default function SearchBar({
     }
   }, []);
 
-  // Save to localStorage whenever search params change (only after mounted)
   useEffect(() => {
     if (!mounted) return;
 
@@ -280,7 +271,6 @@ export default function SearchBar({
     window.dispatchEvent(new Event("hotelSearchUpdate"));
   }, [searchQuery, checkIn, checkOut, rooms, adults, mounted]);
 
-  // Listen for changes from BookingCard
   useEffect(() => {
     if (!mounted) return;
 
@@ -416,6 +406,9 @@ export default function SearchBar({
                   </p>
                   <p className="text-sm font-bold text-white">
                     {checkInDisplay.day} {checkInDisplay.month}
+                  </p>
+                  <p className="text-sm font-bold text-white">
+                    {checkInDisplay.month}
                   </p>
                 </div>
                 <div className="lg:hidden">
