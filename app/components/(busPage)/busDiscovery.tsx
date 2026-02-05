@@ -52,7 +52,7 @@ const OFFERS = [
     id: 2,
     code: "FESTIVE30",
     discount: "30% Cashback",
-    desc: "Valid on luxury sleeper buses",
+    desc: "Valid on luxury sleeper",
     color: "from-blue-600 to-indigo-600",
   },
   {
@@ -74,50 +74,53 @@ export default function BusDiscovery() {
   };
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-16 space-y-16 bg-white">
-      {/* SECTION 1: PROMO OFFERS CAROUSEL */}
+    <section className="max-w-6xl mx-auto px-4 py-8 md:py-16 space-y-10 md:space-y-16 bg-white overflow-hidden">
+      {/* SECTION 1: PROMO OFFERS */}
       <div>
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-2 bg-pink-100 rounded-lg">
-            <GiftIcon className="h-6 w-6 text-pink-600" />
+        <div className="flex items-center gap-2 mb-5 md:mb-8">
+          <div className="p-1.5 md:p-2 bg-pink-100 rounded-lg">
+            <GiftIcon className="h-5 w-5 md:h-6 md:w-6 text-pink-600" />
           </div>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">
-            Best Offers for You
+          <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">
+            Best Offers
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Mobile: Horizontal Scroll | Desktop: Grid */}
+        <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
           {OFFERS.map((offer) => (
             <div
               key={offer.id}
-              className={`relative cursor-pointer overflow-hidden group rounded-2xl p-6 bg-linear-to-br ${offer.color} text-white shadow-lg transition-transform hover:-translate-y-1`}
+              className={`relative shrink-0 w-65 md:w-auto snap-center cursor-pointer overflow-hidden group rounded-2xl p-5 md:p-6 bg-linear-to-br ${offer.color} text-white shadow-lg transition-transform hover:-translate-y-1`}
             >
               <div className="relative z-10 flex flex-col h-full justify-between">
                 <div>
-                  <h3 className="text-2xl font-black mb-1">{offer.discount}</h3>
-                  <p className="text-sm opacity-90 font-medium">{offer.desc}</p>
+                  <h3 className="text-xl md:text-2xl font-black mb-1">
+                    {offer.discount}
+                  </h3>
+                  <p className="text-xs md:text-sm opacity-90 font-medium">
+                    {offer.desc}
+                  </p>
                 </div>
 
-                <div className="mt-6  flex items-center justify-between bg-white/20 backdrop-blur-md p-2 rounded-xl border border-white/30">
-                  <span className="font-mono font-bold text-lg px-2">
+                <div className="mt-5 flex items-center justify-between bg-white/20 backdrop-blur-md p-1.5 rounded-xl border border-white/30">
+                  <span className="font-mono font-bold text-base md:text-lg px-2">
                     {offer.code}
                   </span>
                   <button
                     onClick={() => copyToClipboard(offer.code)}
-                    className="bg-white cursor-pointer text-gray-900 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-100 flex items-center gap-2 transition-colors"
+                    className="bg-white cursor-pointer text-gray-900 px-3 py-1.5 rounded-lg text-[10px] md:text-xs font-bold hover:bg-gray-100 flex items-center gap-1.5 transition-colors"
                   >
                     {copiedCode === offer.code ? (
-                      <CheckBadgeIcon className="h-4 w-4 text-green-600" />
+                      <CheckBadgeIcon className="h-3.5 w-3.5 text-green-600" />
                     ) : (
-                      <ClipboardDocumentCheckIcon className="h-4 w-4" />
+                      <ClipboardDocumentCheckIcon className="h-3.5 w-3.5" />
                     )}
                     {copiedCode === offer.code ? "COPIED" : "COPY"}
                   </button>
                 </div>
               </div>
-
-              {/* Decorative Circle */}
-              <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-colors" />
+              <div className="absolute -right-8 -top-8 w-24 h-24 md:w-32 md:h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20" />
             </div>
           ))}
         </div>
@@ -125,43 +128,53 @@ export default function BusDiscovery() {
 
       {/* SECTION 2: POPULAR ROUTES */}
       <div>
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <TicketIcon className="h-6 w-6 text-blue-600" />
+        <div className="flex items-center justify-between mb-5 md:mb-8">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 md:p-2 bg-blue-100 rounded-lg">
+              <TicketIcon className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
             </div>
-            <h2 className="text-2xl font-black text-gray-900 tracking-tight">
-              Popular Bus Routes
+            <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">
+              Popular Routes
             </h2>
           </div>
-          <button className="text-sm font-bold text-blue-600 hover:underline">
-            View All Routes
+          <button className="text-[10px] md:text-sm font-bold text-blue-600 hover:underline uppercase tracking-wider">
+            View All
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Mobile: Horizontal Scroll | Desktop: Grid */}
+        <div className="flex md:grid md:grid-cols-4 gap-4 md:gap-6 overflow-x-auto pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
           {POPULAR_ROUTES.map((route, idx) => (
-            <div key={idx} className="group cursor-pointer">
-              <div className="relative h-48 mb-4 overflow-hidden rounded-2xl shadow-md">
+            <div
+              key={idx}
+              className="shrink-0 w-40 md:w-auto snap-start group cursor-pointer"
+            >
+              <div className="relative h-32 md:h-48 mb-3 overflow-hidden rounded-2xl shadow-md">
                 <img
                   src={route.image}
                   alt={route.to}
-                  className="w-full h-full object-cover transition-transform duration-500 "
+                  className="w-full h-full object-cover transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
-                <div className="absolute bottom-3 left-3 text-white">
-                  <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">
-                    Starting From
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
+                <div className="absolute bottom-2 left-2 text-white">
+                  <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest opacity-80">
+                    From
                   </p>
-                  <p className="text-lg font-black">₹{route.price}</p>
+                  <p className="text-sm md:text-lg font-black">
+                    ₹{route.price}
+                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-gray-800">{route.from}</span>
-                  <ArrowRightIcon className="h-3 w-3 text-blue-500 stroke-[3px]" />
-                  <span className="font-bold text-gray-800">{route.to}</span>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-[13px] md:text-base text-gray-800">
+                    {route.from}
+                  </span>
+                  <ArrowRightIcon className="h-2.5 w-2.5 text-blue-500 stroke-[3px]" />
+                  <span className="font-bold text-[13px] md:text-base text-gray-800">
+                    {route.to}
+                  </span>
                 </div>
               </div>
             </div>
@@ -170,49 +183,55 @@ export default function BusDiscovery() {
       </div>
 
       {/* SECTION 3: TRUST BAR */}
-      <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 flex flex-wrap justify-center md:justify-between gap-8">
-        <div className="flex items-center gap-4">
-          <div className="bg-white p-3 rounded-full shadow-sm text-blue-600">
-            <CheckBadgeIcon className="h-8 w-8" />
+      <div className="bg-slate-50 rounded-2xl md:rounded-3xl p-5 md:p-8 border border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
+        {[
+          {
+            icon: CheckBadgeIcon,
+            title: "Verified Operators",
+            sub: "2500+ bus partners",
+            color: "text-blue-600",
+          },
+          {
+            icon: TicketIcon,
+            title: "Easy Refunds",
+            sub: "Instant wallet credits",
+            color: "text-green-600",
+          },
+          {
+            icon: GiftIcon,
+            title: "Exclusive Rewards",
+            sub: "Points on every trip",
+            color: "text-orange-500",
+          },
+        ].map((item, idx) => (
+          <div key={idx} className="flex items-center gap-3 md:gap-4">
+            <div
+              className={`bg-white p-2.5 md:p-3 rounded-full shadow-sm ${item.color}`}
+            >
+              <item.icon className="h-6 w-6 md:h-8 md:w-8" />
+            </div>
+            <div>
+              <p className="font-black text-sm md:text-base text-gray-900 leading-tight">
+                {item.title}
+              </p>
+              <p className="text-[10px] md:text-xs text-gray-400 font-medium">
+                {item.sub}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="font-black text-gray-900 leading-tight">
-              Verified Operators
-            </p>
-            <p className="text-xs text-gray-500 font-medium">
-              Over 2500+ bus partners
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="bg-white p-3 rounded-full shadow-sm text-green-600">
-            <TicketIcon className="h-8 w-8" />
-          </div>
-          <div>
-            <p className="font-black text-gray-900 leading-tight">
-              Easy Cancellations
-            </p>
-            <p className="text-xs text-gray-500 font-medium">
-              Instant refunds to wallet
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="bg-white p-3 rounded-full shadow-sm text-orange-500">
-            <GiftIcon className="h-8 w-8" />
-          </div>
-          <div>
-            <p className="font-black text-gray-900 leading-tight">
-              Exclusive Rewards
-            </p>
-            <p className="text-xs text-gray-500 font-medium">
-              Earn points on every trip
-            </p>
-          </div>
-        </div>
+        ))}
       </div>
+
+      {/* CSS to hide scrollbars for cleaner carousel look */}
+      <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </section>
   );
 }
