@@ -27,6 +27,7 @@ const Navbar = () => {
     { name: "Hotels", href: "/hotel" },
     { name: "Activities", href: "/activities" },
     { name: "Trains", href: "/train" },
+    { name: "Buses", href: "/bus" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
