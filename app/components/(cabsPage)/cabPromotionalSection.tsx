@@ -1,9 +1,7 @@
 "use client";
 
-import React from "react";
 import {
   ArrowRight,
-  TicketPercent,
   Navigation,
   Zap,
   CheckCircle2,
@@ -49,7 +47,6 @@ const POPULAR_ROUTES = [
 export default function CompactCabPromotional() {
   return (
     <div className="w-full max-w-6xl mx-auto py-8 md:py-12 px-4 space-y-8 md:space-y-12">
-      {/* SECTION 1: POPULAR ROUTES */}
       <div>
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -71,14 +68,13 @@ export default function CompactCabPromotional() {
               key={idx}
               className="group flex md:flex-col bg-white rounded-xl md:rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all"
             >
-              {/* Image: Thumbnail on Mobile, Full width on Desktop */}
               <div className="relative w-28 md:w-full h-28 md:h-40 shrink-0 overflow-hidden">
                 <img
                   src={route.image}
                   alt={route.to}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
                 <div className="absolute bottom-2 left-2 text-white">
                   <div className="text-[8px] md:text-xs font-bold opacity-90 flex items-center gap-1">
                     <Navigation size={10} /> {route.distance}
@@ -121,8 +117,7 @@ export default function CompactCabPromotional() {
         </div>
       </div>
 
-      {/* SECTION 2: PROMO BANNER (App Part Replaced with Trust Card) */}
-      <div className="relative overflow-hidden bg-gray-900 rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-12 text-white">
+      <div className="relative overflow-hidden bg-gray-900 rounded-3xl md:rounded-[2.5rem] p-6 md:p-12 text-white">
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl" />
 
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-10">
@@ -153,8 +148,7 @@ export default function CompactCabPromotional() {
             </div>
           </div>
 
-          {/* APP REPLACEMENT: TRUST & LOYALTY CARD */}
-          <div className="bg-white/10 backdrop-blur-md p-5 rounded-3xl border border-white/20 w-full max-w-[280px] shadow-2xl relative overflow-hidden group">
+          <div className="bg-white/10 backdrop-blur-md p-5 rounded-3xl border border-white/20 w-full max-w-70 shadow-2xl relative overflow-hidden group">
             <div className="absolute -top-10 -left-10 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700" />
             <div className="flex flex-col items-center text-center space-y-3 relative z-10">
               <div className="flex gap-0.5">
@@ -175,7 +169,7 @@ export default function CompactCabPromotional() {
                 </p>
               </div>
 
-              <div className="w-full h-[1px] bg-white/10 my-1" />
+              <div className="w-full h-px bg-white/10 my-1" />
 
               <div className="space-y-2 w-full">
                 <div className="flex items-center gap-2 text-[10px] font-bold text-blue-300">

@@ -40,7 +40,6 @@ const HIGHLIGHTS = [
 export default function CompactCabServiceHighlights() {
   return (
     <div className="w-full max-w-6xl mx-auto py-8 md:py-16 px-4">
-      {/* HEADER SECTION - COMPACT */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-4">
         <div className="max-w-2xl">
           <h2 className="text-2xl md:text-4xl font-black text-gray-900 leading-tight">
@@ -52,7 +51,6 @@ export default function CompactCabServiceHighlights() {
           </p>
         </div>
 
-        {/* Compact Avatar Stack */}
         <div className="flex items-center gap-3 bg-gray-50 w-fit px-3 py-1.5 rounded-full border border-gray-100">
           <div className="flex -space-x-2">
             {[1, 2, 3].map((i) => (
@@ -69,13 +67,11 @@ export default function CompactCabServiceHighlights() {
           </span>
         </div>
       </div>
-
-      {/* HIGHLIGHTS GRID - 2x2 on Mobile */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
         {HIGHLIGHTS.map((item, index) => (
           <div
             key={index}
-            className="group p-4 md:p-8 bg-white rounded-2xl md:rounded-[2rem] border border-gray-100 hover:border-blue-100 transition-all"
+            className="group p-4 md:p-8 bg-white rounded-2xl md:rounded-4xl border border-gray-100 hover:border-blue-100 transition-all"
           >
             <div className="mb-3 md:mb-6 p-2 md:p-4 bg-gray-50 rounded-xl w-fit group-hover:bg-blue-50 transition-colors">
               {item.icon}
@@ -90,9 +86,7 @@ export default function CompactCabServiceHighlights() {
         ))}
       </div>
 
-      {/* BOTTOM TRUST BAR - REPLACED APP PART */}
-      <div className="mt-8 md:mt-16 p-6 md:p-8 bg-gray-900 rounded-[1.5rem] md:rounded-[2.5rem] relative overflow-hidden">
-        {/* Decorative Element */}
+      <div className="mt-8 md:mt-16 p-6 md:p-8 bg-gray-900 rounded-3xl md:rounded-[2.5rem] relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 md:w-64 h-full bg-blue-600/10 skew-x-12 translate-x-16 md:translate-x-32" />
 
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 md:gap-8">
@@ -109,8 +103,6 @@ export default function CompactCabServiceHighlights() {
               </p>
             </div>
           </div>
-
-          {/* Stat Badges - Hidden on very small screens or condensed */}
           <div className="flex flex-wrap justify-center gap-4 md:gap-8 border-y lg:border-none border-white/10 py-4 lg:py-0">
             <div className="flex items-center gap-2 text-white">
               <CheckCircle size={16} className="text-blue-500" />

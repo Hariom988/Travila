@@ -1,6 +1,4 @@
 "use client";
-
-import React from "react";
 import {
   Users,
   Briefcase,
@@ -70,8 +68,7 @@ const BENEFITS = [
 
 export default function CompactCabDemoInfo() {
   return (
-    <div className="w-full max-w-6xl mx-auto py-6 md:py-12 px-4 space-y-8 md:space-y-16">
-      {/* SECTION 1: FLEET SELECTOR */}
+    <div className="w-full max-w-6xl mx-auto py-16 md:py-14 px-4 space-y-8 md:space-y-16">
       <section>
         <div className="mb-6">
           <h2 className="text-xl md:text-3xl font-black text-gray-900 tracking-tight leading-none">
@@ -139,8 +136,7 @@ export default function CompactCabDemoInfo() {
         </div>
       </section>
 
-      {/* SECTION 2: HOW IT WORKS (Replaced App Part) */}
-      <section className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-[2rem] md:rounded-[3rem] p-5 md:p-10">
+      <section className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-4xl md:rounded-[3rem] p-5 md:p-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div>
             <h2 className="text-2xl md:text-4xl font-black text-gray-900 leading-tight mb-4">
@@ -185,7 +181,7 @@ export default function CompactCabDemoInfo() {
             </div>
           </div>
 
-          <div className="bg-white p-5 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-xl border border-gray-50 relative overflow-hidden group">
+          <div className="bg-white p-5 md:p-8 rounded-3xl md:rounded-[2.5rem] shadow-xl border border-gray-50 relative overflow-hidden group">
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-50 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
             <div className="relative z-10 flex flex-col items-center text-center">
               <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-200">
@@ -194,7 +190,7 @@ export default function CompactCabDemoInfo() {
               <h3 className="text-lg md:text-2xl font-black text-gray-900 mb-2">
                 Need Booking Help?
               </h3>
-              <p className="text-xs md:text-sm text-gray-500 mb-6 max-w-[250px]">
+              <p className="text-xs md:text-sm text-gray-500 mb-6 max-w-62">
                 Our experts are available 24/7 to help you plan your journey.
               </p>
               <button className="bg-gray-900 text-white font-black px-6 md:px-10 py-2.5 md:py-3.5 rounded-full text-xs md:text-sm transition-transform active:scale-95 shadow-lg">
@@ -204,8 +200,6 @@ export default function CompactCabDemoInfo() {
           </div>
         </div>
       </section>
-
-      {/* SECTION 3: QUICK STATS */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-gray-100 pt-8">
         {[
           { label: "Happy Users", value: "1M+" },
