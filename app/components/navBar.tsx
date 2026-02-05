@@ -28,6 +28,7 @@ const Navbar = () => {
     { name: "Activities", href: "/activities" },
     { name: "Trains", href: "/train" },
     { name: "Buses", href: "/bus" },
+    { name: "Cabs", href: "/cabs" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
