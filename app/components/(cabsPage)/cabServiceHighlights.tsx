@@ -124,7 +124,7 @@ export default function CompactCabServiceHighlights() {
             </div>
           </div>
 
-          <button className="bg-white text-blue-600 font-black px-6 md:px-8 py-2 md:py-3 rounded-lg md:rounded-xl hover:bg-blue-50 transition-colors text-xs md:text-base whitespace-nowrap">
+          <button className="bg-white cursor-pointer text-blue-600 font-black px-6 md:px-8 py-2 md:py-3 rounded-lg md:rounded-xl hover:bg-blue-50 transition-colors text-xs md:text-base whitespace-nowrap">
             Learn More
           </button>
         </div>

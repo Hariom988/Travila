@@ -135,7 +135,7 @@ export default function CompactCabBooking() {
             {tripType !== "hourly" && (
               <button
                 onClick={swapCities}
-                className="absolute w-8 h-8 right-4 top-[50%] -translate-y-[50%] sm:left-[50%] sm:-translate-x-[50%] z-20 bg-white border border-gray-200 shadow-md p-1.5 rounded-full text-blue-500 hover:scale-110 active:rotate-180 transition-all"
+                className="absolute cursor-pointer w-8 h-8 right-4 top-[50%] -translate-y-[50%] sm:left-[50%] sm:-translate-x-[50%] z-20 bg-white border border-gray-200 shadow-md p-1.5 rounded-full text-blue-500 hover:scale-110 active:rotate-180 transition-all"
               >
                 <ArrowLeftRight size={15} className="sm:w-4 sm:h-4" />
               </button>
@@ -228,7 +228,7 @@ export default function CompactCabBooking() {
                         setSelectedPackage(p);
                         setActiveDropdown(null);
                       }}
-                      className="w-full p-2.5 text-left hover:bg-blue-50 font-bold text-xs rounded-lg transition-colors"
+                      className="w-full cursor-pointer p-2.5 text-left hover:bg-blue-50 font-bold text-xs rounded-lg transition-colors"
                     >
                       {p}
                     </button>
@@ -240,7 +240,7 @@ export default function CompactCabBooking() {
         </div>
 
         <div className="absolute left-1/2 -translate-x-1/2 -bottom-12 w-full flex justify-center px-6">
-          <button className="bg-linear-to-r from-blue-500 to-blue-700 text-white font-black text-xl sm:text-2xl px-10 sm:px-16 py-3 rounded-full shadow-lg cursor-pointer transition-all uppercase tracking-tighter w-full sm:w-auto">
+          <button className="bg-linear-to-r from-blue-500 to-blue-700  text-white font-black text-xl sm:text-2xl px-10 sm:px-16 py-3 rounded-full shadow-lg cursor-pointer transition-all uppercase tracking-tighter w-full sm:w-auto">
             Search
           </button>
         </div>
@@ -304,10 +304,10 @@ function PremiumCalendar({
           Feb 2026
         </h4>
         <div className="flex gap-1">
-          <button className="p-1 hover:bg-gray-100 rounded-full">
+          <button className="p-1 cursor-pointer hover:bg-gray-100 rounded-full">
             <ChevronLeft size={16} />
           </button>
-          <button className="p-1 hover:bg-gray-100 rounded-full">
+          <button className="p-1 cursor-pointer hover:bg-gray-100 rounded-full">
             <ChevronRight size={16} />
           </button>
         </div>
@@ -322,7 +322,7 @@ function PremiumCalendar({
           <button
             key={day}
             onClick={() => onSelect(new Date(2026, 1, day))}
-            className={`h-7 w-7 sm:h-9 sm:w-9 rounded-full flex items-center justify-center text-xs font-bold transition-all
+            className={`h-7 w-7 cursor-pointer sm:h-9 sm:w-9 rounded-full flex items-center justify-center text-xs font-bold transition-all
               ${day === selectedDate.getDate() ? "bg-blue-600 text-white shadow-md" : "hover:bg-blue-50 text-gray-700"}`}
           >
             {day}
@@ -353,7 +353,7 @@ function TimeGrid({
           <button
             key={time}
             onClick={() => onSelect(time)}
-            className={`py-2 rounded-lg text-[10px] sm:text-xs font-black border transition-all
+            className={`py-2 cursor-pointer rounded-lg text-[10px] sm:text-xs font-black border transition-all
               ${selected === time ? "bg-blue-600 text-white border-blue-600" : "bg-gray-50 text-gray-600 border-transparent hover:border-blue-200"}`}
           >
             {time}

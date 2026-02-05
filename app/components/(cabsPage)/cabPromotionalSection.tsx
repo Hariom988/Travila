@@ -57,7 +57,7 @@ export default function CompactCabPromotional() {
               Popular Routes
             </h2>
           </div>
-          <button className="text-blue-600 font-bold text-xs md:text-sm flex items-center gap-1 hover:underline">
+          <button className="text-blue-600 cursor-pointer font-bold text-xs md:text-sm flex items-center gap-1 hover:underline">
             View All <ArrowRight size={14} />
           </button>
         </div>
@@ -66,13 +66,13 @@ export default function CompactCabPromotional() {
           {POPULAR_ROUTES.map((route, idx) => (
             <div
               key={idx}
-              className="group flex md:flex-col bg-white rounded-xl md:rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all"
+              className="group cursor-pointer flex md:flex-col bg-white rounded-xl md:rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all"
             >
               <div className="relative w-28 md:w-full h-28 md:h-40 shrink-0 overflow-hidden">
                 <img
                   src={route.image}
                   alt={route.to}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  className="w-full h-full object-cover transition-transform"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
                 <div className="absolute bottom-2 left-2 text-white">
@@ -107,7 +107,7 @@ export default function CompactCabPromotional() {
                       ₹{route.price}
                     </div>
                   </div>
-                  <button className="px-3 py-1.5 md:px-4 md:py-2 bg-blue-50 text-blue-600 text-[10px] md:text-sm font-black rounded-lg md:rounded-xl hover:bg-blue-600 hover:text-white transition-colors">
+                  <button className="px-3 cursor-pointer py-1.5 md:px-4 md:py-2 bg-blue-50 text-blue-600 text-[10px] md:text-sm font-black rounded-lg md:rounded-xl hover:bg-blue-600 hover:text-white transition-colors">
                     Book
                   </button>
                 </div>
@@ -142,7 +142,7 @@ export default function CompactCabPromotional() {
                   FIRSTCAB20
                 </span>
               </div>
-              <button className="w-full md:w-auto bg-white text-gray-900 font-black px-6 py-2.5 rounded-full text-xs md:text-sm transition-transform active:scale-95">
+              <button className="w-full cursor-pointer md:w-auto bg-white text-gray-900 font-black px-6 py-2.5 rounded-full text-xs md:text-sm transition-transform active:scale-95">
                 Apply Now
               </button>
             </div>
@@ -180,7 +180,7 @@ export default function CompactCabPromotional() {
                 </div>
               </div>
 
-              <button className="w-full bg-blue-600 text-white font-black py-2.5 rounded-xl text-[10px] uppercase tracking-widest shadow-lg shadow-blue-600/20 active:scale-95 transition-all">
+              <button className="w-full cursor-pointer bg-blue-600 text-white font-black py-2.5 rounded-xl text-[10px] uppercase tracking-widest shadow-lg shadow-blue-600/20 active:scale-95 transition-all">
                 Learn More
               </button>
             </div>

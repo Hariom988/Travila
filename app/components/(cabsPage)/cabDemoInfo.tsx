@@ -83,7 +83,7 @@ export default function CompactCabDemoInfo() {
           {FLEET_CATEGORIES.map((fleet) => (
             <div
               key={fleet.id}
-              className="flex md:flex-col bg-white rounded-2xl md:rounded-3xl overflow-hidden border border-gray-100 shadow-sm transition-all hover:shadow-md"
+              className="flex  cursor-pointer md:flex-col bg-white rounded-2xl md:rounded-3xl overflow-hidden border border-gray-100 shadow-sm transition-all hover:shadow-md"
             >
               <div className="relative w-32 md:w-full h-28 md:h-48 shrink-0 overflow-hidden">
                 <img
@@ -126,7 +126,7 @@ export default function CompactCabDemoInfo() {
                   <span className="flex items-center gap-1 text-[10px] font-bold text-gray-500">
                     <Briefcase size={12} /> {fleet.bags}
                   </span>
-                  <button className="ml-auto text-blue-600 font-bold text-[10px] md:text-xs flex items-center gap-0.5">
+                  <button className="ml-auto  cursor-pointer text-blue-600 font-bold text-[10px] md:text-xs flex items-center gap-0.5">
                     Details <ChevronRight size={14} />
                   </button>
                 </div>
@@ -193,7 +193,7 @@ export default function CompactCabDemoInfo() {
               <p className="text-xs md:text-sm text-gray-500 mb-6 max-w-62">
                 Our experts are available 24/7 to help you plan your journey.
               </p>
-              <button className="bg-gray-900 text-white font-black px-6 md:px-10 py-2.5 md:py-3.5 rounded-full text-xs md:text-sm transition-transform active:scale-95 shadow-lg">
+              <button className="bg-gray-900 cursor-pointer text-white font-black px-6 md:px-10 py-2.5 md:py-3.5 rounded-full text-xs md:text-sm transition-transform active:scale-95 shadow-lg">
                 Talk to an Expert
               </button>
             </div>
