@@ -1,3 +1,4 @@
+// app/user/auth/page.tsx - FIXED VERSION
 "use client";
 import React, { useState, useEffect } from "react";
 import {
@@ -26,12 +27,27 @@ interface FormErrors {
   general?: string;
 }
 
+interface BookingDetails {
+  bookingType: "hotel" | "activity" | null;
+  checkIn?: string;
+  checkOut?: string;
+  rooms?: number;
+  adults?: number;
+  activityDate?: string;
+  people?: number;
+}
+
 const Page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   // Get the referrer URL from query params (passed from booking card)
   const referrerUrl = searchParams.get("redirect") || "/";
+
+  // ✅ FIX 2: State to manage booking details
+  const [bookingDetails, setBookingDetails] = useState<BookingDetails>({
+    bookingType: null,
+  });
 
   const [currentYear] = useState(new Date().getFullYear());
   const [showPassword, setShowPassword] = useState(false);
@@ -50,6 +66,19 @@ const Page = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [mode, setMode] = useState<AuthMode>("login");
+
+  // ✅ FIX 2: Load booking details from localStorage on mount
+  useEffect(() => {
+    const savedBooking = localStorage.getItem("pendingBooking");
+    if (savedBooking) {
+      try {
+        const booking = JSON.parse(savedBooking);
+        setBookingDetails(booking);
+      } catch (e) {
+        console.error("Error parsing booking details:", e);
+      }
+    }
+  }, []);
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(email);
@@ -99,6 +128,9 @@ const Page = () => {
       }
 
       setSuccessMessage("Login successful! Redirecting...");
+
+      // ✅ FIX 2: Clear pending booking after successful login
+      localStorage.removeItem("pendingBooking");
 
       // Redirect to referrer URL after short delay
       setTimeout(() => {
@@ -164,6 +196,10 @@ const Page = () => {
 
       setSuccessMessage("Registration successful! Logging you in...");
 
+      // ✅ FIX 1 + FIX 2: User is now auto-logged in from registration
+      // Clear pending booking and redirect
+      localStorage.removeItem("pendingBooking");
+
       // Redirect to referrer URL after short delay
       setTimeout(() => {
         router.push(referrerUrl);
@@ -225,6 +261,9 @@ const Page = () => {
         }
 
         setSuccessMessage("Google login successful! Redirecting...");
+
+        // ✅ FIX 2: Clear pending booking and redirect
+        localStorage.removeItem("pendingBooking");
 
         // Redirect to referrer URL after short delay
         setTimeout(() => {
