@@ -1,4 +1,3 @@
-// app/(public)/user/bookings/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -158,7 +157,7 @@ export default function MyBookingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 pt-20">
+      <div className="min-h-screen bg-linear-to-b from-slate-50 to-slate-100 pt-20">
         <div className="max-w-6xl mx-auto px-3 sm:px-4">
           <div className="flex items-center justify-center py-16">
             <div className="text-center">
@@ -174,14 +173,13 @@ export default function MyBookingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 pb-8">
-      {/* Header */}
+    <div className="min-h-screen bg-linear-to-b from-slate-50 to-slate-100 pb-8">
       <div className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/"
-              className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0"
+              className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors shrink-0"
             >
               <ArrowLeft size={18} className="text-slate-600" />
             </Link>
@@ -197,7 +195,6 @@ export default function MyBookingsPage() {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="bg-white border-b border-slate-200 sticky top-14 sm:top-16 z-30">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3">
           <div className="flex flex-col xs:flex-row gap-2 sm:gap-3">
@@ -225,7 +222,6 @@ export default function MyBookingsPage() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
@@ -271,13 +267,10 @@ export default function MyBookingsPage() {
                   key={booking.id}
                   className="bg-white rounded-lg border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
                 >
-                  {/* Mobile Layout */}
                   <div className="lg:hidden">
                     <div className="p-3">
-                      {/* Header with image, title and status */}
                       <div className="flex gap-3 mb-3">
-                        {/* Image */}
-                        <div className="flex-shrink-0 w-24 h-24 rounded-lg bg-slate-100 overflow-hidden">
+                        <div className="shrink-0 w-24 h-24 rounded-lg bg-slate-100 overflow-hidden">
                           {(
                             isHotel ? booking.hotelImage : booking.activityImage
                           ) ? (
@@ -310,7 +303,6 @@ export default function MyBookingsPage() {
                           )}
                         </div>
 
-                        {/* Title and status */}
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-col gap-1">
                             <h3 className="text-sm font-bold text-slate-900 line-clamp-2">
@@ -339,7 +331,6 @@ export default function MyBookingsPage() {
                         </div>
                       </div>
 
-                      {/* Details Grid */}
                       <div className="bg-slate-50 rounded-lg p-2.5 mb-3">
                         <div className="grid grid-cols-3 gap-2">
                           {isHotel ? (
@@ -408,7 +399,6 @@ export default function MyBookingsPage() {
                         </div>
                       </div>
 
-                      {/* View Button */}
                       <Link
                         href={
                           isHotel
@@ -423,9 +413,7 @@ export default function MyBookingsPage() {
                     </div>
                   </div>
 
-                  {/* Desktop Layout */}
                   <div className="hidden lg:grid grid-cols-12 gap-4 p-4">
-                    {/* Image */}
                     <div className="col-span-2 rounded-lg bg-slate-100 overflow-hidden">
                       {(
                         isHotel ? booking.hotelImage : booking.activityImage
@@ -444,7 +432,7 @@ export default function MyBookingsPage() {
                           className="object-cover w-full h-full"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center min-h-[140px]">
+                        <div className="w-full h-full flex items-center justify-center min-h-35">
                           {isHotel ? (
                             <Hotel size={36} className="text-slate-300" />
                           ) : (
@@ -454,7 +442,6 @@ export default function MyBookingsPage() {
                       )}
                     </div>
 
-                    {/* Content */}
                     <div className="col-span-7 flex flex-col justify-between">
                       <div>
                         <div className="flex items-start justify-between mb-3">
@@ -481,7 +468,6 @@ export default function MyBookingsPage() {
                           </span>
                         </div>
 
-                        {/* Details Grid */}
                         <div className="grid grid-cols-3 gap-4 pt-3 border-t border-slate-200">
                           {isHotel ? (
                             <>
