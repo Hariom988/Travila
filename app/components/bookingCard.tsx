@@ -1,8 +1,8 @@
-// app/components/bookingCard.tsx - UPDATED with booking intent
+// app/components/bookingCard.tsx - UPDATED with localStorage persistence
 "use client";
 import { useState, useEffect } from "react";
 import { Calendar, Users, ShieldCheck, X } from "lucide-react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import HotelBookingModal from "./hotelBookingModal";
 import ActivityBookingModal from "./activityBookingModal";
 
@@ -177,6 +177,17 @@ const DatePicker = ({
   );
 };
 
+// ✅ ADD THIS INTERFACE
+interface BookingDetails {
+  bookingType: "hotel" | "activity";
+  checkIn?: string;
+  checkOut?: string;
+  rooms?: number;
+  adults?: number;
+  activityDate?: string;
+  people?: number;
+}
+
 interface BookingCardV2Props {
   hotelPrice?: string;
   hotelName?: string;
@@ -200,25 +211,7 @@ export default function BookingCardV2({
 }: BookingCardV2Props) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  // Check if we should auto-open booking modal after login
-  const shouldAutoOpenBooking = searchParams.get("showBooking") === "true";
-
-  // Auto-open booking modal when returning from auth with showBooking=true
-  useEffect(() => {
-    if (shouldAutoOpenBooking) {
-      // Open the appropriate booking modal
-      if (type === "hotel") {
-        setShowHotelBookingModal(true);
-      } else {
-        setShowActivityBookingModal(true);
-      }
-
-      // Clean up the URL by removing the showBooking parameter
-      router.replace(pathname);
-    }
-  }, [shouldAutoOpenBooking, type, pathname, router]);
   // Initialize from localStorage
   const [checkIn, setCheckIn] = useState(() => {
     if (typeof window !== "undefined") {
@@ -279,19 +272,6 @@ export default function BookingCardV2({
   const [showActivityBookingModal, setShowActivityBookingModal] =
     useState(false);
 
-  // Auto-open booking modal if redirected from login
-  useEffect(() => {
-    if (shouldAutoOpenBooking) {
-      if (type === "hotel") {
-        setShowHotelBookingModal(true);
-      } else {
-        setShowActivityBookingModal(true);
-      }
-      // Remove the query param to clean up URL
-      router.replace(pathname);
-    }
-  }, [shouldAutoOpenBooking, type, pathname, router]);
-
   // Sync with localStorage when values change
   useEffect(() => {
     const stored = localStorage.getItem("hotelSearch");
@@ -309,29 +289,39 @@ export default function BookingCardV2({
     window.dispatchEvent(new Event("hotelSearchUpdate"));
   }, [checkIn, checkOut, rooms, adults]);
 
+  // ✅ RESTORE BOOKING DETAILS FROM LOCALSTORAGE AFTER LOGIN
   useEffect(() => {
-    const savedBooking = localStorage.getItem("pendingBooking");
-    if (savedBooking) {
-      try {
-        const booking = JSON.parse(savedBooking);
+    if (typeof window !== "undefined") {
+      const pendingBooking = localStorage.getItem("pendingBooking");
 
-        if (booking.bookingType === "hotel" && type === "hotel") {
-          if (booking.checkIn) setCheckIn(booking.checkIn);
-          if (booking.checkOut) setCheckOut(booking.checkOut);
-          if (booking.rooms) setRooms(booking.rooms);
-          if (booking.adults) setAdults(booking.adults);
-        } else if (booking.bookingType === "activity" && type === "activity") {
-          if (booking.activityDate) setActivityDate(booking.activityDate);
-          if (booking.people) setPeople(booking.people);
+      if (pendingBooking) {
+        try {
+          const booking = JSON.parse(pendingBooking);
+
+          // Restore hotel booking details
+          if (booking.bookingType === "hotel") {
+            if (booking.checkIn) setCheckIn(booking.checkIn);
+            if (booking.checkOut) setCheckOut(booking.checkOut);
+            if (booking.rooms) setRooms(booking.rooms);
+            if (booking.adults) setAdults(booking.adults);
+          }
+
+          // Restore activity booking details
+          if (booking.bookingType === "activity") {
+            if (booking.activityDate) setActivityDate(booking.activityDate);
+            if (booking.people) setPeople(booking.people);
+          }
+
+          // Clear pending booking after restoration
+          localStorage.removeItem("pendingBooking");
+        } catch (error) {
+          console.error("Error restoring booking details:", error);
+          localStorage.removeItem("pendingBooking");
         }
-
-        // Clear the saved booking after restoring
-        localStorage.removeItem("pendingBooking");
-      } catch (e) {
-        console.error("Error restoring booking details:", e);
       }
     }
-  }, [type]);
+  }, [pathname]); // Re-run when user comes back from login
+
   // Listen for changes from SearchBar
   useEffect(() => {
     const handleStorageChange = () => {
@@ -366,30 +356,23 @@ export default function BookingCardV2({
   const pricePerPerson = activityPrice ? parseFloat(activityPrice) : 0;
   const activityTotalPrice = pricePerPerson * people;
 
+  // ✅ HANDLE RESERVE CLICK - SAVE BOOKING DETAILS BEFORE REDIRECT
   const handleReserveClick = async () => {
     try {
       // Check if user is authenticated
       const response = await fetch("/api/auth/verify");
 
       if (!response.ok) {
-        const bookingData: BookingDetails = {
+        // User not authenticated - SAVE BOOKING DETAILS BEFORE REDIRECT
+        const bookingDetails = {
           bookingType: type,
+          ...(type === "hotel" && { checkIn, checkOut, rooms, adults }),
+          ...(type === "activity" && { activityDate, people }),
         };
 
-        if (type === "hotel") {
-          bookingData.checkIn = checkIn;
-          bookingData.checkOut = checkOut;
-          bookingData.rooms = rooms;
-          bookingData.adults = adults;
-        } else {
-          bookingData.activityDate = activityDate;
-          bookingData.people = people;
-        }
+        localStorage.setItem("pendingBooking", JSON.stringify(bookingDetails));
 
-        // Save to localStorage
-        localStorage.setItem("pendingBooking", JSON.stringify(bookingData));
-
-        // Redirect to login with referrer
+        // Redirect to login with return URL
         router.push(`/user/auth?redirect=${encodeURIComponent(pathname)}`);
         return;
       }
@@ -532,7 +515,7 @@ export default function BookingCardV2({
           </div>
         </ClientOnly>
 
-        {/* Reserve Button - Updated to check auth */}
+        {/* Reserve Button */}
         <button
           onClick={handleReserveClick}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-3"
