@@ -36,7 +36,6 @@ const CruiseSearch: React.FC = () => {
   );
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -67,16 +66,13 @@ const CruiseSearch: React.FC = () => {
       ref={containerRef}
     >
       <div className="bg-white rounded-xl shadow-2xl relative pb-8">
-        {/* Title Section */}
         <div className="p-6">
           <h2 className="text-[#4a4a4a] text-lg md:text-xl font-medium">
             Book Domestic and International Cruises
           </h2>
         </div>
 
-        {/* Search Inputs Container */}
         <div className="grid grid-cols-1 md:grid-cols-2 border border-gray-200 mx-6 rounded-lg overflow-visible">
-          {/* Cruising To Section */}
           <div
             className={`relative p-4 cursor-pointer hover:bg-blue-50 transition-colors border-b md:border-b-0 md:border-r border-gray-200 ${activeDropdown === "dest" ? "bg-blue-50" : ""}`}
             onClick={() =>
@@ -90,7 +86,6 @@ const CruiseSearch: React.FC = () => {
               {search.destination || "Select Destination"}
             </div>
 
-            {/* Destination Dropdown */}
             {activeDropdown === "dest" && (
               <div className="absolute left-0 top-full mt-1 w-full bg-white shadow-xl rounded-md z-50 max-h-60 overflow-y-auto border border-gray-100">
                 {destinations.map((dest) => (
@@ -147,7 +142,7 @@ const CruiseSearch: React.FC = () => {
         <div className="absolute left-1/2 -bottom-7 -translate-x-1/2 w-full flex justify-center">
           <button
             onClick={handleSearch}
-            className="bg-linear-to-r from-blue-500 to-blue-700 text-white text-2xl font-bold py-3 px-16 rounded-full shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all uppercase tracking-widest active:scale-95"
+            className="cursor-pointer bg-linear-to-r from-blue-500 to-blue-700 text-white text-2xl font-bold py-3 px-16 rounded-full shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all uppercase tracking-widest active:scale-95"
           >
             Search
           </button>
