@@ -110,8 +110,8 @@ function HotelPageContent() {
             hotel.images?.[0] ||
             hotel.image ||
             "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop",
-          price: `₹${Math.round(hotel.pricePerNight)}`,
-          oldPrice: `₹${Math.round(hotel.pricePerNight * 1.2)}`,
+          price: `${Math.round(hotel.pricePerNight)}`,
+          oldPrice: `${Math.round(hotel.pricePerNight * 1.2)}`,
           rating: hotel.rating || (Math.random() * (5 - 3.8) + 3.8).toFixed(1),
           reviews: hotel.reviews || Math.floor(Math.random() * 500) + 10,
           days: hotel.days || 4,

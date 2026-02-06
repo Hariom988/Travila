@@ -28,7 +28,6 @@ const Page = () => {
     try {
       console.log("Form submitted");
 
-      // Validate inputs on client side first
       if (!email.trim() || !password.trim()) {
         console.log("Empty fields");
         setError("Please fill in all fields");
@@ -45,7 +44,6 @@ const Page = () => {
 
       console.log("Sending login request...");
 
-      // Make API request
       const response = await fetch("/api/auth/admin-login", {
         method: "POST",
         headers: {
@@ -57,27 +55,17 @@ const Page = () => {
         }),
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
       const data = await response.json();
-      console.log("Response data:", data);
 
       if (!response.ok) {
-        console.log("Login failed:", data.error);
         setError(data.error || "Login failed. Please try again.");
         setIsLoading(false);
         return;
       }
 
-      // Success: redirect to dashboard
       if (data.success) {
-        console.log("Login successful, redirecting...");
-        // Store user info in a secure way (optional, token is in httpOnly cookie)
         sessionStorage.setItem("adminUser", JSON.stringify(data.user));
 
-        // Redirect immediately
-        console.log("Pushing to dashboard...");
         router.push("/admin/dashboard");
         return;
       }
@@ -90,7 +78,6 @@ const Page = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-slate-50">
-      {/* Left Side: Hero Section */}
       <div className="hidden lg:flex lg:w-1/2 bg-indigo-600 p-12 flex-col justify-between text-white relative overflow-hidden">
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-8">
@@ -118,15 +105,12 @@ const Page = () => {
           <p>Privacy Policy</p>
         </div>
 
-        {/* Decorative Background Circles */}
         <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-indigo-500 rounded-full blur-3xl opacity-50"></div>
         <div className="absolute -top-20 -right-20 w-80 h-80 bg-blue-400 rounded-full blur-3xl opacity-30"></div>
       </div>
 
-      {/* Right Side: Login Form */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-white">
         <div className="w-full max-w-md space-y-8">
-          {/* Mobile Header */}
           <div className="lg:hidden flex items-center gap-2 mb-10">
             <div className="p-2 bg-indigo-600 rounded-lg text-white">
               <LayoutDashboard size={24} />
@@ -155,7 +139,6 @@ const Page = () => {
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div className="space-y-4">
-              {/* Email Field */}
               <div className="space-y-2">
                 <label
                   className="text-sm font-medium text-slate-700"
@@ -180,7 +163,6 @@ const Page = () => {
                 </div>
               </div>
 
-              {/* Password Field */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label

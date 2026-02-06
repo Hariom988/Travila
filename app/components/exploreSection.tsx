@@ -40,9 +40,7 @@ const ExploreSection = () => {
         </button>
       </div>
 
-      {/* --- EXPLORE COMPONENT PART --- */}
       <div className="absolute bottom-0 left-0 w-full h-32 md:h-48 bg-linear-to-t from-white via-white/50 to-transparent z-10 pointer-events-none" />
-
       <div className="absolute bottom-[-2%] left-0 w-full z-10 flex justify-center pointer-events-none">
         <ScrollFloat
           animationDuration={1.2}
@@ -50,8 +48,14 @@ const ExploreSection = () => {
           scrollStart="top bottom"
           scrub={false}
           stagger={0.05}
-          containerClassName="w-full text-center p-0 m-0 leading-none"
-          textClassName="font-black uppercase text-8xl tracking-widest text-transparent [-webkit-text-stroke:1px_white] md:[-webkit-text-stroke:2px_white] opacity-70"
+          containerClassName="w-full text-center p-0 m-0 leading-[0.9] md:leading-none"
+          textClassName="
+    font-black uppercase 
+    text-5xl sm:text-7xl md:text-8xl 
+    tracking-tighter md:tracking-widest 
+    text-transparent [-webkit-text-stroke:1px_white] md:[-webkit-text-stroke:2px_white] 
+    opacity-70
+  "
         >
           EXPLORE THE WORLD
         </ScrollFloat>

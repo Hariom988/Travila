@@ -1,10 +1,8 @@
 "use client";
 import Image from "next/image";
 import { ArrowRight, Globe, ShieldCheck } from "lucide-react";
-// Replace with your actual asset imports
-import image1 from "@/public/assets/discover-section/image1.jpg"; // Couple Image
-import image2 from "@/public/assets/discover-section/image2.jpg"; // Aerial Beach Image
-import Link from "next/link";
+import image1 from "@/public/assets/discover-section/image1.jpg";
+import image2 from "@/public/assets/discover-section/image2.jpg";
 
 const DiscoverSection = () => {
   const scrollToTop = () => {
