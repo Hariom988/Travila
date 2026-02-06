@@ -53,7 +53,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
                 {tour.oldPrice}
               </span>
             )}
-            <span>{tour.price}</span>
+            <span>₹{tour.price}</span>
           </div>
         </div>
 

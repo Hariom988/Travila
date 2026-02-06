@@ -1,4 +1,3 @@
-// app/user/auth/page.tsx - FIXED VERSION
 "use client";
 import React, { useState, useEffect } from "react";
 import {
@@ -41,10 +40,8 @@ const Page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Get the referrer URL from query params (passed from booking card)
   const referrerUrl = searchParams.get("redirect") || "/";
 
-  // ✅ FIX 2: State to manage booking details
   const [bookingDetails, setBookingDetails] = useState<BookingDetails>({
     bookingType: null,
   });
@@ -67,7 +64,6 @@ const Page = () => {
 
   const [mode, setMode] = useState<AuthMode>("login");
 
-  // ✅ FIX 2: Load booking details from localStorage on mount
   useEffect(() => {
     const savedBooking = localStorage.getItem("pendingBooking");
     if (savedBooking) {
@@ -129,10 +125,8 @@ const Page = () => {
 
       setSuccessMessage("Login successful! Redirecting...");
 
-      // ✅ FIX 2: Clear pending booking after successful login
       localStorage.removeItem("pendingBooking");
 
-      // Redirect to referrer URL after short delay
       setTimeout(() => {
         router.push(referrerUrl);
       }, 1500);
@@ -196,11 +190,8 @@ const Page = () => {
 
       setSuccessMessage("Registration successful! Logging you in...");
 
-      // ✅ FIX 1 + FIX 2: User is now auto-logged in from registration
-      // Clear pending booking and redirect
       localStorage.removeItem("pendingBooking");
 
-      // Redirect to referrer URL after short delay
       setTimeout(() => {
         router.push(referrerUrl);
       }, 1500);
@@ -262,10 +253,8 @@ const Page = () => {
 
         setSuccessMessage("Google login successful! Redirecting...");
 
-        // ✅ FIX 2: Clear pending booking and redirect
         localStorage.removeItem("pendingBooking");
 
-        // Redirect to referrer URL after short delay
         setTimeout(() => {
           router.push(referrerUrl);
         }, 1500);
@@ -291,21 +280,13 @@ const Page = () => {
         ></div>
       </div>
       <div className="relative z-10 w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-linear-to-br from-blue-500 to-purple-600 mb-4 shadow-lg">
-            <span className="text-2xl">✈️</span>
-          </div>
-          <h1 className="text-3xl font-bold text-white mb-2">TravelHub</h1>
-          <p className="text-slate-400">Discover your next adventure</p>
-        </div>
-
         <div className="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-2xl p-8">
           <div className="flex gap-2 mb-8">
             <button
               onClick={() => handleModeSwitch("login")}
-              className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+              className={`flex-1 cursor-pointer py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
                 mode === "login"
-                  ? "bg-linear-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                  ? "bg-blue-500 text-white shadow-lg"
                   : "bg-slate-700/30 text-slate-300 hover:bg-slate-700/50"
               }`}
             >
@@ -314,9 +295,9 @@ const Page = () => {
             </button>
             <button
               onClick={() => handleModeSwitch("register")}
-              className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
+              className={`flex-1 cursor-pointer py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
                 mode === "register"
-                  ? "bg-linear-to-r from-blue-500 to-purple-600 text-white shadow-lg"
+                  ? "bg-blue-500 text-white shadow-lg"
                   : "bg-slate-700/30 text-slate-300 hover:bg-slate-700/50"
               }`}
             >
@@ -388,7 +369,7 @@ const Page = () => {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={isLoading}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+                    className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
                   >
                     {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
@@ -401,7 +382,7 @@ const Page = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 px-4 bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-70 flex items-center justify-center gap-2"
+                className="w-full cursor-pointer py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-70 flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <>
@@ -421,7 +402,7 @@ const Page = () => {
                 <button
                   type="button"
                   onClick={() => handleModeSwitch("register")}
-                  className="text-blue-400 hover:text-blue-300 font-semibold"
+                  className="text-blue-400 cursor-pointer hover:text-blue-300 font-semibold"
                 >
                   Register here
                 </button>
@@ -521,7 +502,7 @@ const Page = () => {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={isLoading}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+                    className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
                   >
                     {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                   </button>
@@ -552,7 +533,7 @@ const Page = () => {
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     disabled={isLoading}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+                    className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
                   >
                     {showConfirmPassword ? (
                       <Eye size={18} />
@@ -571,7 +552,7 @@ const Page = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 px-4 bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-70 flex items-center justify-center gap-2"
+                className="w-full cursor-pointer py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-70 flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <>
@@ -591,7 +572,7 @@ const Page = () => {
                 <button
                   type="button"
                   onClick={() => handleModeSwitch("login")}
-                  className="text-blue-400 hover:text-blue-300 font-semibold"
+                  className="text-blue-400 cursor-pointer hover:text-blue-300 font-semibold"
                 >
                   Sign in here
                 </button>
@@ -609,7 +590,7 @@ const Page = () => {
             type="button"
             onClick={() => handleGoogleLogin()}
             disabled={isLoading}
-            className="w-full py-3 px-4 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-70 flex items-center justify-center gap-3"
+            className="w-full cursor-pointer py-3 px-4 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-70 flex items-center justify-center gap-3"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
