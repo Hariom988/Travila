@@ -524,7 +524,7 @@ export default function SearchBar({
                 onClick={() => setShowGuestsModal(false)}
                 className="w-full cursor-pointer bg-blue-700 hover:bg-blue-800 text-white font-black py-3 rounded-xl transition-all shadow-md"
               >
-                `` APPLY GUESTS
+                APPLY GUESTS
               </button>
             </div>
           </div>
