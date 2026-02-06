@@ -309,6 +309,29 @@ export default function BookingCardV2({
     window.dispatchEvent(new Event("hotelSearchUpdate"));
   }, [checkIn, checkOut, rooms, adults]);
 
+  useEffect(() => {
+    const savedBooking = localStorage.getItem("pendingBooking");
+    if (savedBooking) {
+      try {
+        const booking = JSON.parse(savedBooking);
+
+        if (booking.bookingType === "hotel" && type === "hotel") {
+          if (booking.checkIn) setCheckIn(booking.checkIn);
+          if (booking.checkOut) setCheckOut(booking.checkOut);
+          if (booking.rooms) setRooms(booking.rooms);
+          if (booking.adults) setAdults(booking.adults);
+        } else if (booking.bookingType === "activity" && type === "activity") {
+          if (booking.activityDate) setActivityDate(booking.activityDate);
+          if (booking.people) setPeople(booking.people);
+        }
+
+        // Clear the saved booking after restoring
+        localStorage.removeItem("pendingBooking");
+      } catch (e) {
+        console.error("Error restoring booking details:", e);
+      }
+    }
+  }, [type]);
   // Listen for changes from SearchBar
   useEffect(() => {
     const handleStorageChange = () => {
@@ -343,16 +366,31 @@ export default function BookingCardV2({
   const pricePerPerson = activityPrice ? parseFloat(activityPrice) : 0;
   const activityTotalPrice = pricePerPerson * people;
 
-  // Handle booking - check authentication before opening modal
   const handleReserveClick = async () => {
     try {
       // Check if user is authenticated
       const response = await fetch("/api/auth/verify");
 
       if (!response.ok) {
-        // User not authenticated - redirect to login with referrer and booking intent
-        const loginUrl = `/user/auth?redirect=${encodeURIComponent(pathname)}&bookingIntent=true`;
-        router.push(loginUrl);
+        const bookingData: BookingDetails = {
+          bookingType: type,
+        };
+
+        if (type === "hotel") {
+          bookingData.checkIn = checkIn;
+          bookingData.checkOut = checkOut;
+          bookingData.rooms = rooms;
+          bookingData.adults = adults;
+        } else {
+          bookingData.activityDate = activityDate;
+          bookingData.people = people;
+        }
+
+        // Save to localStorage
+        localStorage.setItem("pendingBooking", JSON.stringify(bookingData));
+
+        // Redirect to login with referrer
+        router.push(`/user/auth?redirect=${encodeURIComponent(pathname)}`);
         return;
       }
 
@@ -365,8 +403,7 @@ export default function BookingCardV2({
     } catch (error) {
       console.error("Auth check error:", error);
       // Redirect to login on error
-      const loginUrl = `/user/auth?redirect=${encodeURIComponent(pathname)}&bookingIntent=true`;
-      router.push(loginUrl);
+      router.push(`/user/auth?redirect=${encodeURIComponent(pathname)}`);
     }
   };
 
