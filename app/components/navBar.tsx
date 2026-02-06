@@ -1,4 +1,4 @@
-// app/components/navBar.tsx - IMPROVED VERSION
+// app/components/navBar.tsx - WITH MY BOOKINGS BUTTON
 "use client";
 import { useState, useEffect } from "react";
 import {
@@ -16,6 +16,7 @@ import {
   Info,
   Mail,
   ChevronDown,
+  BookOpen,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -140,7 +141,7 @@ const Navbar = () => {
           <div className="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-full flex items-center justify-center font-bold text-lg md:text-xl hover:bg-white/30 transition-colors">
             9
           </div>
-          <div className="flex flex-col  sm:block">
+          <div className="flex flex-col ">
             <span className="text-lg md:text-xl font-bold tracking-tight leading-none">
               Travila
             </span>
@@ -170,7 +171,7 @@ const Navbar = () => {
         </div>
 
         {/* --- Right Section: Contact + User Profile --- */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-4 lg:gap-6">
           {/* Contact Info */}
           <div className="flex items-center gap-3 border-r border-gray-700 pr-6">
             <div className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors">
@@ -184,84 +185,96 @@ const Navbar = () => {
 
           {/* User Profile or Login Button */}
           {!isLoading && user ? (
-            <div className="relative">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                onMouseEnter={() => setIsDropdownOpen(true)}
-                onMouseLeave={() => setIsDropdownOpen(false)}
-                className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors group"
-              >
-                <div className="w-9 h-9 rounded-full bg-linear-to-br from-purple-500 to-blue-600 flex items-center justify-center text-sm font-bold ring-2 ring-white/20">
-                  {getInitials(user.name)}
-                </div>
-                <div className="text-left hidden md:block">
-                  <p className="text-sm font-semibold text-white">
-                    {user.name || "User"}
-                  </p>
-                  <p className="text-xs text-gray-400">{user.role}</p>
-                </div>
-                <ChevronDown
-                  size={16}
-                  className={`text-gray-400 transition-transform ${
-                    isDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {/* Dropdown Menu */}
-              <div
-                onMouseEnter={() => setIsDropdownOpen(true)}
-                onMouseLeave={() => setIsDropdownOpen(false)}
-                className={`absolute right-0 mt-2 w-80 bg-linear-to-b from-gray-800 to-gray-900 rounded-xl shadow-2xl border border-gray-700 overflow-hidden transition-all duration-200 ${
-                  isDropdownOpen ? "opacity-100 visible" : "opacity-0 invisible"
-                }`}
-              >
-                {/* User Info Section */}
-                <div className="px-4 py-4 border-b border-gray-700 bg-linear-to-r from-purple-900/20 to-blue-900/20">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-purple-500 to-blue-600 flex items-center justify-center text-lg font-bold">
-                      {getInitials(user.name)}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-white">
-                        {user.name || "User"}
-                      </p>
-                      <p className="text-xs text-gray-400">{user.email}</p>
-                      {user.phone && (
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          {user.phone}
-                        </p>
-                      )}
-                    </div>
+            <>
+              {/* User Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  onMouseEnter={() => setIsDropdownOpen(true)}
+                  onMouseLeave={() => setIsDropdownOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors group"
+                >
+                  <div className="w-9 h-9 rounded-full bg-linear-to-br from-purple-500 to-blue-600 flex items-center justify-center text-sm font-bold ring-2 ring-white/20">
+                    {getInitials(user.name)}
                   </div>
-                  <span className="inline-block px-3 py-1 bg-blue-600/30 text-blue-300 text-xs rounded-full font-medium">
-                    {user.role === "ADMIN" ? "🔐 Admin" : "👤 User"}
-                  </span>
-                </div>
+                  <div className="text-left hidden md:block">
+                    <p className="text-sm font-semibold text-white">
+                      {user.name || "User"}
+                    </p>
+                    <p className="text-xs text-gray-400">{user.role}</p>
+                  </div>
+                  <ChevronDown
+                    size={16}
+                    className={`text-gray-400 transition-transform ${
+                      isDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
 
-                {/* Quick Links */}
-                <div className="px-3 py-2 space-y-1">
-                  <Link
-                    href="/user/profile"
-                    className="w-full px-3 py-2 flex items-center gap-2 hover:bg-gray-700 rounded-lg transition-colors text-sm text-gray-300 hover:text-white"
-                  >
-                    <User size={16} />
-                    View Profile
-                  </Link>
-                </div>
+                {/* Dropdown Menu */}
+                <div
+                  onMouseEnter={() => setIsDropdownOpen(true)}
+                  onMouseLeave={() => setIsDropdownOpen(false)}
+                  className={`absolute right-0 mt-2 w-80 bg-linear-to-b from-gray-800 to-gray-900 rounded-xl shadow-2xl border border-gray-700 overflow-hidden transition-all duration-200 ${
+                    isDropdownOpen
+                      ? "opacity-100 visible"
+                      : "opacity-0 invisible"
+                  }`}
+                >
+                  {/* User Info Section */}
+                  <div className="px-4 py-4 border-b border-gray-700 bg-linear-to-r from-purple-900/20 to-blue-900/20">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 rounded-full bg-linear-to-br from-purple-500 to-blue-600 flex items-center justify-center text-lg font-bold">
+                        {getInitials(user.name)}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-white">
+                          {user.name || "User"}
+                        </p>
+                        <p className="text-xs text-gray-400">{user.email}</p>
+                        {user.phone && (
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {user.phone}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <span className="inline-block px-3 py-1 bg-blue-600/30 text-blue-300 text-xs rounded-full font-medium">
+                      {user.role === "ADMIN" ? "🔐 Admin" : "👤 User"}
+                    </span>
+                  </div>
 
-                {/* Logout Button */}
-                <div className="border-t border-gray-700 p-3">
-                  <button
-                    onClick={handleLogout}
-                    className="w-full px-3 py-2.5 flex items-center justify-center gap-2 hover:bg-red-600/20 rounded-lg transition-colors text-red-400 hover:text-red-300 font-medium text-sm"
-                  >
-                    <LogOut size={16} />
-                    Logout
-                  </button>
+                  {/* Quick Links */}
+                  <div className="px-3 py-2 space-y-1">
+                    <Link
+                      href="/user/bookings"
+                      className="w-full px-3 py-2 flex items-center gap-2 hover:bg-gray-700 rounded-lg transition-colors text-sm text-gray-300 hover:text-white"
+                    >
+                      <BookOpen size={16} />
+                      My Bookings
+                    </Link>
+                    <Link
+                      href="/user/profile"
+                      className="w-full px-3 py-2 flex items-center gap-2 hover:bg-gray-700 rounded-lg transition-colors text-sm text-gray-300 hover:text-white"
+                    >
+                      <User size={16} />
+                      View Profile
+                    </Link>
+                  </div>
+
+                  {/* Logout Button */}
+                  <div className="border-t border-gray-700 p-3">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-3 py-2.5 flex items-center justify-center gap-2 hover:bg-red-600/20 rounded-lg transition-colors text-red-400 hover:text-red-300 font-medium text-sm"
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            </>
           ) : !isLoading ? (
             <Link
               href="/user/auth"
@@ -336,6 +349,18 @@ const Navbar = () => {
                     {user.role === "ADMIN" ? "🔐 Admin" : "👤 User"}
                   </span>
                 </div>
+              )}
+
+              {/* My Bookings Button - Mobile */}
+              {!isLoading && user && (
+                <Link
+                  href="/user/bookings"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full px-4 py-3 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
+                >
+                  <BookOpen size={18} />
+                  My Bookings
+                </Link>
               )}
 
               {/* Category Navigation */}
