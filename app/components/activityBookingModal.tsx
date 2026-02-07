@@ -1,4 +1,3 @@
-// app/components/activityBookingModal.tsx
 "use client";
 import { useState } from "react";
 import {
@@ -68,7 +67,6 @@ export default function ActivityBookingModal({
 
       if (!response.ok) {
         if (response.status === 401) {
-          // User not authenticated - redirect to login
           router.push("/user/auth");
           return;
         }
@@ -99,7 +97,6 @@ export default function ActivityBookingModal({
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
       <div className="bg-white rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="sticky top-0 bg-linear-to-r from-purple-600 to-purple-700 text-white p-4 lg:p-6 flex items-center justify-between rounded-t-3xl lg:rounded-t-2xl">
           <h2 className="font-bold text-lg">Confirm Activity Booking</h2>
           <button
@@ -114,10 +111,7 @@ export default function ActivityBookingModal({
             <X size={20} />
           </button>
         </div>
-
-        {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Status Messages */}
           {bookingState.status === "success" && (
             <div className="p-4 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
@@ -134,11 +128,9 @@ export default function ActivityBookingModal({
 
           {bookingState.status !== "success" && (
             <>
-              {/* Activity Info */}
               <div className="bg-slate-50 p-4 rounded-xl space-y-3">
                 <h3 className="font-bold text-gray-900">{activityName}</h3>
 
-                {/* Activity Details */}
                 <div className="space-y-3 text-sm text-gray-600">
                   <div className="flex items-center gap-2 pb-2 border-b">
                     <Calendar className="w-4 h-4 text-purple-600" />
@@ -173,7 +165,6 @@ export default function ActivityBookingModal({
                 </div>
               </div>
 
-              {/* Price Breakdown */}
               <div className="bg-purple-50 p-4 rounded-xl space-y-2 text-sm">
                 <div className="flex justify-between text-gray-600">
                   <span>
@@ -191,7 +182,6 @@ export default function ActivityBookingModal({
                 </div>
               </div>
 
-              {/* Terms */}
               <div className="bg-slate-50 p-3 rounded-lg text-xs text-gray-600 space-y-1">
                 <p>✓ Instant confirmation</p>
                 <p>✓ Free cancellation up to 24 hours before activity</p>
@@ -199,7 +189,6 @@ export default function ActivityBookingModal({
                 <p>✓ All safety equipment provided</p>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   onClick={onClose}

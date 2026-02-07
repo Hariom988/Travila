@@ -1,12 +1,11 @@
-// app/components/bookingCard.tsx - UPDATED with localStorage persistence
 "use client";
 import { useState, useEffect } from "react";
 import { Calendar, Users, ShieldCheck, X } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import HotelBookingModal from "./hotelBookingModal";
 import ActivityBookingModal from "./activityBookingModal";
+import { flattenedDecrypt } from "jose";
 
-// Client-only wrapper to prevent hydration errors
 function ClientOnly({ children }: { children: React.ReactNode }) {
   const [hasMounted, setHasMounted] = useState(false);
 
@@ -30,7 +29,6 @@ interface DatePickerProps {
   color: "green" | "orange";
 }
 
-// Helper functions
 const formatDateToLocal = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -177,7 +175,6 @@ const DatePicker = ({
   );
 };
 
-// ✅ ADD THIS INTERFACE
 interface BookingDetails {
   bookingType: "hotel" | "activity";
   checkIn?: string;
@@ -212,7 +209,6 @@ export default function BookingCardV2({
   const router = useRouter();
   const pathname = usePathname();
 
-  // Initialize from localStorage
   const [checkIn, setCheckIn] = useState(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("hotelSearch");
@@ -256,8 +252,6 @@ export default function BookingCardV2({
     }
     return 2;
   });
-
-  // Activity specific states
   const [activityDate, setActivityDate] = useState(getTodayDate());
   const [people, setPeople] = useState(1);
 
@@ -267,12 +261,10 @@ export default function BookingCardV2({
   const [showGuestsModal, setShowGuestsModal] = useState(false);
   const [showActivityDateModal, setShowActivityDateModal] = useState(false);
 
-  // Booking modals
   const [showHotelBookingModal, setShowHotelBookingModal] = useState(false);
   const [showActivityBookingModal, setShowActivityBookingModal] =
     useState(false);
 
-  // Sync with localStorage when values change
   useEffect(() => {
     const stored = localStorage.getItem("hotelSearch");
     const currentSearch = stored ? JSON.parse(stored) : {};
@@ -289,7 +281,6 @@ export default function BookingCardV2({
     window.dispatchEvent(new Event("hotelSearchUpdate"));
   }, [checkIn, checkOut, rooms, adults]);
 
-  // ✅ RESTORE BOOKING DETAILS FROM LOCALSTORAGE AFTER LOGIN
   useEffect(() => {
     if (typeof window !== "undefined") {
       const pendingBooking = localStorage.getItem("pendingBooking");
@@ -298,7 +289,6 @@ export default function BookingCardV2({
         try {
           const booking = JSON.parse(pendingBooking);
 
-          // Restore hotel booking details
           if (booking.bookingType === "hotel") {
             if (booking.checkIn) setCheckIn(booking.checkIn);
             if (booking.checkOut) setCheckOut(booking.checkOut);
@@ -306,13 +296,11 @@ export default function BookingCardV2({
             if (booking.adults) setAdults(booking.adults);
           }
 
-          // Restore activity booking details
           if (booking.bookingType === "activity") {
             if (booking.activityDate) setActivityDate(booking.activityDate);
             if (booking.people) setPeople(booking.people);
           }
 
-          // Clear pending booking after restoration
           localStorage.removeItem("pendingBooking");
         } catch (error) {
           console.error("Error restoring booking details:", error);
@@ -320,9 +308,7 @@ export default function BookingCardV2({
         }
       }
     }
-  }, [pathname]); // Re-run when user comes back from login
-
-  // Listen for changes from SearchBar
+  }, [pathname]);
   useEffect(() => {
     const handleStorageChange = () => {
       const stored = localStorage.getItem("hotelSearch");
@@ -340,7 +326,6 @@ export default function BookingCardV2({
       window.removeEventListener("hotelSearchUpdate", handleStorageChange);
   }, []);
 
-  // Calculate nights
   const nights = Math.max(
     1,
     Math.ceil(
@@ -349,21 +334,17 @@ export default function BookingCardV2({
     ),
   );
 
-  // Calculate prices
   const pricePerNight = hotelPrice ? parseFloat(hotelPrice) : 0;
   const hotelTotalPrice = pricePerNight * nights * rooms;
 
   const pricePerPerson = activityPrice ? parseFloat(activityPrice) : 0;
   const activityTotalPrice = pricePerPerson * people;
 
-  // ✅ HANDLE RESERVE CLICK - SAVE BOOKING DETAILS BEFORE REDIRECT
   const handleReserveClick = async () => {
     try {
-      // Check if user is authenticated
       const response = await fetch("/api/auth/verify");
 
       if (!response.ok) {
-        // User not authenticated - SAVE BOOKING DETAILS BEFORE REDIRECT
         const bookingDetails = {
           bookingType: type,
           ...(type === "hotel" && { checkIn, checkOut, rooms, adults }),
@@ -372,12 +353,9 @@ export default function BookingCardV2({
 
         localStorage.setItem("pendingBooking", JSON.stringify(bookingDetails));
 
-        // Redirect to login with return URL
         router.push(`/user/auth?redirect=${encodeURIComponent(pathname)}`);
         return;
       }
-
-      // User is authenticated - open booking modal
       if (type === "hotel") {
         setShowHotelBookingModal(true);
       } else {
@@ -385,16 +363,13 @@ export default function BookingCardV2({
       }
     } catch (error) {
       console.error("Auth check error:", error);
-      // Redirect to login on error
       router.push(`/user/auth?redirect=${encodeURIComponent(pathname)}`);
     }
   };
 
   return (
     <>
-      {/* Booking Card */}
       <div className="sticky top-28 bg-white border border-slate-200 p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 ring-1 ring-slate-100">
-        {/* Price Section */}
         <div className="flex justify-between items-baseline mb-8">
           <div>
             <span className="text-4xl font-black text-slate-900">
@@ -412,10 +387,8 @@ export default function BookingCardV2({
           </div>
         </div>
 
-        {/* Booking Sections */}
         {type === "hotel" && (
           <div className="space-y-4 mb-8">
-            {/* Dates Button */}
             <button
               onClick={() => setShowCalendarModal("in")}
               className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-blue-200 transition-all"
@@ -438,7 +411,6 @@ export default function BookingCardV2({
               </ClientOnly>
             </button>
 
-            {/* Guests Button */}
             <button
               onClick={() => setShowGuestsModal(true)}
               className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-blue-200 transition-all"
@@ -456,7 +428,6 @@ export default function BookingCardV2({
 
         {type === "activity" && (
           <div className="space-y-4 mb-8">
-            {/* Activity Date Button */}
             <button
               onClick={() => setShowActivityDateModal(true)}
               className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-purple-200 transition-all"
@@ -474,7 +445,6 @@ export default function BookingCardV2({
               </ClientOnly>
             </button>
 
-            {/* People Button */}
             <button
               onClick={() => setShowGuestsModal(true)}
               className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-purple-200 transition-all"
@@ -489,7 +459,6 @@ export default function BookingCardV2({
           </div>
         )}
 
-        {/* Price Breakdown */}
         <ClientOnly>
           <div className="mb-6 p-4 bg-slate-50 rounded-2xl space-y-2">
             {type === "hotel" ? (
@@ -515,7 +484,6 @@ export default function BookingCardV2({
           </div>
         </ClientOnly>
 
-        {/* Reserve Button */}
         <button
           onClick={handleReserveClick}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-3"
@@ -538,10 +506,8 @@ export default function BookingCardV2({
         </div>
       </div>
 
-      {/* Calendar Modals for Hotel */}
       {type === "hotel" && (
         <>
-          {/* Check In Calendar */}
           {showCalendarModal === "in" && (
             <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
               <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl max-h-[90vh] overflow-y-auto border border-[#1F2937]">
@@ -576,7 +542,6 @@ export default function BookingCardV2({
             </div>
           )}
 
-          {/* Check Out Calendar */}
           {showCalendarModal === "out" && (
             <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
               <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl max-h-[90vh] overflow-y-auto border border-[#1F2937]">
@@ -608,7 +573,6 @@ export default function BookingCardV2({
         </>
       )}
 
-      {/* Activity Date Calendar Modal */}
       {type === "activity" && showActivityDateModal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
           <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl max-h-[90vh] overflow-y-auto border border-[#1F2937]">
@@ -638,7 +602,6 @@ export default function BookingCardV2({
         </div>
       )}
 
-      {/* Guests/People Modal */}
       {showGuestsModal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end lg:items-center justify-center p-4">
           <div className="bg-[#101828] rounded-3xl lg:rounded-2xl w-full lg:w-96 shadow-2xl border border-[#1F2937]">
@@ -750,7 +713,6 @@ export default function BookingCardV2({
         </div>
       )}
 
-      {/* Hotel Booking Modal */}
       {hotelId && hotelName && hotelPrice && (
         <HotelBookingModal
           isOpen={showHotelBookingModal}
@@ -765,7 +727,6 @@ export default function BookingCardV2({
         />
       )}
 
-      {/* Activity Booking Modal */}
       {activityId && activityName && activityPrice && activityDuration && (
         <ActivityBookingModal
           isOpen={showActivityBookingModal}

@@ -1,6 +1,6 @@
 import React from "react";
 import HeroImage from "@/public/assets/explore/hero-image.jpg";
-import ScrollFloat from "./scrollFoat"; // Ensure correct path
+import ScrollFloat from "./scrollFoat";
 
 const ExploreSection = () => {
   return (

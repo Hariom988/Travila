@@ -15,7 +15,7 @@ interface ScrollFloatProps {
   scrollStart?: string;
   scrollEnd?: string;
   stagger?: number;
-  scrub?: boolean; // Added to control scroll scrubbing
+  scrub?: boolean;
 }
 
 const ScrollFloat: React.FC<ScrollFloatProps> = ({
@@ -79,7 +79,7 @@ const ScrollFloat: React.FC<ScrollFloatProps> = ({
             scrub: scrub,
             toggleActions: "play none none reverse",
           },
-        }
+        },
       );
     }, containerRef);
 

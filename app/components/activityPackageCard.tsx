@@ -1,7 +1,5 @@
 "use client";
 import { useState, useEffect, Activity } from "react";
-import Image from "next/image";
-import TourCard from "@/app/components/tourCard";
 import ActivityCard from "./activityCard";
 
 interface ApiActivity {
@@ -90,7 +88,6 @@ const TourPackages = () => {
   return (
     <section className="w-full bg-white py-20 relative overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
-        {/* HEADER SECTION */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
           <div>
             <p className="text-purple-600 font-bold italic mb-2">
@@ -112,7 +109,6 @@ const TourPackages = () => {
           </div>
         )}
 
-        {/* TOUR CARDS GRID */}
         {!loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {activity.length > 0 ? (

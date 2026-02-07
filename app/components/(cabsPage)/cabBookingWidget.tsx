@@ -4,8 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   ArrowLeftRight,
   Calendar as CalIcon,
-  Clock,
-  ChevronDown,
   Search,
   MapPin,
   ChevronLeft,
