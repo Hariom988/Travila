@@ -7,6 +7,7 @@ import DiscoverSection from "./discoverSection";
 import ExploreSection from "./exploreSection";
 import LocationSection from "./locationSection";
 import { useRouter } from "next/navigation";
+import { SignUpPromoBanner } from "./signupPromoBanner";
 
 export default function Home() {
   const router = useRouter();
@@ -24,32 +25,35 @@ export default function Home() {
   };
 
   return (
-    <main className="w-full flex flex-col">
-      <section className="relative min-h-screen flex flex-col">
-        <div
-          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url('${HeroImage.src}')`,
-          }}
-        >
-          <div className="absolute inset-0 bg-black/30"></div>
-        </div>
-
-        <div className="relative z-10 flex flex-col items-center justify-center grow w-full px-4 pt-28 pb-10 md:pt-20">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white text-center md:max-w-5xl max-w-4xl leading-[1.1] mb-8 md:mb-12 drop-shadow-2xl">
-            Where Every Journey Become An Adventure
-          </h1>
-          <div className="w-full flex justify-center">
-            <SearchBar onSearch={handleSearch} instantSearch={false} />
+    <>
+      <SignUpPromoBanner />
+      <main className="w-full flex flex-col">
+        <section className="relative min-h-screen flex flex-col">
+          <div
+            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url('${HeroImage.src}')`,
+            }}
+          >
+            <div className="absolute inset-0 bg-black/30"></div>
           </div>
-        </div>
-      </section>
 
-      <TravelSection />
-      <TourPackages />
-      <ExploreSection />
-      <LocationSection />
-      <DiscoverSection />
-    </main>
+          <div className="relative z-10 flex flex-col items-center justify-center grow w-full px-4 pt-28 pb-10 md:pt-20">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white text-center md:max-w-5xl max-w-4xl leading-[1.1] mb-8 md:mb-12 drop-shadow-2xl">
+              Where Every Journey Become An Adventure
+            </h1>
+            <div className="w-full flex justify-center">
+              <SearchBar onSearch={handleSearch} instantSearch={false} />
+            </div>
+          </div>
+        </section>
+
+        <TravelSection />
+        <TourPackages />
+        <ExploreSection />
+        <LocationSection />
+        <DiscoverSection />
+      </main>
+    </>
   );
 }
