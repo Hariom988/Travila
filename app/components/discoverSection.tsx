@@ -19,7 +19,6 @@ const DiscoverSection = () => {
 
       <div className="container mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
-          {/* --- LEFT COLUMN: TEXT CONTENT --- */}
           <div className="flex flex-col items-start text-left max-w-xl z-20">
             <p className="text-[#6300ee] font-bold italic text-lg mb-3 tracking-wide">
               Dream Your Next Trip
@@ -36,7 +35,6 @@ const DiscoverSection = () => {
               Solution For You! Here Are Four.
             </p>
 
-            {/* Features List */}
             <div className="flex flex-col gap-6 lg:gap-8 mb-10 lg:mb-12 w-full">
               <div className="flex items-start gap-4 lg:gap-5">
                 <div className="w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
@@ -69,8 +67,6 @@ const DiscoverSection = () => {
               </div>
             </div>
 
-            {/* CTA Button */}
-
             <button
               onClick={scrollToTop}
               className="bg-[#6300ee] hover:bg-[#5000cc] hover:cursor-pointer text-white font-bold py-3 px-8 rounded-lg flex items-center gap-3 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 w-full sm:w-auto justify-center"
@@ -80,10 +76,7 @@ const DiscoverSection = () => {
             </button>
           </div>
 
-          {/* --- RIGHT COLUMN: IMAGES --- */}
-          {/* UPDATED: Added 'hidden lg:flex' so this entire block vanishes on mobile */}
           <div className="hidden lg:flex relative w-full h-120 items-center justify-end">
-            {/* Compass */}
             <div className="absolute top-10 -left-10 w-32 h-32 z-0 opacity-40 animate-spin-slow">
               <svg
                 viewBox="0 0 100 100"
@@ -94,7 +87,6 @@ const DiscoverSection = () => {
               </svg>
             </div>
 
-            {/* Vertical Text */}
             <div className="absolute top-1/2 -translate-y-1/2 hidden xl:block z-0 select-none pointer-events-none">
               <h2
                 className="text-[100px] font-bold tracking-[0.2em] leading-none uppercase"
@@ -109,9 +101,7 @@ const DiscoverSection = () => {
               </h2>
             </div>
 
-            {/* IMAGE WRAPPER */}
             <div className="relative w-105 h-122 z-10 mr-16">
-              {/* Main Image */}
               <div className="absolute top-0 right-0 w-[85%] h-full rounded-[2.5rem] overflow-hidden shadow-2xl z-10">
                 <Image
                   src={image2}
@@ -122,7 +112,6 @@ const DiscoverSection = () => {
                 />
               </div>
 
-              {/* Overlay Image */}
               <div className="absolute top-1/2 -translate-y-1/2 -left-20 w-60 h-60 rounded-4xl border-12 border-white overflow-hidden shadow-2xl z-20">
                 <Image
                   src={image1}

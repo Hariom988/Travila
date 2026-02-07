@@ -1,4 +1,3 @@
-// app/admin/dashboard/dashboard-client-updated.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,10 +13,6 @@ import {
   Upload,
   ChevronDown,
   BookOpen,
-  Users,
-  Calendar,
-  MapPin,
-  DollarSign,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -54,13 +49,13 @@ interface Booking {
   userName: string;
   userEmail: string;
   userPhone: string;
-  startDate?: string; // Hotel booking
-  endDate?: string; // Hotel booking
+  startDate?: string;
+  endDate?: string;
   nights?: number;
   rooms?: number;
-  date?: string; // Activity booking
+  date?: string;
   people?: number;
-  duration?: string; // Activity booking
+  duration?: string;
   pricePerUnit: string;
   totalPrice: string;
   status: "PENDING" | "CONFIRMED" | "CANCELLED";
@@ -123,7 +118,6 @@ export default function AdminDashboard() {
     images: [],
   });
 
-  // Tab configuration
   const tabConfig = {
     hotels: {
       label: "Hotels",
@@ -423,7 +417,6 @@ export default function AdminDashboard() {
     }));
   };
 
-  // Filter items based on search
   const getFilteredItems = () => {
     if (activeTab === "hotels") {
       return hotels.filter(
@@ -453,7 +446,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      {/* Header */}
       <div className="bg-gray-800 border-b border-gray-700 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex items-center justify-between">
           <div>
@@ -474,32 +466,27 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="bg-gray-800 border-b border-gray-700 sticky top-18 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex gap-8 overflow-x-auto">
-            {(["hotels", "activities","bookings"] as TabType[]).map(
-              (tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`py-4 px-2 font-medium transition border-b-2 whitespace-nowrap ${
-                    activeTab === tab
-                      ? "text-blue-400 border-blue-400"
-                      : "text-gray-400 border-transparent hover:text-gray-300"
-                  }`}
-                >
-                  {tabConfig[tab].label}
-                </button>
-              ),
-            )}
+            {(["hotels", "activities", "bookings"] as TabType[]).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`py-4 px-2 font-medium transition border-b-2 whitespace-nowrap ${
+                  activeTab === tab
+                    ? "text-blue-400 border-blue-400"
+                    : "text-gray-400 border-transparent hover:text-gray-300"
+                }`}
+              >
+                {tabConfig[tab].label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        {/* Messages */}
         {successMessage && (
           <div className="mb-6 p-4 bg-green-900/30 border border-green-700 rounded-lg flex items-center gap-3 text-green-300">
             <CheckCircle size={20} />
@@ -516,7 +503,6 @@ export default function AdminDashboard() {
 
         {activeTab !== "bookings" && (
           <>
-            {/* Controls */}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
               <div className="relative w-full sm:w-64">
                 <Search
@@ -539,7 +525,6 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            {/* Desktop Table */}
             <div className="hidden md:block bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
               {loading ? (
                 <div className="p-12 text-center">
@@ -705,7 +690,6 @@ export default function AdminDashboard() {
               )}
             </div>
 
-            {/* Mobile Card View */}
             <div className="md:hidden space-y-3">
               {loading ? (
                 <div className="p-12 text-center">
@@ -726,7 +710,6 @@ export default function AdminDashboard() {
                     key={item.id}
                     className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden"
                   >
-                    {/* Collapsed View */}
                     <div
                       className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-750 transition"
                       onClick={() =>
@@ -764,7 +747,6 @@ export default function AdminDashboard() {
                       </div>
                     </div>
 
-                    {/* Expanded View */}
                     {expandedId === item.id && (
                       <div className="border-t border-gray-700 p-4 space-y-4 bg-gray-750">
                         <div>
@@ -872,9 +854,6 @@ export default function AdminDashboard() {
           </>
         )}
 
-        {/* Activity Logs Tab */}
-
-        {/* Bookings Tab */}
         {activeTab === "bookings" && (
           <>
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
@@ -916,7 +895,6 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Desktop Table */}
             <div className="hidden md:block bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
               {loading ? (
                 <div className="p-12 text-center">
@@ -1052,7 +1030,6 @@ export default function AdminDashboard() {
               )}
             </div>
 
-            {/* Mobile Card View */}
             <div className="md:hidden space-y-3">
               {loading ? (
                 <div className="p-12 text-center">
@@ -1124,7 +1101,6 @@ export default function AdminDashboard() {
 
                     {expandedId === booking.id && (
                       <div className="border-t border-gray-700 p-4 space-y-4 bg-gray-750">
-                        {/* Item Info */}
                         <div>
                           <p className="text-gray-400 text-xs font-semibold uppercase mb-1">
                             Item Details
@@ -1137,7 +1113,6 @@ export default function AdminDashboard() {
                           </p>
                         </div>
 
-                        {/* Customer Info */}
                         <div>
                           <p className="text-gray-400 text-xs font-semibold uppercase mb-1">
                             Customer
@@ -1155,7 +1130,6 @@ export default function AdminDashboard() {
                           )}
                         </div>
 
-                        {/* Booking Info */}
                         {booking.bookingType === "HOTEL" ? (
                           <div>
                             <p className="text-gray-400 text-xs font-semibold uppercase mb-1">
@@ -1227,7 +1201,6 @@ export default function AdminDashboard() {
                           </div>
                         )}
 
-                        {/* Pricing Info */}
                         <div className="border-t border-gray-600 pt-3">
                           <p className="text-gray-400 text-xs font-semibold uppercase mb-2">
                             Pricing
@@ -1258,7 +1231,6 @@ export default function AdminDashboard() {
                           </p>
                         </div>
 
-                        {/* Timestamp */}
                         <div className="text-xs text-gray-500">
                           Booked on{" "}
                           {new Date(booking.createdAt).toLocaleDateString() +
@@ -1275,7 +1247,6 @@ export default function AdminDashboard() {
         )}
       </div>
 
-      {/* Modal */}
       {isModalOpen && activeTab !== "bookings" && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -1403,7 +1374,6 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Image Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   {activeTab === "hotels" ? "Hotel" : "Activity"} Images

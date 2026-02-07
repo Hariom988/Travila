@@ -1,4 +1,3 @@
-import React from "react";
 import BusPage from "../../components/(busPage)/busPage";
 
 const Page = () => {

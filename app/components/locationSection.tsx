@@ -1,7 +1,6 @@
 "use client";
 import { useRef } from "react";
 
-// Hardcoded data - you can replace the image paths with your imported images
 const DESTINATIONS = [
   {
     id: 1,
@@ -64,7 +63,6 @@ const LocationSection = () => {
             </h2>
           </div>
 
-          {/* Slider Buttons */}
           <div className="flex gap-4">
             <button
               onClick={() => slide("left")}
@@ -109,7 +107,6 @@ const LocationSection = () => {
           </div>
         </div>
 
-        {/* Cards Slider Container */}
         <div
           ref={sliderRef}
           className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
@@ -119,26 +116,20 @@ const LocationSection = () => {
               key={card.id}
               className="relative min-w-62 md:min-w-70 h-95 md:h-75 rounded-2xl overflow-hidden snap-start shadow-lg group cursor-pointer"
             >
-              {/* Background Image */}
               <img
                 src={card.image}
                 alt={card.name}
                 className="w-full h-full object-cover transition-transform duration-700 "
               />
 
-              {/* Dark Gradient Overlay for text readability */}
               <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent" />
 
-              {/* Inner White Border Effect (like the design) */}
               <div className="absolute inset-3 border border-white/30 rounded-xl pointer-events-none" />
 
-              {/* Card Content */}
               <div className="absolute bottom-6 w-full px-6 flex flex-col items-center">
-                {/* Purple Badge */}
                 <span className="bg-[#7c3aed] text-white text-xs font-bold px-4 py-1.5 rounded-sm mb-3 shadow-md">
                   {card.tours}
                 </span>
-                {/* City Name */}
                 <h3 className="text-white text-2xl font-bold tracking-wide">
                   {card.name}
                 </h3>

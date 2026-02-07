@@ -90,9 +90,7 @@ const AboutPage = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
-      {/* Hero Section */}
       <section className="relative min-h-[60vh] md:min-h-[80vh] flex items-center justify-center overflow-hidden">
-        {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[radial-linear(circle_at_50%_50%,rgba(139,92,246,0.3),transparent_50%)]"></div>
           <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxIDEuNzktNCAzLjk5LTRDNDIuMiAzMCA0NCAzMS43OSA0NCAzNGMwIDIuMjEtMS44IDQtNC4wMSA0LTIuMiAwLTMuOTktMS43OS0zLjk5LTR6bTAgMjBjMC0yLjIxIDEuNzktNCAzLjk5LTRDNDIuMiA1MCA0NCA1MS43OSA0NCA1NGMwIDIuMjEtMS44IDQtNC4wMSA0LTIuMiAwLTMuOTktMS43OS0zLjk5LTR6TTIwIDM0YzAtMi4yMSAxLjc5LTQgMy45OS00QzI2LjIgMzAgMjggMzEuNzkgMjggMzRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00em0wIDIwYzAtMi4yMSAxLjc5LTQgMy45OS00QzI2LjIgNTAgMjggNTEuNzkgMjggNTRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00ek00IDM0YzAtMi4yMSAxLjc5LTQgMy45OS00QzEwLjIgMzAgMTIgMzEuNzkgMTIgMzRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00em0wIDIwYzAtMi4yMSAxLjc5LTQgMy45OS00QzEwLjIgNTAgMTIgNTEuNzkgMTIgNTRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00ek01MiAzNGMwLTIuMjEgMS43OS00IDMuOTktNEM1OC4yIDMwIDYwIDMxLjc5IDYwIDM0YzAgMi4yMS0xLjggNC00LjAxIDQtMi4yIDAtMy45OS0xLjc5LTMuOTktNHptMCAyMGMwLTIuMjEgMS43OS00IDMuOTktNEM1OC4yIDUwIDYwIDUxLjc5IDYwIDU0YzAgMi4yMS0xLjggNC00LjAxIDQtMi4yIDAtMy45OS0xLjc5LTMuOTktNHoiLz48L2c+PC9nPjwvc3ZnPg==')]"></div>
@@ -112,7 +110,6 @@ const AboutPage = () => {
             worldwide. Our passion is turning your wanderlust into reality.
           </p>
 
-          {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 max-w-4xl mx-auto">
             {stats.map((stat, idx) => (
               <div
@@ -132,10 +129,8 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Mission, Vision, Values Tabs */}
       <section className="py-12 sm:py-20 px-4 sm:px-6">
         <div className="container mx-auto max-w-6xl">
-          {/* Tab Navigation */}
           <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-4 mb-8 sm:mb-12 justify-center">
             {["mission", "vision", "values"].map((tab) => (
               <button
@@ -152,7 +147,6 @@ const AboutPage = () => {
             ))}
           </div>
 
-          {/* Tab Content */}
           <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl sm:rounded-3xl p-6 sm:p-12">
             {activeTab === "mission" && (
               <div className="space-y-4 sm:space-y-6">
@@ -219,7 +213,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Team Section */}
       <section className="py-12 sm:py-20 px-4 sm:px-6 bg-slate-900/30">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-8 sm:mb-12">
@@ -268,7 +261,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Timeline Section */}
       <section className="py-12 sm:py-20 px-4 sm:px-6">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-8 sm:mb-12">
@@ -302,7 +294,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Testimonial */}
       <section className="py-12 sm:py-20 px-4 sm:px-6 bg-linear-to-r from-purple-900/20 to-pink-900/20">
         <div className="container mx-auto max-w-4xl">
           <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center">
@@ -333,7 +324,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-12 sm:py-20 px-4 sm:px-6">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-3 sm:mb-4">

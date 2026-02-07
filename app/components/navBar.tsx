@@ -8,7 +8,7 @@ import {
   LogOut,
   ChevronDown,
   CalendarDays,
-} from "lucide-react"; // Added CalendarDays icon
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -114,7 +114,6 @@ const Navbar = () => {
       className={`${isHomePage ? "absolute" : "relative bg-slate-950"} top-0 left-0 right-0 z-50 px-4 py-4 md:px-8 md:py-6 w-full text-white`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* Logo */}
         <Link
           href="/"
           className="flex items-center gap-2 z-50 relative shrink-0"
@@ -132,7 +131,6 @@ const Navbar = () => {
           </div>
         </Link>
 
-        {/* Desktop Nav */}
         <div className="hidden lg:flex items-center gap-1">
           {allLinks.map((item) => (
             <Link
@@ -149,7 +147,6 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* Desktop User Section */}
         <div className="hidden md:flex items-center gap-6">
           <div className="flex items-center gap-3 border-r border-slate-700 pr-6">
             <div className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors">
@@ -184,7 +181,6 @@ const Navbar = () => {
                 />
               </button>
 
-              {/* Desktop Dropdown */}
               <div
                 onMouseEnter={() => setIsDropdownOpen(true)}
                 onMouseLeave={() => setIsDropdownOpen(false)}
@@ -253,7 +249,6 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <>
           <div
@@ -292,7 +287,6 @@ const Navbar = () => {
                       </p>
                     </div>
                   </div>
-                  {/* Added Navigation link in mobile menu */}
                   <Link
                     href="/user/bookings"
                     onClick={() => setIsMobileMenuOpen(false)}

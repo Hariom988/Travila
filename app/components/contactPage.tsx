@@ -70,7 +70,6 @@ const ContactPage = () => {
     setIsSubmitting(true);
     setFormStatus({ type: null, message: "" });
 
-    // Simulate form submission
     setTimeout(() => {
       setFormStatus({
         type: "success",
@@ -86,7 +85,6 @@ const ContactPage = () => {
         message: "",
       });
 
-      // Clear success message after 5 seconds
       setTimeout(() => {
         setFormStatus({ type: null, message: "" });
       }, 5000);
@@ -106,9 +104,7 @@ const ContactPage = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
-      {/* Hero Section */}
       <section className="relative min-h-[40vh] sm:min-h-[50vh] flex items-center justify-center overflow-hidden">
-        {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[radial-linear(circle_at_50%_50%,rgba(139,92,246,0.3),transparent_50%)]"></div>
           <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxIDEuNzktNCAzLjk5LTRDNDIuMiAzMCA0NCAzMS43OSA0NCAzNGMwIDIuMjEtMS44IDQtNC4wMSA0LTIuMiAwLTMuOTktMS43OS0zLjk5LTR6bTAgMjBjMC0yLjIxIDEuNzktNCAzLjk5LTRDNDIuMiA1MCA0NCA1MS43OSA0NCA1NGMwIDIuMjEtMS44IDQtNC4wMSA0LTIuMiAwLTMuOTktMS43OS0zLjk5LTR6TTIwIDM0YzAtMi4yMSAxLjc5LTQgMy45OS00QzI2LjIgMzAgMjggMzEuNzkgMjggMzRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00em0wIDIwYzAtMi4yMSAxLjc5LTQgMy45OS00QzI2LjIgNTAgMjggNTEuNzkgMjggNTRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00ek00IDM0YzAtMi4yMSAxLjc5LTQgMy45OS00QzEwLjIgMzAgMTIgMzEuNzkgMTIgMzRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00em0wIDIwYzAtMi4yMSAxLjc5LTQgMy45OS00QzEwLjIgNTAgMTIgNTEuNzkgMTIgNTRjMCAyLjIxLTEuOCA0LTQuMDEgNC0yLjIgMC0zLjk5LTEuNzktMy45OS00ek01MiAzNGMwLTIuMjEgMS43OS00IDMuOTktNEM1OC4yIDMwIDYwIDMxLjc5IDYwIDM0YzAgMi4yMS0xLjggNC00LjAxIDQtMi4yIDAtMy45OS0xLjc5LTMuOTktNHptMCAyMGMwLTIuMjEgMS43OS00IDMuOTktNEM1OC4yIDUwIDYwIDUxLjc5IDYwIDU0YzAgMi4yMS0xLjggNC00LjAxIDQtMi4yIDAtMy45OS0xLjc5LTMuOTktNHoiLz48L2c+PC9nPjwvc3ZnPg==')]"></div>
@@ -130,7 +126,6 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* Contact Info Cards */}
       <section className="py-8 sm:py-12 px-4 sm:px-6">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
@@ -161,11 +156,9 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* Main Contact Section */}
       <section className="py-8 sm:py-12 md:py-20 px-4 sm:px-6">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-8 md:gap-12">
-            {/* Contact Form */}
             <div className="lg:col-span-3">
               <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8">
                 <div className="mb-6 sm:mb-8">
@@ -178,7 +171,6 @@ const ContactPage = () => {
                   </p>
                 </div>
 
-                {/* Form Status Messages */}
                 {formStatus.type === "success" && (
                   <div className="mb-6 p-3 sm:p-4 bg-green-600/20 border border-green-500/30 rounded-xl flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
@@ -202,7 +194,6 @@ const ContactPage = () => {
                   className="space-y-4 sm:space-y-6"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                    {/* Name */}
                     <div>
                       <label className="block text-xs sm:text-sm font-medium text-slate-300 mb-2">
                         Your Name *
@@ -218,7 +209,6 @@ const ContactPage = () => {
                       />
                     </div>
 
-                    {/* Email */}
                     <div>
                       <label className="block text-xs sm:text-sm font-medium text-slate-300 mb-2">
                         Email Address *
@@ -236,7 +226,6 @@ const ContactPage = () => {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                    {/* Phone */}
                     <div>
                       <label className="block text-xs sm:text-sm font-medium text-slate-300 mb-2">
                         Phone Number
@@ -251,7 +240,6 @@ const ContactPage = () => {
                       />
                     </div>
 
-                    {/* Subject */}
                     <div>
                       <label className="block text-xs sm:text-sm font-medium text-slate-300 mb-2">
                         Subject *
@@ -273,7 +261,6 @@ const ContactPage = () => {
                     </div>
                   </div>
 
-                  {/* Message */}
                   <div>
                     <label className="block text-xs sm:text-sm font-medium text-slate-300 mb-2">
                       Your Message *
@@ -289,7 +276,6 @@ const ContactPage = () => {
                     />
                   </div>
 
-                  {/* Submit Button */}
                   <button
                     type="submit"
                     disabled={isSubmitting}
@@ -311,9 +297,7 @@ const ContactPage = () => {
               </div>
             </div>
 
-            {/* Additional Info */}
             <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-              {/* Quick Response */}
               <div className="bg-linear-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-sm border border-purple-500/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
                 <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">
                   Quick Response Guarantee
@@ -330,7 +314,6 @@ const ContactPage = () => {
                 </div>
               </div>
 
-              {/* Social Media */}
               <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
                 <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">
                   Follow Us
@@ -352,7 +335,6 @@ const ContactPage = () => {
                 </div>
               </div>
 
-              {/* Office Hours */}
               <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6">
                 <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">
                   Office Hours
@@ -377,7 +359,6 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* Map Section (Placeholder) */}
       <section className="py-8 sm:py-12 px-4 sm:px-6 bg-slate-900/30">
         <div className="container mx-auto max-w-6xl">
           <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl sm:rounded-3xl overflow-hidden">
@@ -395,7 +376,6 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* FAQ Section */}
       <section className="py-8 sm:py-12 md:py-20 px-4 sm:px-6">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-6 sm:mb-8 md:mb-12">

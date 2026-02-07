@@ -29,7 +29,6 @@ const PRICE_RANGES = [
 function ActivityPageContent() {
   const searchParams = useSearchParams();
 
-  // Initialize from localStorage or URL params
   const [searchQuery, setSearchQuery] = useState(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("hotelSearch");
@@ -93,7 +92,6 @@ function ActivityPageContent() {
   const [sortBy, setSortBy] = useState<SortOption>("default");
   const [showFiltersModal, setShowFiltersModal] = useState(false);
 
-  // Fetch tours on mount
   useEffect(() => {
     const fetchTours = async () => {
       try {
@@ -126,7 +124,6 @@ function ActivityPageContent() {
     fetchTours();
   }, []);
 
-  // Handle instant search from SearchBar
   const handleSearch = (params: {
     searchQuery: string;
     checkIn: string;
@@ -141,7 +138,6 @@ function ActivityPageContent() {
     setAdults(params.adults);
   };
 
-  // Filter and sort tours
   const filteredTours = useMemo(() => {
     return tours
       .filter((activity) => {
@@ -181,7 +177,6 @@ function ActivityPageContent() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 lg:px-6 pt-4 lg:pt-8">
-        {/* SearchBar with instant search enabled */}
         <SearchBar
           onSearch={handleSearch}
           defaultSearchQuery={searchQuery}
@@ -189,11 +184,10 @@ function ActivityPageContent() {
           defaultCheckOut={checkOut}
           defaultRooms={rooms}
           defaultAdults={adults}
-          instantSearch={true} // Enable instant search
+          instantSearch={true}
         />
 
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Desktop Filters Sidebar */}
           <aside className="hidden lg:block w-80 shrink-0">
             <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 sticky top-32">
               <h3 className="font-bold text-lg mb-5 flex items-center gap-2">
@@ -244,7 +238,6 @@ function ActivityPageContent() {
             </div>
           </aside>
 
-          {/* Main Content */}
           <main className="flex-1">
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-bold text-lg lg:text-xl text-slate-900">
@@ -299,7 +292,6 @@ function ActivityPageContent() {
         </div>
       </div>
 
-      {/* Mobile Filters Modal */}
       {showFiltersModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end lg:items-center justify-center p-4">
           <div className="bg-white rounded-t-3xl lg:rounded-2xl w-full lg:w-96 max-h-[80vh] overflow-y-auto">

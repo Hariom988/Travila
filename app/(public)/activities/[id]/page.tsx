@@ -12,7 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import BookingCard from "@/app/components/bookingCard"; // ← UPDATED IMPORT
+import BookingCard from "@/app/components/bookingCard";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -55,7 +55,6 @@ export default async function ActivityDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-slate-50/50 pb-20">
-      {/* Sticky Navigation Header */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link
@@ -83,9 +82,7 @@ export default async function ActivityDetailPage({ params }: PageProps) {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 lg:pt-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-          {/* Left Side: Content (8 Columns) */}
           <div className="lg:col-span-8 space-y-8">
-            {/* Title & Badge Section */}
             <section className="space-y-4">
               <div className="flex flex-wrap gap-2">
                 <span className="bg-purple-600 text-white text-[10px] font-black px-2.5 py-1 rounded-sm uppercase tracking-tighter flex items-center gap-1">
@@ -116,7 +113,6 @@ export default async function ActivityDetailPage({ params }: PageProps) {
               </div>
             </section>
 
-            {/* Main Image Gallery */}
             <div className="relative aspect-video w-full rounded-3xl overflow-hidden shadow-2xl shadow-purple-900/10 group">
               <Image
                 src={activity.images?.[0] || "/placeholder-activity.jpg"}
@@ -128,7 +124,6 @@ export default async function ActivityDetailPage({ params }: PageProps) {
               <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
             </div>
 
-            {/* Description Section */}
             <section className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm">
               <h2 className="text-xl font-black text-slate-900 mb-4 flex items-center gap-2">
                 <Info size={20} className="text-purple-600" /> About Activity
@@ -138,7 +133,6 @@ export default async function ActivityDetailPage({ params }: PageProps) {
               </p>
             </section>
 
-            {/* What's Included Section */}
             <section className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm">
               <h2 className="text-xl font-black text-slate-900 mb-4 flex items-center gap-2">
                 <CheckCircle2 size={20} className="text-purple-600" /> What's
@@ -183,7 +177,6 @@ export default async function ActivityDetailPage({ params }: PageProps) {
               </ul>
             </section>
 
-            {/* Highlights Section */}
             <section className="space-y-4">
               <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">
                 Highlights
@@ -225,7 +218,6 @@ export default async function ActivityDetailPage({ params }: PageProps) {
             </section>
           </div>
 
-          {/* Right Side: Booking Card (4 Columns) - UPDATED COMPONENT */}
           <aside className="lg:col-span-4">
             <BookingCard
               type="activity"

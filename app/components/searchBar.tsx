@@ -1,13 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import {
-  Search,
-  Calendar,
-  Users,
-  MapPin,
-  X,
-  ChevronDownIcon,
-} from "lucide-react";
+import { Search, MapPin, X, ChevronDownIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface DatePickerProps {

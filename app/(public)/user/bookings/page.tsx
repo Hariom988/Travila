@@ -560,7 +560,7 @@ export default function MyBookingsPage() {
                       >
                         <Eye size={16} />
                         View Details
-                      </Link>
+                      </Link>g
                     </div>
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   TicketIcon,
   ArrowRightIcon,
@@ -75,7 +75,6 @@ export default function BusDiscovery() {
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-8 md:py-16 space-y-10 md:space-y-16 bg-white overflow-hidden">
-      {/* SECTION 1: PROMO OFFERS */}
       <div>
         <div className="flex items-center gap-2 mb-5 md:mb-8">
           <div className="p-1.5 md:p-2 bg-pink-100 rounded-lg">
@@ -86,7 +85,6 @@ export default function BusDiscovery() {
           </h2>
         </div>
 
-        {/* Mobile: Horizontal Scroll | Desktop: Grid */}
         <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
           {OFFERS.map((offer) => (
             <div
@@ -126,7 +124,6 @@ export default function BusDiscovery() {
         </div>
       </div>
 
-      {/* SECTION 2: POPULAR ROUTES */}
       <div>
         <div className="flex items-center justify-between mb-5 md:mb-8">
           <div className="flex items-center gap-2">
@@ -142,7 +139,6 @@ export default function BusDiscovery() {
           </button>
         </div>
 
-        {/* Mobile: Horizontal Scroll | Desktop: Grid */}
         <div className="flex md:grid md:grid-cols-4 gap-4 md:gap-6 overflow-x-auto pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide">
           {POPULAR_ROUTES.map((route, idx) => (
             <div
@@ -182,7 +178,6 @@ export default function BusDiscovery() {
         </div>
       </div>
 
-      {/* SECTION 3: TRUST BAR */}
       <div className="bg-slate-50 rounded-2xl md:rounded-3xl p-5 md:p-8 border border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
         {[
           {
@@ -222,7 +217,6 @@ export default function BusDiscovery() {
         ))}
       </div>
 
-      {/* CSS to hide scrollbars for cleaner carousel look */}
       <style jsx global>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;

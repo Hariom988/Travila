@@ -1,7 +1,5 @@
 "use client";
-
 import Link from "next/link";
-import Image from "next/image"; // Note: Kept import as per original code
 import {
   MapPin,
   Phone,
@@ -16,12 +14,9 @@ import {
 const Footer = () => {
   return (
     <footer className="relative w-full bg-[#050014] text-gray-400 overflow-hidden font-sans border-t-2 md:border-t-4 border-[#6300ee]">
-      {/* Main Footer Content */}
       <div className="container mx-auto px-4 pt-8 pb-6 md:pt-20 md:pb-12 relative z-20">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-8">
-          {/* SECTION 1: Brand & Newsletter */}
           <div className="col-span-2 lg:col-span-1 space-y-4">
-            {/* Logo - More compact on mobile */}
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-full flex items-center justify-center shrink-0">
                 <span className="text-[#050014] font-bold text-lg">9</span>
@@ -41,7 +36,6 @@ const Footer = () => {
               The Readable Content.
             </p>
 
-            {/* Newsletter - More compact height */}
             <form className="flex w-full max-w-sm shadow-lg">
               <input
                 type="email"
@@ -56,7 +50,6 @@ const Footer = () => {
               </button>
             </form>
 
-            {/* Social Icons - Scaled down slightly */}
             <div className="flex gap-2.5 pt-1">
               {[Facebook, Twitter, Instagram, Linkedin].map((Icon, index) => (
                 <Link
@@ -70,7 +63,6 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* SECTION 2: Quick Links */}
           <div className="col-span-1 lg:pl-8">
             <h3 className="text-white text-base md:text-lg font-bold mb-4 md:mb-6">
               Quick Links
@@ -91,7 +83,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* SECTION 3: Utility Pages */}
           <div className="col-span-1">
             <h3 className="text-white text-base md:text-lg font-bold mb-4 md:mb-6">
               Utility Pages
@@ -109,8 +100,6 @@ const Footer = () => {
               ))}
             </ul>
           </div>
-
-          {/* SECTION 4: Information */}
           <div className="col-span-2 lg:col-span-1 pt-2 md:pt-0">
             <h3 className="text-white text-base md:text-lg font-bold mb-4 md:mb-6 border-t md:border-t-0 border-white/5 pt-6 md:pt-0">
               Information
@@ -138,8 +127,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-
-      {/* COPYRIGHT BAR */}
       <div className="relative z-20 border-t border-white/5 bg-black/20">
         <div className="container mx-auto px-4 py-4 text-center">
           <p className="text-[10px] md:text-sm text-gray-500">

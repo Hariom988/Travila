@@ -1,4 +1,3 @@
-// app/admin/dashboard/page.tsx
 import HotelManagementDashboard from "./dashboard-client";
 
 export const metadata = {
