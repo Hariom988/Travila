@@ -14,9 +14,12 @@ import {
   Loader,
   ArrowLeft,
   Eye,
+  X,
+  Trash2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useBookingCancel } from "@/hooks/useBookingCancel";
 
 interface HotelBooking {
   id: string;
@@ -57,6 +60,18 @@ export default function MyBookingsPage() {
   const [filterType, setFilterType] = useState<BookingType>("all");
   const [filterStatus, setFilterStatus] = useState<BookingStatus>("all");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const {
+    isLoading: isCancelling,
+    cancelHotelBooking,
+    cancelActivityBooking,
+  } = useBookingCancel();
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+  const [showCancelConfirm, setShowCancelConfirm] = useState<string | null>(
+    null,
+  );
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const verifyAuth = async () => {
@@ -112,6 +127,40 @@ export default function MyBookingsPage() {
     return "hotelId" in booking;
   };
 
+  const handleCancelBooking = async (booking: Booking) => {
+    setCancellingId(booking.id);
+    setCancelError(null);
+
+    try {
+      const isHotel = isHotelBooking(booking);
+
+      if (isHotel) {
+        await cancelHotelBooking(booking.id);
+      } else {
+        await cancelActivityBooking(booking.id);
+      }
+
+      // Update local state
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === booking.id ? { ...b, status: "CANCELLED" } : b,
+        ),
+      );
+
+      setSuccessMessage(
+        `${isHotel ? "Hotel" : "Activity"} booking cancelled successfully! Refund will be processed within 5-7 business days.`,
+      );
+      setShowCancelConfirm(null);
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (err) {
+      setCancelError(
+        err instanceof Error ? err.message : "Failed to cancel booking",
+      );
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
   const filteredBookings = bookings.filter((booking) => {
     let typeMatch = true;
     let statusMatch = true;
@@ -149,10 +198,22 @@ export default function MyBookingsPage() {
       case "CONFIRMED":
         return <CheckCircle size={14} />;
       case "CANCELLED":
-        return <AlertCircle size={14} />;
+        return <X size={14} />;
       default:
         return null;
     }
+  };
+
+  const canCancelBooking = (booking: Booking): boolean => {
+    if (booking.status === "CANCELLED") return false;
+
+    const isHotel = isHotelBooking(booking);
+    const dateToCheck = isHotel ? booking.startDate : booking.date;
+    const bookingDate = new Date(dateToCheck);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return bookingDate >= today;
   };
 
   if (loading) {
@@ -230,6 +291,20 @@ export default function MyBookingsPage() {
           </div>
         )}
 
+        {cancelError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+            <AlertCircle className="text-red-600 shrink-0" size={18} />
+            <p className="text-red-800 text-sm">{cancelError}</p>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2">
+            <CheckCircle className="text-green-600 shrink-0" size={18} />
+            <p className="text-green-800 text-sm">{successMessage}</p>
+          </div>
+        )}
+
         {filteredBookings.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
             <Calendar className="w-12 h-12 mx-auto text-slate-400 mb-3" />
@@ -241,14 +316,6 @@ export default function MyBookingsPage() {
                 ? "Start exploring and book your next adventure!"
                 : "Try adjusting your filters"}
             </p>
-            {bookings.length === 0 && (
-              <Link
-                href="/hotel"
-                className="inline-block mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors"
-              >
-                Explore Hotels
-              </Link>
-            )}
           </div>
         ) : (
           <div className="space-y-3">
@@ -261,308 +328,399 @@ export default function MyBookingsPage() {
                       (1000 * 60 * 60 * 24),
                   )
                 : null;
+              const canCancel = canCancelBooking(booking);
 
               return (
-                <div
-                  key={booking.id}
-                  className="bg-white rounded-lg border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
-                >
-                  <div className="lg:hidden">
-                    <div className="p-3">
-                      <div className="flex gap-3 mb-3">
-                        <div className="shrink-0 w-24 h-24 rounded-lg bg-slate-100 overflow-hidden">
-                          {(
-                            isHotel ? booking.hotelImage : booking.activityImage
-                          ) ? (
-                            <Image
-                              src={
-                                isHotel
-                                  ? booking.hotelImage!
-                                  : booking.activityImage!
-                              }
-                              alt={
-                                isHotel
+                <div key={booking.id}>
+                  <div className="bg-white rounded-lg border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
+                    <div className="lg:hidden">
+                      <div className="p-3">
+                        <div className="flex gap-3 mb-3">
+                          <div className="shrink-0 w-24 h-24 rounded-lg bg-slate-100 overflow-hidden">
+                            {(
+                              isHotel
+                                ? booking.hotelImage
+                                : booking.activityImage
+                            ) ? (
+                              <Image
+                                src={
+                                  isHotel
+                                    ? booking.hotelImage!
+                                    : booking.activityImage!
+                                }
+                                alt={
+                                  isHotel
+                                    ? booking.hotelName
+                                    : booking.activityName
+                                }
+                                width={96}
+                                height={96}
+                                className="object-cover w-full h-full"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                {isHotel ? (
+                                  <Hotel size={28} className="text-slate-300" />
+                                ) : (
+                                  <Activity
+                                    size={28}
+                                    className="text-slate-300"
+                                  />
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col gap-1">
+                              <h3 className="text-sm font-bold text-slate-900 line-clamp-2">
+                                {isHotel
                                   ? booking.hotelName
-                                  : booking.activityName
-                              }
-                              width={96}
-                              height={96}
-                              className="object-cover w-full h-full"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              {isHotel ? (
-                                <Hotel size={28} className="text-slate-300" />
-                              ) : (
-                                <Activity
-                                  size={28}
-                                  className="text-slate-300"
-                                />
-                              )}
+                                  : booking.activityName}
+                              </h3>
+                              <p className="text-xs text-slate-500 line-clamp-1">
+                                {isHotel
+                                  ? booking.hotelLocation
+                                  : booking.activityLocation}
+                              </p>
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded w-fit text-xs font-semibold ${getStatusColor(
+                                  booking.status,
+                                )}`}
+                              >
+                                {getStatusIcon(booking.status)}
+                                {booking.status === "PENDING"
+                                  ? "Pending"
+                                  : booking.status === "CONFIRMED"
+                                    ? "Confirmed"
+                                    : "Cancelled"}
+                              </span>
                             </div>
-                          )}
+                          </div>
                         </div>
 
-                        <div className="flex-1 min-w-0">
-                          <div className="flex flex-col gap-1">
-                            <h3 className="text-sm font-bold text-slate-900 line-clamp-2">
-                              {isHotel
-                                ? booking.hotelName
-                                : booking.activityName}
-                            </h3>
-                            <p className="text-xs text-slate-500 line-clamp-1">
-                              {isHotel
-                                ? booking.hotelLocation
-                                : booking.activityLocation}
-                            </p>
+                        <div className="bg-slate-50 rounded-lg p-2.5 mb-3">
+                          <div className="grid grid-cols-3 gap-2">
+                            {isHotel ? (
+                              <>
+                                <div>
+                                  <p className="text-xs text-slate-500 font-semibold mb-0.5">
+                                    Check-in
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    {new Date(
+                                      booking.startDate,
+                                    ).toLocaleDateString("en-US", {
+                                      month: "short",
+                                      day: "numeric",
+                                    })}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-slate-500 font-semibold mb-0.5">
+                                    Nights
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    {nights}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-slate-500 font-semibold mb-0.5">
+                                    Price
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    ₹{booking.totalPrice}
+                                  </p>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div>
+                                  <p className="text-xs text-slate-500 font-semibold mb-0.5">
+                                    Date
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    {new Date(booking.date).toLocaleDateString(
+                                      "en-US",
+                                      { month: "short", day: "numeric" },
+                                    )}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-slate-500 font-semibold mb-0.5">
+                                    People
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    {booking.people}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-slate-500 font-semibold mb-0.5">
+                                    Price
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    ₹{booking.totalPrice}
+                                  </p>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Link
+                            href={
+                              isHotel
+                                ? `/hotel/${booking.hotelId}`
+                                : `/activities/${booking.activityId}`
+                            }
+                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors"
+                          >
+                            <Eye size={16} />
+                            View Details
+                          </Link>
+                          {canCancel && (
+                            <button
+                              onClick={() => setShowCancelConfirm(booking.id)}
+                              disabled={
+                                isCancelling && cancellingId === booking.id
+                              }
+                              className="flex items-center justify-center gap-2 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                            >
+                              <Trash2 size={16} />
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="hidden lg:grid grid-cols-12 gap-4 p-4">
+                      <div className="col-span-2 rounded-lg bg-slate-100 overflow-hidden">
+                        {(
+                          isHotel ? booking.hotelImage : booking.activityImage
+                        ) ? (
+                          <Image
+                            src={
+                              isHotel
+                                ? booking.hotelImage!
+                                : booking.activityImage!
+                            }
+                            alt={
+                              isHotel ? booking.hotelName : booking.activityName
+                            }
+                            width={160}
+                            height={140}
+                            className="object-cover w-full h-full"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center min-h-35">
+                            {isHotel ? (
+                              <Hotel size={36} className="text-slate-300" />
+                            ) : (
+                              <Activity size={36} className="text-slate-300" />
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="col-span-7 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                              <h3 className="text-lg font-bold text-slate-900 mb-1">
+                                {isHotel
+                                  ? booking.hotelName
+                                  : booking.activityName}
+                              </h3>
+                              <div className="flex items-center gap-1 text-slate-600 text-sm">
+                                <MapPin size={14} />
+                                {isHotel
+                                  ? booking.hotelLocation
+                                  : booking.activityLocation}
+                              </div>
+                            </div>
                             <span
-                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded w-fit text-xs font-semibold ${getStatusColor(
+                              className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${getStatusColor(
                                 booking.status,
                               )}`}
                             >
                               {getStatusIcon(booking.status)}
-                              {booking.status === "PENDING"
-                                ? "Pending"
-                                : booking.status === "CONFIRMED"
-                                  ? "Confirmed"
-                                  : "Cancelled"}
+                              {booking.status}
                             </span>
                           </div>
-                        </div>
-                      </div>
 
-                      <div className="bg-slate-50 rounded-lg p-2.5 mb-3">
-                        <div className="grid grid-cols-3 gap-2">
-                          {isHotel ? (
-                            <>
-                              <div>
-                                <p className="text-xs text-slate-500 font-semibold mb-0.5">
-                                  Check-in
-                                </p>
-                                <p className="text-sm font-semibold text-slate-900">
-                                  {new Date(
-                                    booking.startDate,
-                                  ).toLocaleDateString("en-US", {
-                                    month: "short",
-                                    day: "numeric",
-                                  })}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-slate-500 font-semibold mb-0.5">
-                                  Nights
-                                </p>
-                                <p className="text-sm font-semibold text-slate-900">
-                                  {nights}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-slate-500 font-semibold mb-0.5">
-                                  Price
-                                </p>
-                                <p className="text-sm font-semibold text-slate-900">
-                                  ₹{booking.totalPrice}
-                                </p>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div>
-                                <p className="text-xs text-slate-500 font-semibold mb-0.5">
-                                  Date
-                                </p>
-                                <p className="text-sm font-semibold text-slate-900">
-                                  {new Date(booking.date).toLocaleDateString(
-                                    "en-US",
-                                    { month: "short", day: "numeric" },
-                                  )}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-slate-500 font-semibold mb-0.5">
-                                  People
-                                </p>
-                                <p className="text-sm font-semibold text-slate-900">
-                                  {booking.people}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-slate-500 font-semibold mb-0.5">
-                                  Price
-                                </p>
-                                <p className="text-sm font-semibold text-slate-900">
-                                  ₹{booking.totalPrice}
-                                </p>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                      <Link
-                        href={
-                          isHotel
-                            ? `/hotel/${booking.hotelId}`
-                            : `/activities/${booking.activityId}`
-                        }
-                        className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors"
-                      >
-                        <Eye size={16} />
-                        View Details
-                      </Link>
-                    </div>
-                  </div>
-
-                  <div className="hidden lg:grid grid-cols-12 gap-4 p-4">
-                    <div className="col-span-2 rounded-lg bg-slate-100 overflow-hidden">
-                      {(
-                        isHotel ? booking.hotelImage : booking.activityImage
-                      ) ? (
-                        <Image
-                          src={
-                            isHotel
-                              ? booking.hotelImage!
-                              : booking.activityImage!
-                          }
-                          alt={
-                            isHotel ? booking.hotelName : booking.activityName
-                          }
-                          width={160}
-                          height={140}
-                          className="object-cover w-full h-full"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center min-h-35">
-                          {isHotel ? (
-                            <Hotel size={36} className="text-slate-300" />
-                          ) : (
-                            <Activity size={36} className="text-slate-300" />
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="col-span-7 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-bold text-slate-900 mb-1">
-                              {isHotel
-                                ? booking.hotelName
-                                : booking.activityName}
-                            </h3>
-                            <div className="flex items-center gap-1 text-slate-600 text-sm">
-                              <MapPin size={14} />
-                              {isHotel
-                                ? booking.hotelLocation
-                                : booking.activityLocation}
-                            </div>
+                          <div className="grid grid-cols-3 gap-4 pt-3 border-t border-slate-200">
+                            {isHotel ? (
+                              <>
+                                <div>
+                                  <p className="text-xs text-slate-500 font-semibold mb-0.5">
+                                    CHECK-IN
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    {new Date(
+                                      booking.startDate,
+                                    ).toLocaleDateString()}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-slate-500 font-semibold mb-0.5">
+                                    DURATION
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    {nights} nights
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-slate-500 font-semibold mb-0.5">
+                                    CHECK-OUT
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    {new Date(
+                                      booking.endDate,
+                                    ).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div>
+                                  <p className="text-xs text-slate-500 font-semibold mb-0.5">
+                                    DATE
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    {new Date(
+                                      booking.date,
+                                    ).toLocaleDateString()}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-slate-500 font-semibold mb-0.5">
+                                    PARTICIPANTS
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900 flex items-center gap-1">
+                                    <Users size={14} />
+                                    {booking.people} people
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-xs text-slate-500 font-semibold mb-0.5">
+                                    DURATION
+                                  </p>
+                                  <p className="text-sm font-semibold text-slate-900 flex items-center gap-1">
+                                    <Clock size={14} />
+                                    {booking.duration}
+                                  </p>
+                                </div>
+                              </>
+                            )}
                           </div>
-                          <span
-                            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${getStatusColor(
-                              booking.status,
-                            )}`}
-                          >
-                            {getStatusIcon(booking.status)}
-                            {booking.status}
-                          </span>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4 pt-3 border-t border-slate-200">
-                          {isHotel ? (
-                            <>
-                              <div>
-                                <p className="text-xs text-slate-500 font-semibold mb-0.5">
-                                  CHECK-IN
-                                </p>
-                                <p className="text-sm font-semibold text-slate-900">
-                                  {new Date(
-                                    booking.startDate,
-                                  ).toLocaleDateString()}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-slate-500 font-semibold mb-0.5">
-                                  DURATION
-                                </p>
-                                <p className="text-sm font-semibold text-slate-900">
-                                  {nights} nights
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-slate-500 font-semibold mb-0.5">
-                                  CHECK-OUT
-                                </p>
-                                <p className="text-sm font-semibold text-slate-900">
-                                  {new Date(
-                                    booking.endDate,
-                                  ).toLocaleDateString()}
-                                </p>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div>
-                                <p className="text-xs text-slate-500 font-semibold mb-0.5">
-                                  DATE
-                                </p>
-                                <p className="text-sm font-semibold text-slate-900">
-                                  {new Date(booking.date).toLocaleDateString()}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-slate-500 font-semibold mb-0.5">
-                                  PARTICIPANTS
-                                </p>
-                                <p className="text-sm font-semibold text-slate-900 flex items-center gap-1">
-                                  <Users size={14} />
-                                  {booking.people} people
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-slate-500 font-semibold mb-0.5">
-                                  DURATION
-                                </p>
-                                <p className="text-sm font-semibold text-slate-900 flex items-center gap-1">
-                                  <Clock size={14} />
-                                  {booking.duration}
-                                </p>
-                              </div>
-                            </>
+                        <p className="text-xs text-slate-500 mt-2">
+                          Booked{" "}
+                          {new Date(booking.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+
+                      <div className="col-span-3 flex flex-col items-end justify-between">
+                        <div className="text-right">
+                          <p className="text-xs text-slate-500 mb-1">
+                            Total Price
+                          </p>
+                          <p className="text-3xl font-bold text-slate-900">
+                            ₹{booking.totalPrice}
+                          </p>
+                        </div>
+
+                        <div className="flex gap-2 w-full">
+                          <Link
+                            href={
+                              isHotel
+                                ? `/hotel/${booking.hotelId}`
+                                : `/activities/${booking.activityId}`
+                            }
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors"
+                          >
+                            <Eye size={16} />
+                            Details
+                          </Link>
+                          {canCancel && (
+                            <button
+                              onClick={() => setShowCancelConfirm(booking.id)}
+                              disabled={
+                                isCancelling && cancellingId === booking.id
+                              }
+                              className="flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium text-sm transition-colors disabled:opacity-50"
+                            >
+                              <Trash2 size={16} />
+                              Cancel
+                            </button>
                           )}
                         </div>
                       </div>
-
-                      <p className="text-xs text-slate-500 mt-2">
-                        Booked{" "}
-                        {new Date(booking.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-
-                    {/* Price & Action */}
-                    <div className="col-span-3 flex flex-col items-end justify-between">
-                      <div className="text-right">
-                        <p className="text-xs text-slate-500 mb-1">
-                          Total Price
-                        </p>
-                        <p className="text-3xl font-bold text-slate-900">
-                          ₹{booking.totalPrice}
-                        </p>
-                      </div>
-
-                      <Link
-                        href={
-                          isHotel
-                            ? `/hotel/${booking.hotelId}`
-                            : `/activities/${booking.activityId}`
-                        }
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors"
-                      >
-                        <Eye size={16} />
-                        View Details
-                      </Link>g
                     </div>
                   </div>
+
+                  {/* Cancel Confirmation Modal */}
+                  {showCancelConfirm === booking.id && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                      <div className="bg-white rounded-lg p-6 max-w-sm w-full">
+                        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
+                          <AlertCircle className="text-red-600" size={24} />
+                        </div>
+
+                        <h3 className="text-lg font-semibold text-slate-900 text-center mb-2">
+                          Cancel Booking?
+                        </h3>
+
+                        <p className="text-slate-600 text-sm text-center mb-2">
+                          {isHotel
+                            ? `Are you sure you want to cancel your hotel booking at ${booking.hotelName}?`
+                            : `Are you sure you want to cancel your activity booking for ${booking.activityName}?`}
+                        </p>
+
+                        <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-6">
+                          <p className="text-xs text-blue-800">
+                            <strong>Refund:</strong> ₹{booking.totalPrice} will
+                            be refunded to your original payment method within
+                            5-7 business days.
+                          </p>
+                        </div>
+
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => setShowCancelConfirm(null)}
+                            disabled={
+                              isCancelling && cancellingId === booking.id
+                            }
+                            className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors disabled:opacity-50"
+                          >
+                            Keep Booking
+                          </button>
+                          <button
+                            onClick={() => handleCancelBooking(booking)}
+                            disabled={
+                              isCancelling && cancellingId === booking.id
+                            }
+                            className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                          >
+                            {isCancelling && cancellingId === booking.id ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                Cancelling...
+                              </>
+                            ) : (
+                              <>
+                                <Trash2 size={16} />
+                                Yes, Cancel
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
