@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image"; // Note: Kept import as per original code
 import {
   MapPin,
   Phone,
@@ -14,6 +13,25 @@ import {
 } from "lucide-react";
 
 const Footer = () => {
+  // Organized based on your Navbar reference
+  const quickLinks = [
+    { name: "Home", href: "/" },
+    { name: "Hotels", href: "/hotel" },
+    { name: "Activities", href: "/activities" },
+    { name: "Trains", href: "/train" },
+    { name: "Buses", href: "/bus" },
+    { name: "Cabs", href: "/cabs" },
+    { name: "Cruise", href: "/cruise" },
+    { name: "About Us", href: "/about" },
+    { name: "Contact Us", href: "/contact" },
+  ];
+
+  const policyLinks = [
+    { name: "Privacy Policy", href: "/privacy-policy" },
+    { name: "Terms & Conditions", href: "/terms-and-conditions" },
+    { name: "Refund Policy", href: "/refund-policy" },
+  ];
+
   return (
     <footer className="relative w-full bg-[#050014] text-gray-400 overflow-hidden font-sans border-t-2 md:border-t-4 border-[#6300ee]">
       {/* Main Footer Content */}
@@ -21,7 +39,6 @@ const Footer = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-8">
           {/* SECTION 1: Brand & Newsletter */}
           <div className="col-span-2 lg:col-span-1 space-y-4">
-            {/* Logo - More compact on mobile */}
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-full flex items-center justify-center shrink-0">
                 <span className="text-[#050014] font-bold text-lg">9</span>
@@ -37,11 +54,10 @@ const Footer = () => {
             </div>
 
             <p className="text-xs md:text-sm leading-relaxed text-gray-400 max-w-sm">
-              It Is A Long Established Fact That A Reader Will Be Distracted By
-              The Readable Content.
+              Your gateway to seamless travel experiences. From luxury stays to
+              cross-country adventures, we make every journey memorable.
             </p>
 
-            {/* Newsletter - More compact height */}
             <form className="flex w-full max-w-sm shadow-lg">
               <input
                 type="email"
@@ -56,7 +72,6 @@ const Footer = () => {
               </button>
             </form>
 
-            {/* Social Icons - Scaled down slightly */}
             <div className="flex gap-2.5 pt-1">
               {[Facebook, Twitter, Instagram, Linkedin].map((Icon, index) => (
                 <Link
@@ -70,47 +85,45 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* SECTION 2: Quick Links */}
+          {/* SECTION 2: Quick Links (Updated from Navbar) */}
           <div className="col-span-1 lg:pl-8">
             <h3 className="text-white text-base md:text-lg font-bold mb-4 md:mb-6">
               Quick Links
             </h3>
             <ul className="space-y-2.5">
-              {["Home", "About Us", "Services", "Blogs", "Contact Us"].map(
-                (item) => (
-                  <li key={item}>
-                    <Link
-                      href="#"
-                      className="text-xs md:text-sm hover:text-[#6300ee] hover:pl-1 transition-all duration-300 block"
-                    >
-                      {item}
-                    </Link>
-                  </li>
-                ),
-              )}
-            </ul>
-          </div>
-
-          {/* SECTION 3: Utility Pages */}
-          <div className="col-span-1">
-            <h3 className="text-white text-base md:text-lg font-bold mb-4 md:mb-6">
-              Utility Pages
-            </h3>
-            <ul className="space-y-2.5">
-              {["Team", "Shop", "Cart", "Wishlist", "Faq"].map((item) => (
-                <li key={item}>
+              {quickLinks.map((link) => (
+                <li key={link.name}>
                   <Link
-                    href="#"
-                    className="text-xs md:text-sm hover:text-[#6300ee] hover:pl-1 transition-all duration-300 block"
+                    href={link.href}
+                    className="text-xs md:text-sm uppercase hover:text-[#6300ee] hover:pl-1 transition-all duration-300 block"
                   >
-                    {item}
+                    {link.name}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* SECTION 4: Information */}
+          {/* SECTION 3: Policies */}
+          <div className="col-span-1">
+            <h3 className="text-white text-base md:text-lg font-bold mb-4 md:mb-6">
+              Policies
+            </h3>
+            <ul className="space-y-2.5">
+              {policyLinks.map((policy) => (
+                <li key={policy.name}>
+                  <Link
+                    href={policy.href}
+                    className="text-xs md:text-sm uppercase hover:text-[#6300ee] hover:pl-1 transition-all duration-300 block"
+                  >
+                    {policy.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* SECTION 4: Contact Info */}
           <div className="col-span-2 lg:col-span-1 pt-2 md:pt-0">
             <h3 className="text-white text-base md:text-lg font-bold mb-4 md:mb-6 border-t md:border-t-0 border-white/5 pt-6 md:pt-0">
               Information
@@ -124,12 +137,12 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-[#6300ee] shrink-0" />
-                <span className="text-xs md:text-sm">+91 7856839450</span>
+                <span className="text-xs md:text-sm">+91 9878677770</span>
               </li>
               <li className="flex items-start gap-3">
                 <Clock className="w-4 h-4 text-[#6300ee] shrink-0 mt-0.5" />
                 <span className="text-xs md:text-sm leading-snug">
-                  Mon – Sat: 8 Am – 5 Pm
+                  Mon – Sat: 8 AM – 5 PM
                   <br />
                   Sunday: <span className="text-red-500/80">CLOSED</span>
                 </span>
@@ -139,11 +152,10 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* COPYRIGHT BAR */}
       <div className="relative z-20 border-t border-white/5 bg-black/20">
         <div className="container mx-auto px-4 py-4 text-center">
           <p className="text-[10px] md:text-sm text-gray-500">
-            Copyright © 2026{" "}
+            Copyright © {new Date().getFullYear()}{" "}
             <span className="text-white font-medium">Travila</span>. All Rights
             Reserved.
           </p>
