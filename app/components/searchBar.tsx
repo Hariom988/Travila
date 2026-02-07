@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Search, MapPin, X, ChevronDownIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import SecurityBanner from "./securityBanner";
 
 interface DatePickerProps {
   selectedDate: string;
@@ -18,6 +19,7 @@ interface SearchBarProps {
   defaultRooms?: number;
   defaultAdults?: number;
   instantSearch?: boolean;
+  showSecurityBanner?: boolean;
 }
 
 export interface SearchParams {
@@ -212,10 +214,12 @@ export default function SearchBar({
   defaultRooms = 1,
   defaultAdults = 2,
   instantSearch = false,
+  showSecurityBanner = true,
 }: SearchBarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
+  const [showBanner, setShowBanner] = useState(showSecurityBanner);
 
   const [searchQuery, setSearchQuery] = useState(defaultSearchQuery);
   const [checkIn, setCheckIn] = useState(defaultCheckIn);
@@ -330,7 +334,7 @@ export default function SearchBar({
   const checkOutDisplay = formatDateForDisplay(checkOut);
 
   return (
-    <div className="w-full flex flex-col items-center justify-center px-3 py-6 sm:px-4 sm:py-5 font-sans">
+    <div className="w-full flex flex-col items-center justify-center px-3 py-6 sm:px-4 sm:py-5 font-sans gap-2">
       <div className="relative border-2 border-gray-200 w-full max-w-6xl bg-white rounded-2xl shadow-xl z-20 overflow-visible">
         <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-gray-100">
           <div className="lg:col-span-4 relative px-4 py-3 sm:px-6 sm:py-5 cursor-pointer transition-colors hover:bg-slate-50 rounded-t-2xl lg:rounded-tr-none lg:rounded-l-2xl">
@@ -432,6 +436,14 @@ export default function SearchBar({
           </div>
         </div>
       </div>
+
+      {/* Security Banner */}
+      {showBanner && (
+        <SecurityBanner
+          autoHideDelay={10000}
+          onClose={() => setShowBanner(false)}
+        />
+      )}
 
       {showCalendarModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
