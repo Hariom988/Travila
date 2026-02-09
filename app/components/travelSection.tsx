@@ -47,9 +47,6 @@ const TravelSection = () => {
               <div className="opacity-20 text-5xl font-bold tracking-tighter text-gray-400 select-none">
                 HikinHigh
               </div>
-              <p className="text-[10px] text-gray-400 tracking-[0.3em] uppercase mt-1">
-                Travels Private Limited
-              </p>
             </div>
 
             <p className="text-purple-600 font-semibold italic mt-6 mb-2">

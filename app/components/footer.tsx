@@ -8,7 +8,7 @@ import {
   Instagram,
   Linkedin,
 } from "lucide-react";
-
+import logo from "@/public/hikinhighlogo.webp";
 const Footer = () => {
   const quickLinks = [
     { name: "Home", href: "/" },
@@ -34,10 +34,12 @@ const Footer = () => {
       <div className="container mx-auto px-5 py-8 md:py-8 lg:px-8">
         <div className="flex flex-row justify-between items-center mb-8 border-b border-white/5 pb-6 md:border-0 md:pb-0 md:mb-10">
           <Link href="/" className="flex items-center gap-2.5 md:gap-3">
-            <div className="w-9 h-9 md:w-11 md:h-11 bg-white rounded-lg flex items-center justify-center shrink-0">
-              <span className="text-[#050014] font-black text-lg md:text-xl">
-                9
-              </span>
+            <div className="w-12 h-12 flex items-center justify-center  rounded-lg p-1">
+              <img
+                src={logo.src}
+                alt="Logo"
+                className="w-full rounded-2xl  h-full object-contain"
+              />
             </div>
             <div className="flex flex-col">
               <span className="text-xl md:text-2xl font-bold text-white leading-tight">
