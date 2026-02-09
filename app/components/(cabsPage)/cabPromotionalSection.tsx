@@ -20,7 +20,7 @@ const POPULAR_ROUTES = [
     price: "2,499",
     oldPrice: "3,200",
     image:
-      "https://images.unsplash.com/photo-1570160896387-99c15d488941?auto=format&fit=crop&q=80&w=400",
+      "https://images.unsplash.com/photo-1673045122087-45a66440fe13?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
   {
     from: "Delhi",
@@ -40,7 +40,7 @@ const POPULAR_ROUTES = [
     price: "2,100",
     oldPrice: "2,800",
     image:
-      "https://images.unsplash.com/photo-1580226689038-07248383842f?auto=format&fit=crop&q=80&w=400",
+      "https://images.unsplash.com/photo-1698688349585-a417fe9c9a09?q=80&w=1333&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
 ];
 

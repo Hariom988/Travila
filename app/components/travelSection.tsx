@@ -45,10 +45,10 @@ const TravelSection = () => {
           <div className="col-span-1 lg:col-span-6 text-center flex flex-col items-center justify-center px-4">
             <div className="mb-2">
               <div className="opacity-20 text-5xl font-bold tracking-tighter text-gray-400 select-none">
-                Travila
+                HikinHigh
               </div>
               <p className="text-[10px] text-gray-400 tracking-[0.3em] uppercase mt-1">
-                A Travel Agency
+                Travels Private Limited
               </p>
             </div>
 
@@ -86,7 +86,10 @@ const TravelSection = () => {
               Tailored Itinerary That Exceeds Your Expectations.
             </p>
 
-            <button className="group bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-300">
+            <button
+              onClick={scrollToTop}
+              className="group cursor-pointer bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-300"
+            >
               TAKE A TOUR
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>

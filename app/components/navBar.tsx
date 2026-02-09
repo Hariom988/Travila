@@ -123,10 +123,10 @@ const Navbar = () => {
           </div>
           <div className="flex flex-col">
             <span className="text-lg md:text-xl font-bold tracking-tight leading-none">
-              Travila
+              HikinHigh
             </span>
             <span className="text-[7px] md:text-[9px] font-normal tracking-wide uppercase opacity-80">
-              A Travel Agency
+              Travels Private Limited
             </span>
           </div>
         </Link>
@@ -261,7 +261,7 @@ const Navbar = () => {
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center font-bold text-lg">
                   9
                 </div>
-                <span className="text-lg font-bold">Travila</span>
+                <span className="text-lg font-bold">HikinHigh</span>
               </div>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}

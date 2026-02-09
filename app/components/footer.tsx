@@ -41,10 +41,10 @@ const Footer = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-xl md:text-2xl font-bold text-white leading-tight">
-                Travila
+                HikinHigh
               </span>
               <span className="text-[7px] md:text-[9px] tracking-[0.2em] uppercase text-[#6300ee] font-bold">
-                Travel Agency
+                Travels Private Limited
               </span>
             </div>
           </Link>
@@ -120,7 +120,7 @@ const Footer = () => {
         <div className="container mx-auto px-5 flex flex-col md:flex-row justify-between items-center gap-3">
           <p className="text-[10px] md:text-[13px] text-gray-600">
             © {new Date().getFullYear()}{" "}
-            <span className="text-gray-400 font-medium">Travila</span>. All
+            <span className="text-gray-400 font-medium">HikinHigh</span>. All
             rights reserved.
           </p>
         </div>
