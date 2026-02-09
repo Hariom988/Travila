@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import logo from "@/public/hikinhighlogo.webp";
 
 interface UserData {
   id: string;
@@ -75,7 +76,6 @@ const Navbar = () => {
           setUser(null);
         }
       } catch (error) {
-        console.error("Auth verification error:", error);
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -88,7 +88,6 @@ const Navbar = () => {
     try {
       await fetch("/api/auth/user/logout", { method: "POST" });
     } catch (error) {
-      console.error("Logout error:", error);
     } finally {
       setUser(null);
       setIsDropdownOpen(false);
@@ -116,17 +115,18 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link
           href="/"
-          className="flex items-center gap-2 z-50 relative shrink-0"
+          className="flex items-center gap-3 z-50 relative shrink-0"
         >
-          <div className="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-full flex items-center justify-center font-bold text-lg md:text-xl hover:bg-white/30 transition-colors">
-            9
+          <div className="w-12 h-12 md:w-14 md:h-14 relative flex items-center justify-center  rounded-lg p-1 ">
+            <img
+              src={logo.src}
+              alt="HikinHigh Logo"
+              className="w-full h-full rounded-2xl object-contain"
+            />
           </div>
           <div className="flex flex-col">
-            <span className="text-lg md:text-xl font-bold tracking-tight leading-none">
+            <span className="text-lg md:text-xl font-bold tracking-tight leading-none text-white">
               HikinHigh
-            </span>
-            <span className="text-[7px] md:text-[9px] font-normal tracking-wide uppercase opacity-80">
-              Travels Private Limited
             </span>
           </div>
         </Link>
@@ -152,9 +152,20 @@ const Navbar = () => {
             <div className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors">
               <Phone className="w-4 h-4" />
             </div>
-            <div className="text-xs text-left">
+            <div className="text-[10px] md:text-xs text-left">
               <p className="text-gray-400">Call Us:</p>
-              <p className="font-semibold text-white">9878677770</p>
+              <Link
+                href="tel:+918130069469"
+                className="font-semibold text-white block hover:text-blue-400"
+              >
+                +91 8130069469 🇮🇳
+              </Link>
+              <Link
+                href="tel:+17863868934"
+                className="font-semibold text-white block hover:text-blue-400"
+              >
+                +1 7863868934 🇺🇸 🇨🇦
+              </Link>
             </div>
           </div>
 
@@ -257,11 +268,15 @@ const Navbar = () => {
           />
           <div className="fixed top-0 left-0 right-0 bottom-0 z-50 flex flex-col max-h-screen overflow-y-auto bg-slate-950">
             <div className="flex items-center justify-between p-4 border-b border-slate-800 sticky top-0 bg-slate-950/95 backdrop-blur z-10">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center font-bold text-lg">
-                  9
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 flex items-center justify-center  rounded-lg p-1">
+                  <img
+                    src={logo.src}
+                    alt="Logo"
+                    className="w-full rounded-2xl  h-full object-contain"
+                  />
                 </div>
-                <span className="text-lg font-bold">HikinHigh</span>
+                <span className="text-lg font-bold text-white">HikinHigh</span>
               </div>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -330,9 +345,20 @@ const Navbar = () => {
                   <div className="bg-blue-600/20 p-2.5 rounded-full">
                     <Phone className="w-5 h-5 text-blue-400" />
                   </div>
-                  <div>
+                  <div className="flex flex-col gap-1">
                     <p className="text-xs text-slate-400">Customer Support</p>
-                    <p className="text-sm font-bold">9878677770</p>
+                    <Link
+                      href="tel:+918130069469"
+                      className="font-semibold text-white text-sm"
+                    >
+                      +91 8130069469 🇮🇳
+                    </Link>
+                    <Link
+                      href="tel:+17863868934"
+                      className="font-semibold text-white text-sm"
+                    >
+                      +1 7863868934 🇺🇸 🇨🇦
+                    </Link>
                   </div>
                 </div>
               </div>
