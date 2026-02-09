@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Mail, Clock, AlertCircle, FileText } from "lucide-react";
 
 const RefundPolicy = () => {
   return (
-    <div className="min-h-screen bg-[#fcfcfd] text-[#374151] font-sans selection:bg-blue-100">
-      <header className="bg-white border-b border-gray-100 pt-16 pb-12 px-6">
+    <div className="min-h-screen bg-white text-slate-800 font-sans selection:bg-slate-100">
+      {/* Header */}
+      <header className="border-b border-slate-100 pt-16 pb-12 px-6 bg-slate-50/50">
         <div className="max-w-3xl mx-auto">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors mb-8 text-sm font-semibold group"
+            className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors mb-8 text-sm font-medium group"
           >
             <ChevronLeft
               size={16}
@@ -18,106 +19,110 @@ const RefundPolicy = () => {
             />
             Back to Home
           </Link>
-          <div className="flex items-center gap-3 mb-4">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#111827] tracking-tight">
-              Refund Policy
-            </h1>
-          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-2">
+            Refund Policy
+          </h1>
+          <p className="text-slate-500 font-medium">For www.hikinhigh.com</p>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-16">
-        <div className="prose prose-blue max-w-none space-y-12">
+        <div className="space-y-12">
+          {/* Compliance & Overview */}
           <section>
-            <h2 className="text-xl font-bold text-[#111827] mb-4">
-              1. Overview of Cancellation
-            </h2>
-            <div className="space-y-4 leading-relaxed text-gray-600">
-              <p>
-                At Travila, we strive to ensure that our customers are satisfied
-                with their bookings. However, we understand that plans can
-                change. This policy outlines the conditions under which refunds
-                may be issued for cancellations.
-              </p>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-                lacinia odio vitae vestibulum vestibulum. Cras venenatis euismod
-                malesuada. Nulla facilisi. Etiam sit amet lectus quis est
-                elementum.
-              </p>
-            </div>
-          </section>
-          {/* Section 2 */}
-          <section>
-            <h2 className="text-xl font-bold text-[#111827] mb-4">
-              2. Eligibility for Refunds
-            </h2>
-            <div className="space-y-4 leading-relaxed text-gray-600">
-              <p>
-                Refund eligibility depends on several factors, including the
-                type of service booked (Hotel, Flight, Train, or Tour) and the
-                timing of the cancellation request.
-              </p>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>Cancellations made 48 hours prior to the service date.</li>
-                <li>
-                  Service provider failure to deliver the agreed-upon service.
-                </li>
-                <li>Duplicate payments or technical billing errors.</li>
-                <li>Force majeure events (subject to documentation).</li>
-              </ul>
-            </div>
+            <p className="text-lg leading-relaxed text-slate-700">
+              HikinHigh Travels Private Limited processes refunds per this
+              policy, compliant with the{" "}
+              <strong>Consumer Protection Act 2019</strong>.
+            </p>
           </section>
 
-          <section>
-            <h2 className="text-xl font-bold text-[#111827] mb-4">
-              3. Non-Refundable Items
+          {/* Request Process */}
+          <section className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+            <h2 className="text-sm uppercase tracking-widest font-bold text-slate-400 mb-4 flex items-center gap-2">
+              <Mail size={16} /> Submission Process
             </h2>
-            <div className="space-y-4 leading-relaxed text-gray-600">
-              <p>
-                Certain fees and service types are strictly non-refundable once
-                the booking is confirmed. These include, but are not limited to:
-              </p>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non
-                risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing
-                nec, ultricies sed, dolor. Cras elementum ultrices diam.
-                Maecenas ligula massa, varius a, semper congue, euismod non, mi.
-              </p>
-            </div>
+            <p className="text-slate-700 leading-relaxed">
+              All refund requests must be emailed to{" "}
+              <a
+                href="mailto:bookings@hikinhigh.com"
+                className="text-blue-600 font-semibold hover:underline"
+              >
+                bookings@hikinhigh.com
+              </a>
+              . The date the email is received determines the eligibility for
+              the refund.
+            </p>
           </section>
+
+          {/* Non-Refundable Items */}
           <section>
-            <h2 className="text-xl font-bold text-[#111827] mb-4">
-              4. Refund Processing Time
+            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <AlertCircle size={20} className="text-slate-400" />{" "}
+              Non-Refundable Items
             </h2>
-            <div className="space-y-4 leading-relaxed text-gray-600">
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {["TCS (20% outbound)", "Visa Fees", "Insurance Premiums"].map(
+                (item) => (
+                  <li
+                    key={item}
+                    className="flex items-center gap-3 p-3 border border-slate-100 rounded-lg text-slate-600"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                    {item}
+                  </li>
+                ),
+              )}
+            </ul>
+          </section>
+
+          {/* Processing Timeline */}
+          <section>
+            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <Clock size={20} className="text-slate-400" /> Processing
+              Timelines
+            </h2>
+            <div className="space-y-4 text-slate-600 leading-relaxed">
               <p>
-                Once a refund is approved, it will be processed through the
-                original method of payment. Please note that processing times
-                can vary depending on your financial institution.
+                Refunds are issued within <strong>15 working days</strong> after
+                supplier confirmation.
               </p>
-              <p>
-                Generally, approved refunds take **5 to 10 business days** to
-                reflect in your account. Lorem ipsum dolor sit amet, consectetur
-                adipiscing elit. Pellentesque eu pretium quis.
+              <p className="bg-blue-50 border-l-4 border-blue-200 p-4 text-sm">
+                <strong>Airlines:</strong> Maximum of 21 days per DGCA
+                guidelines.
               </p>
             </div>
           </section>
 
-          <section>
-            <h2 className="text-xl font-bold text-[#111827] mb-4">
-              5. Service Provider Policies
-            </h2>
-            <div className="space-y-4 leading-relaxed text-gray-600">
-              <p>
-                Please be aware that Travila acts as an intermediary. Many of
-                our partner hotels, airlines, and transport providers have their
-                own independent refund policies which we are required to follow.
-              </p>
+          {/* Financial Details */}
+          <section className="pt-8 border-t border-slate-100">
+            <div className="flex flex-col md:flex-row gap-8">
+              <div className="flex-1">
+                <h3 className="font-bold text-slate-900 mb-2">Bank Charges</h3>
+                <p className="text-slate-600 text-sm">
+                  Applicable bank charges will be deducted from the final refund
+                  amount.
+                </p>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-slate-900 mb-2">Refund Method</h3>
+                <p className="text-slate-600 text-sm">
+                  Vouchers are preferred and remain valid for 1 year from the
+                  date of issue.
+                </p>
+              </div>
             </div>
           </section>
         </div>
       </main>
+
+      {/* Footer minimal info */}
+      <footer className="max-w-3xl mx-auto px-6 pb-20">
+        <div className="flex items-center gap-2 text-slate-400 text-xs font-medium uppercase tracking-widest">
+          <FileText size={14} />
+          <span>HikinHigh Travels Private Limited</span>
+        </div>
+      </footer>
     </div>
   );
 };
