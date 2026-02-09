@@ -135,7 +135,7 @@ export default function AdminDashboard() {
         "facilities",
         "images",
       ] as const,
-      priceLabel: "Price per Night (₹)",
+      priceLabel: "Price per Night ($)",
       extraField: "facilities",
       hasToggle: true,
     },
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
         "duration",
         "images",
       ] as const,
-      priceLabel: "Price per Person (₹)",
+      priceLabel: "Price per Person ($)",
       extraField: "duration",
       hasToggle: false,
     },
@@ -595,7 +595,7 @@ export default function AdminDashboard() {
                             {item.location}
                           </td>
                           <td className="px-6 py-4 text-gray-300">
-                            ₹
+                            $
                             {activeTab === "hotels"
                               ? item.pricePerNight
                               : item.pricePerPerson}
@@ -721,7 +721,7 @@ export default function AdminDashboard() {
                           {item.name}
                         </h3>
                         <p className="text-gray-400 text-sm">
-                          ₹
+                          $
                           {activeTab === "hotels"
                             ? item.pricePerNight
                             : item.pricePerPerson}
@@ -854,23 +854,25 @@ export default function AdminDashboard() {
           </>
         )}
 
-       {activeTab === "bookings" && (
-  <BookingsSection
-    bookings={bookings}
-    loading={loading}
-    onBookingUpdated={(updatedBooking) => {
-      setBookings(prev =>
-        prev.map(b => b.id === updatedBooking.id ? updatedBooking : b)
-      );
-    }}
-    searchTerm={searchTerm}
-    onSearchChange={setSearchTerm}
-    bookingFilter={bookingFilter}
-    onBookingFilterChange={setBookingFilter}
-    statusFilter={statusFilter}
-    onStatusFilterChange={setStatusFilter}
-  />
-)}
+        {activeTab === "bookings" && (
+          <BookingsSection
+            bookings={bookings}
+            loading={loading}
+            onBookingUpdated={(updatedBooking) => {
+              setBookings((prev) =>
+                prev.map((b) =>
+                  b.id === updatedBooking.id ? updatedBooking : b,
+                ),
+              );
+            }}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            bookingFilter={bookingFilter}
+            onBookingFilterChange={setBookingFilter}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+          />
+        )}
       </div>
 
       {isModalOpen && activeTab !== "bookings" && (

@@ -47,7 +47,9 @@ interface BookingsSectionProps {
   bookingFilter: "all" | "hotel" | "activity";
   onBookingFilterChange: (filter: "all" | "hotel" | "activity") => void;
   statusFilter: "all" | "PENDING" | "CONFIRMED" | "CANCELLED";
-  onStatusFilterChange: (filter: "all" | "PENDING" | "CONFIRMED" | "CANCELLED") => void;
+  onStatusFilterChange: (
+    filter: "all" | "PENDING" | "CONFIRMED" | "CANCELLED",
+  ) => void;
 }
 
 export function BookingsSection({
@@ -70,7 +72,7 @@ export function BookingsSection({
 
   const handleStatusUpdate = async (
     bookingId: string,
-    newStatus: "CONFIRMED" | "CANCELLED" | "PENDING"
+    newStatus: "CONFIRMED" | "CANCELLED" | "PENDING",
   ) => {
     setUpdatingId(bookingId);
     setApiError(null);
@@ -88,15 +90,13 @@ export function BookingsSection({
           });
         }
 
-        setSuccessMessage(
-          `Booking ${newStatus.toLowerCase()} successfully!`
-        );
+        setSuccessMessage(`Booking ${newStatus.toLowerCase()} successfully!`);
         setStatusMenuId(null);
         setTimeout(() => setSuccessMessage(null), 3000);
       }
     } catch (err) {
       setApiError(
-        err instanceof Error ? err.message : "Failed to update booking"
+        err instanceof Error ? err.message : "Failed to update booking",
       );
     } finally {
       setUpdatingId(null);
@@ -110,9 +110,11 @@ export function BookingsSection({
       booking.userName.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesType =
-      bookingFilter === "all" || booking.bookingType.toLowerCase() === bookingFilter;
+      bookingFilter === "all" ||
+      booking.bookingType.toLowerCase() === bookingFilter;
 
-    const matchesStatus = statusFilter === "all" || booking.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "all" || booking.status === statusFilter;
 
     return matchesSearch && matchesType && matchesStatus;
   });
@@ -148,10 +150,7 @@ export function BookingsSection({
       {/* Filters and Search */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
         <div className="relative w-full sm:w-64">
-          <Search
-            className="absolute left-3 top-3 text-gray-500"
-            size={18}
-          />
+          <Search className="absolute left-3 top-3 text-gray-500" size={18} />
           <input
             type="text"
             placeholder="Search bookings..."
@@ -302,18 +301,18 @@ export function BookingsSection({
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-white font-bold">
-                        ₹{booking.totalPrice}
+                        ${booking.totalPrice}
                       </p>
                       <p className="text-gray-400 text-xs">
                         {booking.bookingType === "HOTEL"
-                          ? `₹${booking.pricePerUnit}/night`
-                          : `₹${booking.pricePerUnit}/person`}
+                          ? `$${booking.pricePerUnit}/night`
+                          : `$${booking.pricePerUnit}/person`}
                       </p>
                     </td>
                     <td className="px-6 py-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit ${getStatusColor(
-                          booking.status
+                          booking.status,
                         )}`}
                       >
                         {getStatusIcon(booking.status)}
@@ -326,7 +325,7 @@ export function BookingsSection({
                           <button
                             onClick={() =>
                               setStatusMenuId(
-                                statusMenuId === booking.id ? null : booking.id
+                                statusMenuId === booking.id ? null : booking.id,
                               )
                             }
                             disabled={updatingId === booking.id}
@@ -414,7 +413,7 @@ export function BookingsSection({
                     </span>
                     <span
                       className={`px-2 py-0.5 rounded text-xs font-medium flex items-center gap-1 ${getStatusColor(
-                        booking.status
+                        booking.status,
                       )}`}
                     >
                       {getStatusIcon(booking.status)}
@@ -428,9 +427,7 @@ export function BookingsSection({
                 </div>
 
                 <div className="text-right ml-2">
-                  <p className="text-white font-bold">
-                    ₹{booking.totalPrice}
-                  </p>
+                  <p className="text-white font-bold">${booking.totalPrice}</p>
                   <ChevronDown
                     size={18}
                     className={`text-gray-400 transition mt-1 ${
@@ -446,9 +443,7 @@ export function BookingsSection({
                     <p className="text-gray-400 text-xs font-semibold uppercase mb-1">
                       Item Details
                     </p>
-                    <p className="text-white font-medium">
-                      {booking.itemName}
-                    </p>
+                    <p className="text-white font-medium">{booking.itemName}</p>
                     <p className="text-gray-400 text-sm">
                       {booking.itemLocation}
                     </p>
@@ -458,12 +453,8 @@ export function BookingsSection({
                     <p className="text-gray-400 text-xs font-semibold uppercase mb-1">
                       Customer
                     </p>
-                    <p className="text-white font-medium">
-                      {booking.userName}
-                    </p>
-                    <p className="text-gray-400 text-sm">
-                      {booking.userEmail}
-                    </p>
+                    <p className="text-white font-medium">{booking.userName}</p>
+                    <p className="text-gray-400 text-sm">{booking.userEmail}</p>
                     {booking.userPhone && (
                       <p className="text-gray-400 text-sm">
                         {booking.userPhone}
@@ -481,15 +472,11 @@ export function BookingsSection({
                           <span className="text-gray-400">Check-in:</span>{" "}
                           <span className="text-white">
                             {booking.startDate &&
-                              new Date(
-                                booking.startDate
-                              ).toLocaleDateString()}
+                              new Date(booking.startDate).toLocaleDateString()}
                           </span>
                         </p>
                         <p>
-                          <span className="text-gray-400">
-                            Check-out:
-                          </span>{" "}
+                          <span className="text-gray-400">Check-out:</span>{" "}
                           <span className="text-white">
                             {booking.endDate &&
                               new Date(booking.endDate).toLocaleDateString()}
@@ -517,18 +504,12 @@ export function BookingsSection({
                           </span>
                         </p>
                         <p>
-                          <span className="text-gray-400">
-                            Participants:
-                          </span>{" "}
-                          <span className="text-white">
-                            {booking.people}
-                          </span>
+                          <span className="text-gray-400">Participants:</span>{" "}
+                          <span className="text-white">{booking.people}</span>
                         </p>
                         <p>
                           <span className="text-gray-400">Duration:</span>{" "}
-                          <span className="text-white">
-                            {booking.duration}
-                          </span>
+                          <span className="text-white">{booking.duration}</span>
                         </p>
                       </div>
                     </div>
