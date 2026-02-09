@@ -168,16 +168,16 @@ export default function ActivityBookingModal({
               <div className="bg-purple-50 p-4 rounded-xl space-y-2 text-sm">
                 <div className="flex justify-between text-gray-600">
                   <span>
-                    ₹{activityPrice} × {people} person{people > 1 ? "s" : ""}
+                    ${activityPrice} × {people} person{people > 1 ? "s" : ""}
                   </span>
                   <span className="font-medium">
-                    ₹{totalPrice.toLocaleString("en-IN")}
+                    ${totalPrice.toLocaleString("en-IN")}
                   </span>
                 </div>
                 <div className="border-t pt-2 flex justify-between font-bold text-gray-900">
                   <span>Total Amount:</span>
                   <span className="text-purple-600">
-                    ₹{totalPrice.toLocaleString("en-IN")}
+                    ${totalPrice.toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>

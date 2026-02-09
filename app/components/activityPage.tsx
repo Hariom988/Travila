@@ -19,11 +19,11 @@ interface activity {
 type SortOption = "high-to-low" | "low-to-high" | "top-rated" | "default";
 
 const PRICE_RANGES = [
-  { label: "₹0-₹1500", min: 0, max: 1500 },
-  { label: "₹1500-₹2500", min: 1500, max: 2500 },
-  { label: "₹2500-₹5000", min: 2500, max: 5000 },
-  { label: "₹5000-₹7500", min: 5000, max: 7500 },
-  { label: "₹7500+", min: 7500, max: 100000 },
+  { label: "$0-$1500", min: 0, max: 1500 },
+  { label: "$1500-$2500", min: 1500, max: 2500 },
+  { label: "$2500-$5000", min: 2500, max: 5000 },
+  { label: "$5000-$7500", min: 5000, max: 7500 },
+  { label: "$7500+", min: 7500, max: 100000 },
 ];
 
 function ActivityPageContent() {
@@ -106,8 +106,8 @@ function ActivityPageContent() {
             hotel.images?.[0] ||
             hotel.image ||
             "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop",
-          pricePerNight: `₹${Math.round(hotel.pricePerPerson)}`,
-          oldPrice: `₹${Math.round(hotel.pricePerPerson * 1.2)}`,
+          pricePerNight: `$${Math.round(hotel.pricePerPerson)}`,
+          oldPrice: `$${Math.round(hotel.pricePerPerson * 1.2)}`,
           rating: hotel.rating || (Math.random() * (5 - 3.8) + 3.8).toFixed(1),
           reviews: hotel.reviews || Math.floor(Math.random() * 500) + 10,
           duration: hotel.duration || 4,
@@ -141,7 +141,7 @@ function ActivityPageContent() {
   const filteredTours = useMemo(() => {
     return tours
       .filter((activity) => {
-        const price = parseFloat(activity.pricePerNight.replace("₹", ""));
+        const price = parseFloat(activity.pricePerNight.replace("$", ""));
         const matchesSearch =
           activity.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           activity.location.toLowerCase().includes(searchQuery.toLowerCase());
@@ -156,8 +156,8 @@ function ActivityPageContent() {
         return matchesSearch && matchesRange && matchesMin && matchesMax;
       })
       .sort((a, b) => {
-        const priceA = parseFloat(a.pricePerNight.replace("₹", ""));
-        const priceB = parseFloat(b.pricePerNight.replace("₹", ""));
+        const priceA = parseFloat(a.pricePerNight.replace("$", ""));
+        const priceB = parseFloat(b.pricePerNight.replace("$", ""));
         if (sortBy === "low-to-high") return priceA - priceB;
         if (sortBy === "high-to-low") return priceB - priceA;
         return 0;
@@ -221,14 +221,14 @@ function ActivityPageContent() {
                 <div className="space-y-3">
                   <input
                     type="number"
-                    placeholder="Min (₹)"
+                    placeholder="Min ($)"
                     className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
                     value={minBudget}
                     onChange={(e) => setMinBudget(e.target.value)}
                   />
                   <input
                     type="number"
-                    placeholder="Max (₹)"
+                    placeholder="Max ($)"
                     className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
                     value={maxBudget}
                     onChange={(e) => setMaxBudget(e.target.value)}
@@ -334,14 +334,14 @@ function ActivityPageContent() {
                 <div className="space-y-3">
                   <input
                     type="number"
-                    placeholder="Min (₹)"
+                    placeholder="Min ($)"
                     className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
                     value={minBudget}
                     onChange={(e) => setMinBudget(e.target.value)}
                   />
                   <input
                     type="number"
-                    placeholder="Max (₹)"
+                    placeholder="Max ($)"
                     className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
                     value={maxBudget}
                     onChange={(e) => setMaxBudget(e.target.value)}
