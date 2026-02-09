@@ -373,7 +373,7 @@ export default function BookingCardV2({
         <div className="flex justify-between items-baseline mb-8">
           <div>
             <span className="text-4xl font-black text-slate-900">
-              ₹{type === "hotel" ? hotelPrice : activityPrice}
+              ${type === "hotel" ? hotelPrice : activityPrice}
             </span>
             <span className="text-slate-400 font-bold text-sm tracking-tighter">
               {type === "hotel" ? " / night" : " / person"}
@@ -464,20 +464,20 @@ export default function BookingCardV2({
             {type === "hotel" ? (
               <div className="flex justify-between text-sm">
                 <span className="text-slate-600">
-                  ₹{hotelPrice} × {nights} night{nights > 1 ? "s" : ""} ×{" "}
+                  ${hotelPrice} × {nights} night{nights > 1 ? "s" : ""} ×{" "}
                   {rooms} room{rooms > 1 ? "s" : ""}
                 </span>
                 <span className="font-bold text-slate-900">
-                  ₹{hotelTotalPrice.toLocaleString("en-IN")}
+                  ${hotelTotalPrice.toLocaleString("en-IN")}
                 </span>
               </div>
             ) : (
               <div className="flex justify-between text-sm">
                 <span className="text-slate-600">
-                  ₹{activityPrice} × {people} person{people > 1 ? "s" : ""}
+                  ${activityPrice} × {people} person{people > 1 ? "s" : ""}
                 </span>
                 <span className="font-bold text-slate-900">
-                  ₹{activityTotalPrice.toLocaleString("en-IN")}
+                  ${activityTotalPrice.toLocaleString("en-IN")}
                 </span>
               </div>
             )}

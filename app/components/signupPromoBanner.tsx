@@ -81,7 +81,7 @@ export function SignUpPromoBanner() {
             </div>
 
             <h2 className="text-2xl font-extrabold text-gray-900 mb-2 tracking-tight">
-              Unlock More with Travila
+              Unlock More with HikinHigh
             </h2>
             <p className="text-gray-500 text-sm mb-6 leading-relaxed">
               Join our community for exclusive travel deals, priority booking,

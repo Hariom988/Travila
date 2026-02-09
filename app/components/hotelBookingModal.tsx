@@ -161,22 +161,21 @@ export default function HotelBookingModal({
               <div className="bg-blue-50 p-4 rounded-xl space-y-2 text-sm">
                 <div className="flex justify-between text-gray-600">
                   <span>
-                    ₹{hotelPrice} × {nights} nights × {rooms} rooms
+                    ${hotelPrice} × {nights} nights × {rooms} rooms
                   </span>
                   <span className="font-medium">
-                    ₹{totalPrice.toLocaleString("en-IN")}
+                    ${totalPrice.toLocaleString("en-IN")}
                   </span>
                 </div>
                 <div className="border-t pt-2 flex justify-between font-bold text-gray-900">
                   <span>Total Amount:</span>
                   <span className="text-blue-600">
-                    ₹{totalPrice.toLocaleString("en-IN")}
+                    ${totalPrice.toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>
 
               <div className="bg-slate-50 p-3 rounded-lg text-xs text-gray-600 space-y-1">
-                <p>✓ Free cancellation up to 48 hours before check-in</p>
                 <p>✓ Instant confirmation</p>
                 <p>✓ Secure payment</p>
               </div>
