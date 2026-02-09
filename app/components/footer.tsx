@@ -105,7 +105,21 @@ const Footer = () => {
             <div className="space-y-3 md:space-y-4">
               <div className="flex items-center gap-2 md:gap-3 text-xs md:text-[15px]">
                 <Phone className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#6300ee]" />
-                <span className="text-gray-300">9878677770</span>
+                <div className="text-[10px] md:text-xs text-left">
+                  <p className="text-gray-400">Call Us:</p>
+                  <Link
+                    href="tel:+918130069469"
+                    className="font-semibold text-white block hover:text-blue-400"
+                  >
+                    +91 8130069469 🇮🇳
+                  </Link>
+                  <Link
+                    href="tel:+17863868934"
+                    className="font-semibold text-white block hover:text-blue-400"
+                  >
+                    +1 7863868934 🇺🇸 🇨🇦
+                  </Link>
+                </div>
               </div>
               <div className="flex items-start gap-2 md:gap-3 text-xs md:text-[15px] leading-tight">
                 <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#6300ee] shrink-0" />
