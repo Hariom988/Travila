@@ -21,11 +21,11 @@ interface Tour {
 type SortOption = "high-to-low" | "low-to-high" | "top-rated" | "default";
 
 const PRICE_RANGES = [
-  { label: "₹0-₹1500", min: 0, max: 1500 },
-  { label: "₹1500-₹2500", min: 1500, max: 2500 },
-  { label: "₹2500-₹5000", min: 2500, max: 5000 },
-  { label: "₹5000-₹7500", min: 5000, max: 7500 },
-  { label: "₹7500+", min: 7500, max: 100000 },
+  { label: "$0-$1500", min: 0, max: 1500 },
+  { label: "$1500-$2500", min: 1500, max: 2500 },
+  { label: "$2500-$5000", min: 2500, max: 5000 },
+  { label: "$5000-$7500", min: 5000, max: 7500 },
+  { label: "$7500+", min: 7500, max: 100000 },
 ];
 
 function HotelPageContent() {
@@ -143,7 +143,7 @@ function HotelPageContent() {
   const filteredTours = useMemo(() => {
     return tours
       .filter((tour) => {
-        const price = parseFloat(tour.price.replace("₹", ""));
+        const price = parseFloat(tour.price.replace("$", ""));
         const matchesSearch =
           tour.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           tour.location.toLowerCase().includes(searchQuery.toLowerCase());
@@ -158,8 +158,8 @@ function HotelPageContent() {
         return matchesSearch && matchesRange && matchesMin && matchesMax;
       })
       .sort((a, b) => {
-        const priceA = parseFloat(a.price.replace("₹", ""));
-        const priceB = parseFloat(b.price.replace("₹", ""));
+        const priceA = parseFloat(a.price.replace("$", ""));
+        const priceB = parseFloat(b.price.replace("$", ""));
         if (sortBy === "low-to-high") return priceA - priceB;
         if (sortBy === "high-to-low") return priceB - priceA;
         if (sortBy === "top-rated") return b.rating - a.rating;
@@ -224,14 +224,14 @@ function HotelPageContent() {
                 <div className="space-y-3">
                   <input
                     type="number"
-                    placeholder="Min (₹)"
+                    placeholder="Min ($)"
                     className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
                     value={minBudget}
                     onChange={(e) => setMinBudget(e.target.value)}
                   />
                   <input
                     type="number"
-                    placeholder="Max (₹)"
+                    placeholder="Max ($)"
                     className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
                     value={maxBudget}
                     onChange={(e) => setMaxBudget(e.target.value)}
@@ -337,14 +337,14 @@ function HotelPageContent() {
                 <div className="space-y-3">
                   <input
                     type="number"
-                    placeholder="Min (₹)"
+                    placeholder="Min ($)"
                     className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
                     value={minBudget}
                     onChange={(e) => setMinBudget(e.target.value)}
                   />
                   <input
                     type="number"
-                    placeholder="Max (₹)"
+                    placeholder="Max ($)"
                     className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
                     value={maxBudget}
                     onChange={(e) => setMaxBudget(e.target.value)}
