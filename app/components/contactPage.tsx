@@ -259,7 +259,7 @@ const ContactPage = () => {
 
               <div className="rounded-[20px] overflow-hidden border border-slate-100 min-h-55 shadow-sm flex-1">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d246255.38184803393!2d77.04417434001834!3d28.527252739872903!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b347eb62d%3A0x52c2b7494e204dce!2sNew%20Delhi%2C%20Delhi!5e1!3m2!1sen!2sin!4v1770630816834!5m2!1sen!2sin"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3845.5575239061236!2d77.0006853113029!3d28.586992186045496!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d100ef8bfb055%3A0x97c7f2a44a784c95!2sH2P3%2BQ8R%2C%20Deenpur%2C%20Shyam%20Vihar%20-%20II%2C%20Najafgarh%2C%20Delhi!5e1!3m2!1sen!2sin!4v1770637329313!5m2!1sen!2sin"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
