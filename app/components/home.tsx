@@ -6,6 +6,7 @@ import TourPackages from "./tourPackageCard";
 import DiscoverSection from "./discoverSection";
 import ExploreSection from "./exploreSection";
 import LocationSection from "./locationSection";
+import WhatsAppButton from "./whatsAppButton";
 import { useRouter } from "next/navigation";
 import { SignUpPromoBanner } from "./signupPromoBanner";
 import Image from "next/image";
@@ -28,6 +29,7 @@ export default function Home() {
   return (
     <>
       <SignUpPromoBanner />
+      <WhatsAppButton phoneNumber="918130069469" />
       <main className="w-full flex flex-col">
         <section className="relative min-h-screen flex flex-col">
           <div className="absolute inset-0 z-0">
