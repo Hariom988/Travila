@@ -21,7 +21,7 @@ const DESTINATIONS = [
     name: "New York City",
     tours: "2 Tours",
     image:
-      "https://images.unsplash.com/photo-1496442226666-8d4d0e6653cb?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1515081774057-84dcf72d0cf1?q=80&w=715&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
   {
     id: 4,
@@ -35,9 +35,15 @@ const DESTINATIONS = [
     name: "London",
     tours: "3 Tours",
     image:
-      "https://images.unsplash.com/photo-1513635269975-59693e2d8400?q=80&w=600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1674738689581-cdba855a5790?q=80&w=736&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
 ];
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
 
 const LocationSection = () => {
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -114,6 +120,7 @@ const LocationSection = () => {
           {DESTINATIONS.map((card) => (
             <div
               key={card.id}
+              onClick={scrollToTop}
               className="relative min-w-62 md:min-w-70 h-95 md:h-75 rounded-2xl overflow-hidden snap-start shadow-lg group cursor-pointer"
             >
               <img

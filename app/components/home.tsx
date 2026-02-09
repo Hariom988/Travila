@@ -1,6 +1,6 @@
 "use client";
 import SearchBar from "@/app/components/searchBar";
-import HeroImage from "@/public/assets/hero-image.jpg";
+import HeroImage from "@/public/assets/hero-image.webp";
 import TravelSection from "./travelSection";
 import TourPackages from "./tourPackageCard";
 import DiscoverSection from "./discoverSection";
@@ -8,6 +8,7 @@ import ExploreSection from "./exploreSection";
 import LocationSection from "./locationSection";
 import { useRouter } from "next/navigation";
 import { SignUpPromoBanner } from "./signupPromoBanner";
+import Image from "next/image";
 
 export default function Home() {
   const router = useRouter();
@@ -29,13 +30,16 @@ export default function Home() {
       <SignUpPromoBanner />
       <main className="w-full flex flex-col">
         <section className="relative min-h-screen flex flex-col">
-          <div
-            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url('${HeroImage.src}')`,
-            }}
-          >
-            <div className="absolute inset-0 bg-black/30"></div>
+          <div className="absolute inset-0 z-0">
+            <Image
+              src={HeroImage}
+              alt="Hero background"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-black/30" />
           </div>
 
           <div className="relative z-10 flex flex-col items-center justify-center grow w-full px-4 pt-28 pb-10 md:pt-20">

@@ -3,6 +3,12 @@ import HeroImage from "@/public/assets/explore/hero-image.jpg";
 import ScrollFloat from "./scrollFoat";
 
 const ExploreSection = () => {
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
   return (
     <section
       className="relative w-full h-dvh bg-cover bg-center flex flex-col items-center justify-center text-center px-4 overflow-hidden"
@@ -21,7 +27,10 @@ const ExploreSection = () => {
           Available Worldwide
         </h1>
 
-        <button className="group mt-4 bg-purple-100 hover:bg-white text-purple-700 px-8 py-3.5 rounded-md font-bold text-xs md:text-sm uppercase tracking-wider flex items-center gap-2 transition-all duration-300 shadow-xl hover:shadow-2xl hover:cursor-pointer">
+        <button
+          onClick={scrollToTop}
+          className="group mt-4 bg-purple-100 hover:bg-white text-purple-700 px-8 py-3.5 rounded-md font-bold text-xs md:text-sm uppercase tracking-wider flex items-center gap-2 transition-all duration-300 shadow-xl hover:shadow-2xl hover:cursor-pointer"
+        >
           Book your trip Now
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +60,7 @@ const ExploreSection = () => {
           containerClassName="w-full text-center p-0 m-0 leading-[0.9] md:leading-none"
           textClassName="
     font-black uppercase 
-    text-5xl sm:text-7xl md:text-8xl 
+    text-3xl sm:text-5xl md:text-6xl 
     tracking-tighter md:tracking-widest 
     text-transparent [-webkit-text-stroke:1px_white] md:[-webkit-text-stroke:2px_white] 
     opacity-70
