@@ -259,11 +259,12 @@ const ContactPage = () => {
 
               <div className="rounded-[20px] overflow-hidden border border-slate-100 min-h-55 shadow-sm flex-1">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d56092.516073928455!2d77.27210433305079!3d28.51619823620842!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce65f77cae949%3A0x7c768dbb3f78e57!2sBadarpur%2C%20New%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1770118041625!5m2!1sen!2sin"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d246255.38184803393!2d77.04417434001834!3d28.527252739872903!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd5b347eb62d%3A0x52c2b7494e204dce!2sNew%20Delhi%2C%20Delhi!5e1!3m2!1sen!2sin!4v1770630816834!5m2!1sen!2sin"
                   width="100%"
                   height="100%"
-                  className="border-0"
+                  style={{ border: 0 }}
                   loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
                 ></iframe>
               </div>
             </div>
