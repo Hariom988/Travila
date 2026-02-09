@@ -132,12 +132,16 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="bg-black/40 border-t border-white/5 py-5 ">
+      <div className="bg-black/40 border-t flex flex-row border-white/5 py-5 ">
         <div className="container mx-auto px-5 flex flex-col md:flex-row justify-between items-center gap-3">
           <p className="text-[10px] md:text-[13px] text-gray-600">
             © {new Date().getFullYear()}{" "}
             <span className="text-gray-400 font-medium">HikinHigh</span>. All
-            rights reserved.
+            rights reserved. Design & Powered by{" "}
+            <a target="_blank" href="https://www.ynrsgroup.com/">
+              <u>YNRS Group</u>
+            </a>
+            .
           </p>
         </div>
       </div>

@@ -50,10 +50,10 @@ const TourCard: React.FC<TourCardProps> = ({ tour }) => {
           <div className="absolute bottom-3 left-3 bg-[#5b21b6] text-white px-3 py-1 rounded-md text-xs font-bold flex gap-2 items-center z-10">
             {tour.oldPrice && (
               <span className="text-gray-300 line-through font-normal opacity-80">
-                ₹{tour.oldPrice}
+                ${tour.oldPrice}
               </span>
             )}
-            <span>₹{tour.price}</span>
+            <span>${tour.price}</span>
           </div>
         </div>
 
