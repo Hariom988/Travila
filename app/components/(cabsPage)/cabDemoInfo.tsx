@@ -21,7 +21,7 @@ const FLEET_CATEGORIES = [
     description: "Economical for small groups",
     seats: 4,
     bags: 2,
-    pricePerKm: "₹12/km",
+    pricePerKm: "$12/km",
     image:
       "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=400",
     color: "bg-green-500",
@@ -32,7 +32,7 @@ const FLEET_CATEGORIES = [
     description: "Extra legroom & luggage space",
     seats: 4,
     bags: 3,
-    pricePerKm: "₹14/km",
+    pricePerKm: "$14/km",
     image:
       "https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&q=80&w=400",
     color: "bg-blue-500",
@@ -43,7 +43,7 @@ const FLEET_CATEGORIES = [
     description: "Perfect for family vacations",
     seats: 6,
     bags: 5,
-    pricePerKm: "₹18/km",
+    pricePerKm: "$18/km",
     image:
       "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=400",
     color: "bg-purple-500",

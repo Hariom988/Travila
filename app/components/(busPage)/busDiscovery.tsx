@@ -44,7 +44,7 @@ const OFFERS = [
   {
     id: 1,
     code: "FIRSTBUS",
-    discount: "Flat ₹200 Off",
+    discount: "Flat $200 Off",
     desc: "On your first booking",
     color: "from-pink-500 to-rose-500",
   },
@@ -58,7 +58,7 @@ const OFFERS = [
   {
     id: 3,
     code: "ZINGGO",
-    discount: "Up to ₹500 Off",
+    discount: "Up to $500 Off",
     desc: "Valid on Zingbus routes",
     color: "from-emerald-500 to-teal-600",
   },
@@ -157,7 +157,7 @@ export default function BusDiscovery() {
                     From
                   </p>
                   <p className="text-sm md:text-lg font-black">
-                    ₹{route.price}
+                    ${route.price}
                   </p>
                 </div>
               </div>

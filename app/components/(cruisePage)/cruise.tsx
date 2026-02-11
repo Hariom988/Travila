@@ -30,7 +30,7 @@ const CRUISE_DEALS: CruiseDeal[] = [
     title: "Singapore & Thailand Special",
     line: "Royal Caribbean",
     duration: "4 Nights / 5 Days",
-    price: "₹45,500",
+    price: "$45,500",
     rating: 4.8,
     image:
       "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&q=80&w=800",
@@ -41,7 +41,7 @@ const CRUISE_DEALS: CruiseDeal[] = [
     title: "Greek Islands Odyssey",
     line: "MSC Cruises",
     duration: "7 Nights / 8 Days",
-    price: "₹1,12,000",
+    price: "$1,12,000",
     rating: 4.9,
     image:
       "https://images.unsplash.com/photo-1599640842225-85d111c60e6b?auto=format&fit=crop&q=80&w=800",
@@ -52,7 +52,7 @@ const CRUISE_DEALS: CruiseDeal[] = [
     title: "Bahamas Escape",
     line: "Norwegian Line",
     duration: "3 Nights / 4 Days",
-    price: "₹38,900",
+    price: "$38,900",
     rating: 4.7,
     image:
       "https://images.unsplash.com/photo-1500021804447-2ca2eaaaabeb?auto=format&fit=crop&q=80&w=800",

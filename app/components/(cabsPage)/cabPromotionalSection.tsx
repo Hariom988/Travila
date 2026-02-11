@@ -101,10 +101,10 @@ export default function CompactCabPromotional() {
                 <div className="flex justify-between items-center">
                   <div className="leading-tight">
                     <span className="text-[10px] text-gray-400 line-through tracking-tighter">
-                      ₹{route.oldPrice}
+                      ${route.oldPrice}
                     </span>
                     <div className="text-base md:text-xl font-black text-gray-900 leading-none">
-                      ₹{route.price}
+                      ${route.price}
                     </div>
                   </div>
                   <button className="px-3 cursor-pointer py-1.5 md:px-4 md:py-2 bg-blue-50 text-blue-600 text-[10px] md:text-sm font-black rounded-lg md:rounded-xl hover:bg-blue-600 hover:text-white transition-colors">

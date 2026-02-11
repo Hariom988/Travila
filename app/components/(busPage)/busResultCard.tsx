@@ -195,7 +195,7 @@ export default function BusResultCard() {
                 <p className="text-[9px] font-bold text-gray-400 uppercase">
                   Starts from
                 </p>
-                <p className="text-lg font-black text-gray-900">₹{bus.price}</p>
+                <p className="text-lg font-black text-gray-900">${bus.price}</p>
               </div>
             </div>
 
@@ -235,7 +235,7 @@ export default function BusResultCard() {
                   Starts from
                 </p>
                 <p className="text-2xl font-black text-gray-900">
-                  ₹{bus.price}
+                  ${bus.price}
                 </p>
               </div>
 

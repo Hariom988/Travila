@@ -35,19 +35,21 @@ const ContactPage = () => {
     {
       icon: Phone,
       title: "Call Us",
-      details: ["+91 7856839450", "+91 9878677770"],
+      details: ["+91 8130069469", "+1 7863868934"],
       color: "bg-blue-50 text-blue-600",
     },
     {
       icon: Mail,
       title: "Email Us",
-      details: ["support@travila.com", "info@travila.com"],
+      details: ["bookings@hikinhigh.com", "support@hikinhigh.com"],
       color: "bg-purple-50 text-purple-600",
     },
     {
       icon: MapPin,
       title: "Visit Us",
-      details: ["Connaught Place", "New Delhi, 110001"],
+      details: [
+        "H2P3+Q8R, Deenpur, Shyam Vihar - II, Najafgarh, New Delhi, Delhi, 110043",
+      ],
       color: "bg-rose-50 text-rose-600",
     },
     {

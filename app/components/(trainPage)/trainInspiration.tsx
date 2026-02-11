@@ -15,7 +15,7 @@ const POPULAR_ROUTES = [
     to: "Varanasi",
     train: "Vande Bharat Exp",
     time: "8h 00m",
-    price: "₹1,750",
+    price: "$1,750",
     image:
       "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?q=80&w=800&auto=format&fit=crop", // Varanasi
     tag: "Fastest",
@@ -27,7 +27,7 @@ const POPULAR_ROUTES = [
     to: "Goa",
     train: "Tejas Express",
     time: "8h 50m",
-    price: "₹1,500",
+    price: "$1,500",
     image:
       "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=800&auto=format&fit=crop", // Goa
     tag: "Scenic",
@@ -39,7 +39,7 @@ const POPULAR_ROUTES = [
     to: "Mysore",
     train: "Shatabdi Exp",
     time: "2h 00m",
-    price: "₹450",
+    price: "$450",
     image:
       "https://images.unsplash.com/photo-1590766940554-634a7ed41450?q=80&w=800&auto=format&fit=crop", // Mysore
     tag: "Weekend",
@@ -51,7 +51,7 @@ const POPULAR_ROUTES = [
     to: "Darjeeling",
     train: "Himalayan Rail",
     time: "12h 30m",
-    price: "₹800",
+    price: "$800",
     image:
       "https://hips.hearstapps.com/hmg-prod/images/alpe-di-siusi-sunrise-with-sassolungo-or-langkofel-royalty-free-image-1623254127.jpg", // Mountains
     tag: "Heritage",

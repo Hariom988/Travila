@@ -43,7 +43,7 @@ const SERVICES = [
 ];
 
 const OFFERS = [
-  { code: "TRAINBEST", title: "₹100 OFF", desc: "First booking", bank: "UPI" },
+  { code: "TRAINBEST", title: "$100 OFF", desc: "First booking", bank: "UPI" },
   { code: "HDFCSUPER", title: "15% OFF", desc: "HDFC Cards", bank: "HDFC" },
   { code: "CREDDEAL", title: "No Fees", desc: "Pay via CRED", bank: "CRED" },
 ];
