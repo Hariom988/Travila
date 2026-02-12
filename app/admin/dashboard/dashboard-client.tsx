@@ -196,7 +196,9 @@ export default function AdminDashboard() {
   const fetchItems = async (type: Exclude<TabType, "bookings">) => {
     try {
       const endpoint = tabConfig[type].endpoint;
-      const response = await fetch(endpoint);
+      const response = await fetch(endpoint, {
+        credentials: "include",
+      });
       if (!response.ok) throw new Error(`Failed to fetch ${type}`);
       const data = await response.json();
 
@@ -225,7 +227,9 @@ export default function AdminDashboard() {
         url += `?${params.toString()}`;
       }
 
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: "include",
+      });
       if (!response.ok) throw new Error("Failed to fetch bookings");
 
       const data = await response.json();
@@ -331,6 +335,7 @@ export default function AdminDashboard() {
         {
           method: editingId ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(payload),
         },
       );
@@ -359,6 +364,7 @@ export default function AdminDashboard() {
       const response = await fetch(`/api/hotels/${id}/availability`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ available: !currentStatus }),
       });
 
@@ -379,7 +385,10 @@ export default function AdminDashboard() {
 
     try {
       const endpoint = tabConfig[activeTab].endpoint;
-      const response = await fetch(`${endpoint}/${id}`, { method: "DELETE" });
+      const response = await fetch(`${endpoint}/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
       if (!response.ok) throw new Error("Failed to delete");
 
@@ -456,7 +465,10 @@ export default function AdminDashboard() {
           </div>
           <button
             onClick={async () => {
-              await fetch("/api/auth/admin-logout", { method: "POST" });
+              await fetch("/api/auth/admin-logout", {
+                method: "POST",
+                credentials: "include",
+              });
               router.push("/admin/login");
             }}
             className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium text-sm"
