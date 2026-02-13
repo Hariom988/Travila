@@ -471,7 +471,7 @@ export default function AdminDashboard() {
               });
               router.push("/admin/login");
             }}
-            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium text-sm"
+            className="flex cursor-pointer items-center gap-2 px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition font-medium text-sm"
           >
             <LogOut size={16} /> Logout
           </button>
@@ -485,7 +485,7 @@ export default function AdminDashboard() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`py-4 px-2 font-medium transition border-b-2 whitespace-nowrap ${
+                className={`py-4 cursor-pointer px-2 font-medium transition border-b-2 whitespace-nowrap ${
                   activeTab === tab
                     ? "text-blue-400 border-blue-400"
                     : "text-gray-400 border-transparent hover:text-gray-300"
@@ -531,7 +531,7 @@ export default function AdminDashboard() {
               </div>
               <button
                 onClick={handleAddClick}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-medium text-sm whitespace-nowrap w-full sm:w-auto justify-center sm:justify-start"
+                className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-medium text-sm whitespace-nowrap w-full sm:w-auto justify-center sm:justify-start"
               >
                 <Plus size={18} /> {currentConfig.addLabel}
               </button>
@@ -553,7 +553,7 @@ export default function AdminDashboard() {
                   {!searchTerm && (
                     <button
                       onClick={handleAddClick}
-                      className="text-blue-400 hover:text-blue-300"
+                      className="text-blue-400 cursor-pointer hover:text-blue-300"
                     >
                       Add your first{" "}
                       {currentConfig.label.toLowerCase().slice(0, -1)}
@@ -662,7 +662,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => handleEditClick(item)}
-                                className="p-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition"
+                                className="p-2 cursor-pointer bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition"
                               >
                                 <Edit2 size={16} />
                               </button>
@@ -674,7 +674,7 @@ export default function AdminDashboard() {
                                       item.available,
                                     )
                                   }
-                                  className={`p-2 rounded transition ${
+                                  className={`p-2 cursor-pointer rounded transition ${
                                     item.available
                                       ? "bg-gray-700 hover:bg-red-600 text-gray-300"
                                       : "bg-gray-700 hover:bg-green-600 text-gray-300"
@@ -687,7 +687,7 @@ export default function AdminDashboard() {
                                   onClick={() =>
                                     handleDelete(item.id, item.name)
                                   }
-                                  className="p-2 bg-gray-700 hover:bg-red-600 text-gray-300 rounded transition"
+                                  className="p-2 cursor-pointer bg-gray-700 hover:bg-red-600 text-gray-300 rounded transition"
                                 >
                                   <Trash2 size={16} />
                                 </button>
@@ -828,7 +828,7 @@ export default function AdminDashboard() {
                         <div className="flex gap-2 pt-2">
                           <button
                             onClick={() => handleEditClick(item)}
-                            className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition flex items-center justify-center gap-2"
+                            className="flex-1 cursor-pointer py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition flex items-center justify-center gap-2"
                           >
                             <Edit2 size={16} /> Edit
                           </button>
@@ -840,7 +840,7 @@ export default function AdminDashboard() {
                                   item.available,
                                 )
                               }
-                              className={`flex-1 py-2 rounded text-sm font-medium transition ${
+                              className={`flex-1 cursor-pointer py-2 rounded text-sm font-medium transition ${
                                 item.available
                                   ? "bg-red-600 hover:bg-red-700 text-white"
                                   : "bg-green-600 hover:bg-green-700 text-white"
@@ -851,7 +851,7 @@ export default function AdminDashboard() {
                           ) : (
                             <button
                               onClick={() => handleDelete(item.id, item.name)}
-                              className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-medium transition"
+                              className="flex-1 cursor-pointer py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-medium transition"
                             >
                               Delete
                             </button>
@@ -897,7 +897,7 @@ export default function AdminDashboard() {
               <button
                 onClick={() => setIsModalOpen(false)}
                 disabled={isSubmitting}
-                className="p-1 hover:bg-gray-700 rounded transition text-gray-400"
+                className="p-1 cursor-pointer hover:bg-gray-700 rounded transition text-gray-400"
               >
                 <X size={20} />
               </button>
@@ -1044,7 +1044,7 @@ export default function AdminDashboard() {
                         />
                         <button
                           onClick={() => removeImage(idx)}
-                          className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                          className="absolute cursor-pointer top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
                           type="button"
                         >
                           <X size={14} />
@@ -1060,14 +1060,14 @@ export default function AdminDashboard() {
               <button
                 onClick={() => setIsModalOpen(false)}
                 disabled={isSubmitting}
-                className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition font-medium disabled:opacity-50"
+                className="flex-1 cursor-pointer px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition font-medium disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={isSubmitting}
-                className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 cursor-pointer px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition font-medium disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isSubmitting && (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

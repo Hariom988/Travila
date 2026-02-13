@@ -1,4 +1,4 @@
-// app/admin/dashboard/bookings-section.tsx
+// app/admin/dashboard/booking-section.tsx
 "use client";
 
 import { useState } from "react";
@@ -10,6 +10,7 @@ import {
   Clock,
   Trash2,
   BookOpen,
+  X,
 } from "lucide-react";
 import { useAdminBooking } from "@/hooks/useAdminBooking";
 
@@ -68,7 +69,10 @@ export function BookingsSection({
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [statusMenuId, setStatusMenuId] = useState<string | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    bookingId: string;
+    newStatus: "CONFIRMED" | "CANCELLED" | "PENDING";
+  } | null>(null);
 
   const handleStatusUpdate = async (
     bookingId: string,
@@ -91,7 +95,7 @@ export function BookingsSection({
         }
 
         setSuccessMessage(`Booking ${newStatus.toLowerCase()} successfully!`);
-        setStatusMenuId(null);
+        setConfirmModal(null);
         setTimeout(() => setSuccessMessage(null), 3000);
       }
     } catch (err) {
@@ -320,53 +324,50 @@ export function BookingsSection({
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      {booking.status === "PENDING" ? (
-                        <div className="relative">
+                      <div className="flex gap-2">
+                        {booking.status === "PENDING" && (
                           <button
                             onClick={() =>
-                              setStatusMenuId(
-                                statusMenuId === booking.id ? null : booking.id,
-                              )
+                              setConfirmModal({
+                                bookingId: booking.id,
+                                newStatus: "CONFIRMED",
+                              })
                             }
                             disabled={updatingId === booking.id}
-                            className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded text-xs font-medium transition disabled:opacity-50 flex items-center gap-1"
+                            className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition disabled:opacity-50"
                           >
-                            Update
-                            <ChevronDown size={14} />
+                            Confirm
                           </button>
-
-                          {statusMenuId === booking.id && (
-                            <div className="absolute right-0 mt-1 w-40 bg-gray-900 border border-gray-600 rounded-lg shadow-lg z-10">
-                              <button
-                                onClick={() =>
-                                  handleStatusUpdate(booking.id, "CONFIRMED")
-                                }
-                                disabled={updatingId === booking.id}
-                                className="w-full text-left px-4 py-2 text-green-300 hover:bg-gray-800 transition text-sm font-medium flex items-center gap-2 disabled:opacity-50"
-                              >
-                                <CheckCircle size={14} />
-                                Confirm Booking
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleStatusUpdate(booking.id, "CANCELLED")
-                                }
-                                disabled={updatingId === booking.id}
-                                className="w-full text-left px-4 py-2 text-red-300 hover:bg-gray-800 transition text-sm font-medium flex items-center gap-2 disabled:opacity-50 border-t border-gray-700"
-                              >
-                                <Trash2 size={14} />
-                                Cancel Booking
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-gray-400 text-xs">
-                          {booking.status === "CONFIRMED"
-                            ? "No actions available"
-                            : "Booking cancelled"}
-                        </span>
-                      )}
+                        )}
+                        {booking.status === "CONFIRMED" && (
+                          <button
+                            onClick={() =>
+                              setConfirmModal({
+                                bookingId: booking.id,
+                                newStatus: "CANCELLED",
+                              })
+                            }
+                            disabled={updatingId === booking.id}
+                            className="px-3 cursor-pointer py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-medium transition disabled:opacity-50"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                        {booking.status === "CANCELLED" && (
+                          <button
+                            onClick={() =>
+                              setConfirmModal({
+                                bookingId: booking.id,
+                                newStatus: "CONFIRMED",
+                              })
+                            }
+                            disabled={updatingId === booking.id}
+                            className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition disabled:opacity-50"
+                          >
+                            Confirm
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -519,36 +520,50 @@ export function BookingsSection({
                     <p className="text-gray-400 text-xs font-semibold uppercase mb-2">
                       Actions
                     </p>
-                    {booking.status === "PENDING" ? (
-                      <div className="flex gap-2">
+                    <div className="flex gap-2">
+                      {booking.status === "PENDING" && (
                         <button
                           onClick={() =>
-                            handleStatusUpdate(booking.id, "CONFIRMED")
+                            setConfirmModal({
+                              bookingId: booking.id,
+                              newStatus: "CONFIRMED",
+                            })
                           }
                           disabled={updatingId === booking.id}
-                          className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition disabled:opacity-50 flex items-center justify-center gap-1"
+                          className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition disabled:opacity-50"
                         >
-                          <CheckCircle size={14} />
                           Confirm
                         </button>
+                      )}
+                      {booking.status === "CONFIRMED" && (
                         <button
                           onClick={() =>
-                            handleStatusUpdate(booking.id, "CANCELLED")
+                            setConfirmModal({
+                              bookingId: booking.id,
+                              newStatus: "CANCELLED",
+                            })
                           }
                           disabled={updatingId === booking.id}
-                          className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-medium transition disabled:opacity-50 flex items-center justify-center gap-1"
+                          className="flex-1 cursor-pointer px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-medium transition disabled:opacity-50"
                         >
-                          <Trash2 size={14} />
                           Cancel
                         </button>
-                      </div>
-                    ) : (
-                      <p className="text-gray-400 text-xs">
-                        {booking.status === "CONFIRMED"
-                          ? "Booking confirmed"
-                          : "Booking cancelled"}
-                      </p>
-                    )}
+                      )}
+                      {booking.status === "CANCELLED" && (
+                        <button
+                          onClick={() =>
+                            setConfirmModal({
+                              bookingId: booking.id,
+                              newStatus: "CONFIRMED",
+                            })
+                          }
+                          disabled={updatingId === booking.id}
+                          className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-medium transition disabled:opacity-50"
+                        >
+                          Confirm
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
@@ -556,6 +571,60 @@ export function BookingsSection({
           ))
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      {confirmModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 max-w-sm w-full">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-yellow-900/30 mx-auto mb-4">
+              <AlertCircle className="text-yellow-400" size={24} />
+            </div>
+
+            <h3 className="text-lg font-semibold text-white text-center mb-2">
+              {confirmModal.newStatus === "CONFIRMED"
+                ? "Confirm Booking?"
+                : "Cancel Booking?"}
+            </h3>
+
+            <p className="text-gray-400 text-sm text-center mb-6">
+              {confirmModal.newStatus === "CONFIRMED"
+                ? "Are you sure you want to confirm this booking?"
+                : "Are you sure you want to cancel this booking?"}
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmModal(null)}
+                disabled={updatingId === confirmModal.bookingId}
+                className="flex-1 cursor-pointer px-4 py-2 border border-gray-600 text-gray-300 rounded-lg font-medium hover:bg-gray-700 transition disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() =>
+                  handleStatusUpdate(
+                    confirmModal.bookingId,
+                    confirmModal.newStatus,
+                  )
+                }
+                disabled={updatingId === confirmModal.bookingId}
+                className={`flex-1 cursor-pointer px-4 py-2 text-white rounded-lg font-medium transition flex items-center justify-center gap-2 disabled:opacity-50 ${
+                  confirmModal.newStatus === "CONFIRMED"
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-red-600 hover:bg-red-700"
+                }`}
+              >
+                {updatingId === confirmModal.bookingId && (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                )}
+                {confirmModal.newStatus === "CONFIRMED"
+                  ? "Confirm"
+                  : "Cancel Booking"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
