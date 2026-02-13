@@ -1,11 +1,9 @@
-// app/api/activity-management/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 import { logActivity } from '@/lib/activity-logger';
 
-// ✅ GET all activities - PUBLIC (NO authentication required)
-// Anyone can view activities to browse before booking
 export async function GET(request: NextRequest) {
   try {
     const activities = await prisma.activity.findMany({
@@ -29,17 +27,18 @@ export async function GET(request: NextRequest) {
       pricePerPerson: activity.pricePerPerson.toString(),
     }));
 
-    return NextResponse.json(safeActivities);
+    const response = NextResponse.json(safeActivities);
+    response.headers.set("Content-Type", "application/json");
+    return response;
   } catch (error) {
     console.error('Error fetching activities:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch activities' },
+      { error: 'Failed to fetch activities', details: String(error) },
       { status: 500 }
     );
   }
 }
 
-// ✅ POST - Create new activity - ADMIN ONLY
 export async function POST(request: NextRequest) {
   try {
     const auth = await verifyAdminAuth(request);
@@ -68,7 +67,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Log activity
     await logActivity(
       auth.id,
       'CREATE_ACTIVITY',

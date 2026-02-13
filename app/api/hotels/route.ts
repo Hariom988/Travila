@@ -1,11 +1,9 @@
-// app/api/hotels/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 import { logActivity } from '@/lib/activity-logger';
 
-// ✅ GET all hotels - PUBLIC (NO authentication required)
-// Anyone can view hotels to browse and see prices
 export async function GET(request: NextRequest) {
   try {
     const hotels = await prisma.hotel.findMany({
@@ -30,17 +28,18 @@ export async function GET(request: NextRequest) {
       pricePerNight: hotel.pricePerNight.toString(),
     }));
 
-    return NextResponse.json(safeHotels);
+    const response = NextResponse.json(safeHotels);
+    response.headers.set("Content-Type", "application/json; charset=utf-8");
+    return response;
   } catch (error) {
     console.error('Error fetching hotels:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch hotels' },
+      { error: 'Failed to fetch hotels', details: String(error) },
       { status: 500 }
     );
   }
 }
 
-// ✅ POST - Create new hotel - ADMIN ONLY
 export async function POST(request: NextRequest) {
   try {
     const auth = await verifyAdminAuth(request);
@@ -70,7 +69,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Log activity
     await logActivity(
       auth.id,
       'CREATE_HOTEL',

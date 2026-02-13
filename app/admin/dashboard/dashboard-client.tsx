@@ -198,8 +198,23 @@ export default function AdminDashboard() {
       const endpoint = tabConfig[type].endpoint;
       const response = await fetch(endpoint, {
         credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
       });
-      if (!response.ok) throw new Error(`Failed to fetch ${type}`);
+
+      const contentType = response.headers.get("content-type");
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Failed to fetch ${type}: ${response.status}`);
+      }
+
+      if (!contentType?.includes("application/json")) {
+        throw new Error(`Expected JSON but got ${contentType}`);
+      }
+
       const data = await response.json();
 
       if (type === "hotels") setHotels(data);
@@ -207,7 +222,9 @@ export default function AdminDashboard() {
       else setLogs(data);
     } catch (error) {
       console.error(`Error fetching ${type}:`, error);
-      setFormError(`Failed to load ${type}`);
+      setFormError(
+        `Failed to load ${type}: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
   };
 
