@@ -10,6 +10,8 @@ import WhatsAppButton from "./whatsAppButton";
 import { useRouter } from "next/navigation";
 import { SignUpPromoBanner } from "./signupPromoBanner";
 import Image from "next/image";
+import TestimonialsSection from "./testimonialssection";
+import AboutUsPreview from "./aboutuspreview";
 
 export default function Home() {
   const router = useRouter();
@@ -56,6 +58,8 @@ export default function Home() {
 
         <TravelSection />
         <TourPackages />
+        <AboutUsPreview />
+        <TestimonialsSection />
         <ExploreSection />
         <LocationSection />
         <DiscoverSection />

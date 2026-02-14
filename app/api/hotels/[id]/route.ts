@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 import { logActivity } from '@/lib/activity-logger';
-
-// ✅ GET single hotel - PUBLIC (NO authentication required)
+export const maxDuration = 60;
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -37,7 +36,6 @@ export async function GET(
   }
 }
 
-// ✅ PUT - Update hotel - ADMIN ONLY
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -71,7 +69,6 @@ export async function PUT(
       },
     });
 
-    // Log activity
     await logActivity(
       auth.id,
       'UPDATE_HOTEL',
@@ -102,8 +99,6 @@ export async function PUT(
     );
   }
 }
-
-// ✅ DELETE - Delete hotel - ADMIN ONLY
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -127,7 +122,6 @@ export async function DELETE(
       );
     }
 
-    // Check for PENDING or CONFIRMED bookings (ignore CANCELLED)
     const activeBookingCount = await prisma.hotelBooking.count({
       where: {
         hotelId: id,
@@ -148,7 +142,6 @@ export async function DELETE(
       );
     }
 
-    // Delete all CANCELLED bookings first (clean up)
     await prisma.hotelBooking.deleteMany({
       where: {
         hotelId: id,
@@ -156,12 +149,10 @@ export async function DELETE(
       },
     });
 
-    // Now delete the hotel
     await prisma.hotel.delete({
       where: { id },
     });
 
-    // Log activity
     await logActivity(
       auth.id,
       'DELETE_HOTEL',
@@ -193,7 +184,6 @@ export async function DELETE(
   }
 }
 
-// ✅ PATCH - Update hotel availability - ADMIN ONLY
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

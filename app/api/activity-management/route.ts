@@ -1,9 +1,8 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 import { logActivity } from '@/lib/activity-logger';
-
+export const maxDuration = 60;
 export async function GET(request: NextRequest) {
   try {
     const activities = await prisma.activity.findMany({
