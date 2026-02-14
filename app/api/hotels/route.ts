@@ -1,11 +1,9 @@
-// app/api/hotels/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 import { logActivity } from '@/lib/activity-logger';
-
-// ✅ GET all hotels - PUBLIC (NO authentication required)
-// Anyone can view hotels to browse and see prices
+export const maxDuration = 60;
 export async function GET(request: NextRequest) {
   try {
     const hotels = await prisma.hotel.findMany({

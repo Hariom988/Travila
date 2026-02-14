@@ -1,11 +1,8 @@
-// app/api/activity-management/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/apiAuth';
 import { logActivity } from '@/lib/activity-logger';
-
-// ✅ GET all activities - PUBLIC (NO authentication required)
-// Anyone can view activities to browse before booking
+export const maxDuration = 60;
 export async function GET(request: NextRequest) {
   try {
     const activities = await prisma.activity.findMany({

@@ -1,8 +1,8 @@
-// app/api/bookings/activity/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { jwtVerify } from 'jose';
-
+export const maxDuration = 60;
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'a131878d308104875e624401c5bb3a31e40f8c9b893a6274b38451df3303479d'
 );
