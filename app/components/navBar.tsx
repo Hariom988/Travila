@@ -110,7 +110,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`${isHomePage ? "absolute" : "relative bg-slate-950"} top-0 left-0 right-0 z-[100] px-4 py-4 md:px-8 md:py-6 w-full text-white`}
+      className={`${isHomePage ? "absolute" : "relative bg-slate-950"} top-0 left-0 right-0 z-100 px-4 py-4 md:px-8 md:py-6 w-full text-white`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link
@@ -263,10 +263,10 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] top-0 left-0"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-110 top-0 left-0"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div className="fixed top-0 left-0 right-0 bottom-0 z-[120] flex flex-col max-h-screen overflow-y-auto bg-slate-950">
+          <div className="fixed top-0 left-0 right-0 bottom-0 z-120 flex flex-col max-h-screen overflow-y-auto bg-slate-950">
             <div className="flex items-center justify-between p-4 border-b border-slate-800 sticky top-0 bg-slate-950/95 backdrop-blur z-10">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 flex items-center justify-center  rounded-lg p-1">
