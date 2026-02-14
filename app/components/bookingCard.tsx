@@ -1,10 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Calendar, Users, ShieldCheck, X } from "lucide-react";
+import { ShieldCheck, X } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import HotelBookingModal from "./hotelBookingModal";
 import ActivityBookingModal from "./activityBookingModal";
-import { flattenedDecrypt } from "jose";
 
 function ClientOnly({ children }: { children: React.ReactNode }) {
   const [hasMounted, setHasMounted] = useState(false);
@@ -51,8 +50,6 @@ const DatePicker = ({
   onSelectDate,
   minDate,
   maxDate,
-  label,
-  color,
 }: DatePickerProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date(selectedDate));
 
@@ -107,7 +104,7 @@ const DatePicker = ({
         <div className="flex gap-2">
           <button
             onClick={handlePrevMonth}
-            className="p-2 hover:bg-[#344054] rounded-lg transition-colors text-gray-400 hover:text-white"
+            className="p-2 cursor-pointer hover:bg-[#344054] rounded-lg transition-colors text-gray-400 hover:text-white"
             aria-label="Previous month"
           >
             <svg
@@ -123,7 +120,7 @@ const DatePicker = ({
           </button>
           <button
             onClick={handleNextMonth}
-            className="p-2 hover:bg-[#344054] rounded-lg transition-colors text-gray-400 hover:text-white"
+            className="p-2 cursor-pointer hover:bg-[#344054] rounded-lg transition-colors text-gray-400 hover:text-white"
             aria-label="Next month"
           >
             <svg
@@ -157,7 +154,7 @@ const DatePicker = ({
             key={`day-${idx}`}
             disabled={!day || isDateDisabled(day as Date)}
             onClick={() => day && onSelectDate(formatDateToLocal(day))}
-            className={`aspect-square text-xs font-medium rounded-lg transition-all ${
+            className={`aspect-square cursor-pointer text-xs font-medium rounded-lg transition-all ${
               !day
                 ? "opacity-0"
                 : isDateSelected(day as Date)
@@ -391,7 +388,7 @@ export default function BookingCardV2({
           <div className="space-y-4 mb-8">
             <button
               onClick={() => setShowCalendarModal("in")}
-              className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-blue-200 transition-all"
+              className="w-full cursor-pointer flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-blue-200 transition-all"
             >
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
                 Dates
@@ -413,7 +410,7 @@ export default function BookingCardV2({
 
             <button
               onClick={() => setShowGuestsModal(true)}
-              className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-blue-200 transition-all"
+              className="w-full cursor-pointer flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-blue-200 transition-all"
             >
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
                 Guests
@@ -430,7 +427,7 @@ export default function BookingCardV2({
           <div className="space-y-4 mb-8">
             <button
               onClick={() => setShowActivityDateModal(true)}
-              className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-purple-200 transition-all"
+              className="w-full cursor-pointer flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-purple-200 transition-all"
             >
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
                 Activity Date
@@ -447,7 +444,7 @@ export default function BookingCardV2({
 
             <button
               onClick={() => setShowGuestsModal(true)}
-              className="w-full flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-purple-200 transition-all"
+              className="w-full cursor-pointer flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:bg-white hover:border-purple-200 transition-all"
             >
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
                 Participants
@@ -486,7 +483,7 @@ export default function BookingCardV2({
 
         <button
           onClick={handleReserveClick}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-3"
+          className="w-full cursor-pointer bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-3"
         >
           Reserve {type === "hotel" ? "Property" : "Activity"}
         </button>
@@ -515,7 +512,7 @@ export default function BookingCardV2({
                   <h2 className="font-bold text-lg">Select Check-In Date</h2>
                   <button
                     onClick={() => setShowCalendarModal(null)}
-                    className="hover:bg-green-500 p-2 rounded-lg transition-colors"
+                    className="hover:bg-green-500  cursor-pointer p-2 rounded-lg transition-colors"
                     aria-label="Close modal"
                   >
                     <X size={20} />
@@ -549,7 +546,7 @@ export default function BookingCardV2({
                   <h2 className="font-bold text-lg">Select Check-Out Date</h2>
                   <button
                     onClick={() => setShowCalendarModal(null)}
-                    className="hover:bg-orange-500 p-2 rounded-lg transition-colors"
+                    className="hover:bg-orange-500 cursor-pointer p-2 rounded-lg transition-colors"
                     aria-label="Close modal"
                   >
                     <X size={20} />
@@ -580,7 +577,7 @@ export default function BookingCardV2({
               <h2 className="font-bold text-lg">Select Activity Date</h2>
               <button
                 onClick={() => setShowActivityDateModal(false)}
-                className="hover:bg-purple-500 p-2 rounded-lg transition-colors"
+                className="hover:bg-purple-500 cursor-pointer p-2 rounded-lg transition-colors"
                 aria-label="Close modal"
               >
                 <X size={20} />
@@ -617,7 +614,7 @@ export default function BookingCardV2({
               </h2>
               <button
                 onClick={() => setShowGuestsModal(false)}
-                className="hover:bg-purple-500 p-2 rounded-lg transition-colors"
+                className="hover:bg-purple-500 cursor-pointer p-2 rounded-lg transition-colors"
                 aria-label="Close modal"
               >
                 <X size={20} />
@@ -633,7 +630,7 @@ export default function BookingCardV2({
                     <div className="flex items-center gap-4">
                       <button
                         onClick={() => setRooms(Math.max(1, rooms - 1))}
-                        className="w-10 h-10 border border-[#344054] rounded-lg hover:bg-[#1D2939] flex items-center justify-center font-bold text-white transition-colors"
+                        className="w-10 h-10 cursor-pointer border border-[#344054] rounded-lg hover:bg-[#1D2939] flex items-center justify-center font-bold text-white transition-colors"
                       >
                         −
                       </button>
@@ -642,7 +639,7 @@ export default function BookingCardV2({
                       </span>
                       <button
                         onClick={() => setRooms(rooms + 1)}
-                        className="w-10 h-10 border border-[#344054] rounded-lg hover:bg-[#1D2939] flex items-center justify-center font-bold text-white transition-colors"
+                        className="w-10 h-10 cursor-pointer border border-[#344054] rounded-lg hover:bg-[#1D2939] flex items-center justify-center font-bold text-white transition-colors"
                       >
                         +
                       </button>
@@ -655,7 +652,7 @@ export default function BookingCardV2({
                     <div className="flex items-center gap-4">
                       <button
                         onClick={() => setAdults(Math.max(1, adults - 1))}
-                        className="w-10 h-10 border border-[#344054] rounded-lg hover:bg-[#1D2939] flex items-center justify-center font-bold text-white transition-colors"
+                        className="w-10 h-10 cursor-pointer border border-[#344054] rounded-lg hover:bg-[#1D2939] flex items-center justify-center font-bold text-white transition-colors"
                       >
                         −
                       </button>
@@ -664,7 +661,7 @@ export default function BookingCardV2({
                       </span>
                       <button
                         onClick={() => setAdults(adults + 1)}
-                        className="w-10 h-10 border border-[#344054] rounded-lg hover:bg-[#1D2939] flex items-center justify-center font-bold text-white transition-colors"
+                        className="w-10 h-10 cursor-pointer border border-[#344054] rounded-lg hover:bg-[#1D2939] flex items-center justify-center font-bold text-white transition-colors"
                       >
                         +
                       </button>
@@ -681,7 +678,7 @@ export default function BookingCardV2({
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => setPeople(Math.max(1, people - 1))}
-                      className="w-10 h-10 border border-[#344054] rounded-lg hover:bg-[#1D2939] flex items-center justify-center font-bold text-white transition-colors"
+                      className="w-10 h-10 cursor-pointer border border-[#344054] rounded-lg hover:bg-[#1D2939] flex items-center justify-center font-bold text-white transition-colors"
                     >
                       −
                     </button>
@@ -690,7 +687,7 @@ export default function BookingCardV2({
                     </span>
                     <button
                       onClick={() => setPeople(people + 1)}
-                      className="w-10 h-10 border border-[#344054] rounded-lg hover:bg-[#1D2939] flex items-center justify-center font-bold text-white transition-colors"
+                      className="w-10 h-10 cursor-pointer border border-[#344054] rounded-lg hover:bg-[#1D2939] flex items-center justify-center font-bold text-white transition-colors"
                     >
                       +
                     </button>
@@ -700,7 +697,7 @@ export default function BookingCardV2({
 
               <button
                 onClick={() => setShowGuestsModal(false)}
-                className={`w-full ${
+                className={`w-full cursor-pointer ${
                   type === "hotel"
                     ? "bg-purple-600 hover:bg-purple-700"
                     : "bg-pink-600 hover:bg-pink-700"

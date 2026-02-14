@@ -105,7 +105,7 @@ export default function ActivityBookingModal({
               bookingState.status === "loading" ||
               bookingState.status === "success"
             }
-            className="hover:bg-purple-500 p-2 rounded-lg transition-colors disabled:opacity-50"
+            className="hover:bg-purple-500 cursor-pointer p-2 rounded-lg transition-colors disabled:opacity-50"
             aria-label="Close modal"
           >
             <X size={20} />
@@ -184,7 +184,7 @@ export default function ActivityBookingModal({
 
               <div className="bg-slate-50 p-3 rounded-lg text-xs text-gray-600 space-y-1">
                 <p>✓ Instant confirmation</p>
-                <p>✓ Free cancellation up to 24 hours before activity</p>
+                <p>✓ Cancellation up to 24 hours before activity</p>
                 <p>✓ Professional guides included</p>
                 <p>✓ All safety equipment provided</p>
               </div>
@@ -193,14 +193,14 @@ export default function ActivityBookingModal({
                 <button
                   onClick={onClose}
                   disabled={bookingState.status === "loading"}
-                  className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg font-medium transition-colors disabled:opacity-50"
+                  className="flex-1 cursor-pointer px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleBooking}
                   disabled={bookingState.status === "loading"}
-                  className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 cursor-pointer px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {bookingState.status === "loading" && (
                     <Loader2 className="w-4 h-4 animate-spin" />

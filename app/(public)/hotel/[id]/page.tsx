@@ -1,7 +1,4 @@
-// EXAMPLE: How to update app/(public)/hotel/[id]/page.tsx
-
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import {
   MapPin,
@@ -16,11 +13,30 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import BookingCard from "@/app/components/bookingCard";
+import ImageGallery from "@/app/components/imageGallery";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
+const formatDescription = (text: string) => {
+  if (!text) return null;
 
+  const lines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line);
+
+  return (
+    <div className="space-y-3">
+      {lines.map((line, index) => (
+        <div key={index} className="flex gap-3">
+          <div className="shrink-0 w-2 h-2 rounded-full bg-blue-600 mt-2" />
+          <p className="text-slate-600 leading-relaxed">{line}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
 async function getHotelData(id: string) {
   try {
     const hotel = await prisma.hotel.findUnique({
@@ -58,7 +74,6 @@ export default async function HotelDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-slate-50/50 pb-20">
-      {/* Sticky Navigation Header */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link
@@ -86,9 +101,7 @@ export default async function HotelDetailPage({ params }: PageProps) {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 lg:pt-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-          {/* Left Side: Content (8 Columns) */}
           <div className="lg:col-span-8 space-y-8">
-            {/* Title & Badge Section */}
             <section className="space-y-4">
               <div className="flex flex-wrap gap-2">
                 <span className="bg-blue-600 text-white text-[10px] font-black px-2.5 py-1 rounded-sm uppercase tracking-tighter flex items-center gap-1">
@@ -110,30 +123,25 @@ export default async function HotelDetailPage({ params }: PageProps) {
                 </span>
               </div>
             </section>
+            <ImageGallery
+              images={hotel.images || []}
+              title={hotel.name}
+              featured={true}
+            />
 
-            {/* Main Image Gallery */}
-            <div className="relative aspect-video w-full rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/10 group">
-              <Image
-                src={hotel.images?.[0] || "/placeholder-hotel.jpg"}
-                alt={hotel.name}
-                fill
-                className="object-cover transition-transform duration-700"
-                priority
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-            </div>
-
-            {/* Description Section */}
             <section className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm">
               <h2 className="text-xl font-black text-slate-900 mb-4 flex items-center gap-2">
-                <Info size={20} className="text-blue-600" /> About Property
+                <Info size={20} className="text-purple-600" /> About property
               </h2>
-              <p className="text-slate-600 leading-relaxed text-base md:text-lg font-medium">
-                {hotel.description}
-              </p>
+              <div className="text-base md:text-lg font-medium">
+                {hotel.description ? (
+                  formatDescription(hotel.description)
+                ) : (
+                  <p className="text-slate-600">No description available</p>
+                )}
+              </div>
             </section>
 
-            {/* Facilities Section */}
             <section className="space-y-4">
               <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">
                 Premium Facilities
@@ -156,7 +164,6 @@ export default async function HotelDetailPage({ params }: PageProps) {
             </section>
           </div>
 
-          {/* Right Side: Booking Card (4 Columns) - UPDATED COMPONENT */}
           <aside className="lg:col-span-4">
             <BookingCard
               type="hotel"

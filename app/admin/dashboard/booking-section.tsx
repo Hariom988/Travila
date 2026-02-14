@@ -1,4 +1,3 @@
-// app/admin/dashboard/booking-section.tsx
 "use client";
 
 import { useState } from "react";
@@ -85,7 +84,6 @@ export function BookingsSection({
       const response = await updateBookingStatus(bookingId, newStatus);
 
       if (response.success) {
-        // Update the booking in the parent component
         const updatedBooking = bookings.find((b) => b.id === bookingId);
         if (updatedBooking) {
           onBookingUpdated({
@@ -151,7 +149,6 @@ export function BookingsSection({
 
   return (
     <>
-      {/* Filters and Search */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-3 top-3 text-gray-500" size={18} />
@@ -188,7 +185,6 @@ export function BookingsSection({
         </div>
       </div>
 
-      {/* Messages */}
       {apiError && (
         <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg flex items-center gap-3 text-red-300">
           <AlertCircle size={20} />
@@ -203,7 +199,6 @@ export function BookingsSection({
         </div>
       )}
 
-      {/* Desktop Table */}
       <div className="hidden md:block bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
@@ -376,8 +371,6 @@ export function BookingsSection({
           </div>
         )}
       </div>
-
-      {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
         {loading ? (
           <div className="p-12 text-center">
@@ -571,8 +564,6 @@ export function BookingsSection({
           ))
         )}
       </div>
-
-      {/* Confirmation Modal */}
       {confirmModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 max-w-sm w-full">
