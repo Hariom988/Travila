@@ -329,6 +329,16 @@ export default function AdminDashboard() {
       } else {
         payload.duration = formData.duration;
       }
+      const estimatedPayload = JSON.stringify(payload);
+      const payloadSizeInMB = new Blob([estimatedPayload]).size / (1024 * 1024);
+
+      if (payloadSizeInMB > 10) {
+        setFormError(
+          `Payload too large (${payloadSizeInMB.toFixed(2)}MB). Please remove some images.`,
+        );
+        setIsSubmitting(false);
+        return;
+      }
 
       const response = await fetch(
         editingId ? `${endpoint}/${editingId}` : endpoint,
@@ -339,10 +349,30 @@ export default function AdminDashboard() {
           body: JSON.stringify(payload),
         },
       );
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        const text = await response.text();
+        console.error("Server response (not JSON):", text);
 
+        if (text.includes("413") || text.includes("Payload Too Large")) {
+          throw new Error(
+            "Payload too large. Please try with fewer or smaller images.",
+          );
+        } else if (text.includes("timeout")) {
+          throw new Error(
+            "Request timeout. Your images may be too large. Please try again.",
+          );
+        } else if (text.length > 0) {
+          throw new Error(`Server error: ${text.substring(0, 150)}`);
+        } else {
+          throw new Error("Server returned an error (no details available)");
+        }
+      }
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Operation failed");
+        const error = response.json();
+        throw new Error(data.error || "Operation failed");
       }
 
       setSuccessMessage(tabConfig[activeTab].successMsg(!!editingId));
@@ -399,23 +429,59 @@ export default function AdminDashboard() {
       setFormError(error instanceof Error ? error.message : "Delete failed");
     }
   };
+  const compressImage = async (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const maxWidth = 800;
+          const maxHeight = 600;
+          let width = img.width;
+          let height = img.height;
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+          if (width > height) {
+            if (width > maxWidth) {
+              height *= maxWidth / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width *= maxHeight / height;
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext("2d")?.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", 0.7)); // 70% quality
+        };
+      };
+    });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      Array.from(files).forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const result = event.target?.result;
-          if (result && typeof result === "string") {
-            setFormData((prev) => ({
-              ...prev,
-              images: [...prev.images, result],
-            }));
-          }
-        };
-        reader.readAsDataURL(file);
-      });
+      try {
+        const filesToProcess = Array.from(files).slice(0, 10);
+
+        for (const file of filesToProcess) {
+          const compressedBase64 = await compressImage(file);
+          setFormData((prev) => ({
+            ...prev,
+            images: [...prev.images, compressedBase64],
+          }));
+        }
+      } catch (error) {
+        setFormError(
+          `Failed to process image: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+      }
     }
   };
 
