@@ -1,5 +1,4 @@
   import type { NextConfig } from "next";
-
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -9,7 +8,6 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
-      // You might also need this if your database uses the direct source URL
       {
         protocol: "https",
         hostname: "plus.unsplash.com",
@@ -24,6 +22,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
 };
 
 export default nextConfig;
