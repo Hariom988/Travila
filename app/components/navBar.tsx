@@ -110,7 +110,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`${isHomePage ? "absolute" : "relative bg-slate-950"} top-0 left-0 right-0 z-50 px-4 py-4 md:px-8 md:py-6 w-full text-white`}
+      className={`${isHomePage ? "absolute" : "relative bg-slate-950"} top-0 left-0 right-0 z-[100] px-4 py-4 md:px-8 md:py-6 w-full text-white`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link
@@ -195,13 +195,13 @@ const Navbar = () => {
               <div
                 onMouseEnter={() => setIsDropdownOpen(true)}
                 onMouseLeave={() => setIsDropdownOpen(false)}
-                className={`absolute right-0 mt-2 w-72 bg-slate-900 rounded-xl shadow-2xl border border-slate-700 overflow-hidden transition-all duration-200 ${
+                className={`absolute right-0 mt-2 w-72 bg-slate-900 rounded-xl shadow-2xl border border-slate-700 overflow-hidden transition-all duration-200 z-[110] ${
                   isDropdownOpen
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-2 invisible"
                 }`}
               >
-                <div className="px-4 py-4 border-b border-slate-800 bg-slate-800/50">
+                <div className="px-4 py-4 z-50 border-b border-slate-800 bg-slate-800/50">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold">
                       {getInitials(user.name)}
@@ -263,10 +263,10 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 top-0 left-0"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] top-0 left-0"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div className="fixed top-0 left-0 right-0 bottom-0 z-50 flex flex-col max-h-screen overflow-y-auto bg-slate-950">
+          <div className="fixed top-0 left-0 right-0 bottom-0 z-[120] flex flex-col max-h-screen overflow-y-auto bg-slate-950">
             <div className="flex items-center justify-between p-4 border-b border-slate-800 sticky top-0 bg-slate-950/95 backdrop-blur z-10">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 flex items-center justify-center  rounded-lg p-1">

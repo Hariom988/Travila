@@ -35,7 +35,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity }) => {
             </div>
           )}
 
-          <button className="absolute top-3 right-3 bg-white/90 p-2 rounded-full hover:bg-red-50 hover:text-red-500 text-gray-600 transition-colors z-10">
+          <button className="absolute cursor-pointer top-3 right-3 bg-white/90 p-2 rounded-full hover:bg-red-50 hover:text-red-500 text-gray-600 transition-colors z-10">
             <Heart className="w-3.5 h-3.5" />
           </button>
 

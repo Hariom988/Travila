@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import {
   Plus,
@@ -16,6 +15,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { BookingsSection } from "./booking-section";
+
 interface Hotel {
   id: string;
   name: string;
@@ -174,6 +174,27 @@ export default function AdminDashboard() {
     },
   };
 
+  const formatDescription = (text: string) => {
+    if (!text) return "";
+
+    const lines = text
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line);
+
+    return (
+      <div className="space-y-3">
+        {lines.map((line, index) => (
+          <div key={index} className="flex gap-3">
+            <div className="shrink-0 w-2 h-2 rounded-full bg-blue-600 mt-2" />
+
+            <p className="text-gray-700 leading-relaxed">{line}</p>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   useEffect(() => {
     fetchData();
   }, [activeTab, bookingFilter, statusFilter]);
@@ -324,6 +345,26 @@ export default function AdminDashboard() {
   const handleSave = async () => {
     if (!validateForm()) return;
 
+    const estimatedPayload = JSON.stringify({
+      name: formData.name,
+      location: formData.location,
+      description: formData.description,
+      [activeTab === "hotels" ? "pricePerNight" : "pricePerPerson"]: parseFloat(
+        formData.price,
+      ),
+      images: formData.images,
+    });
+
+    const payloadSizeInMB = new Blob([estimatedPayload]).size / (1024 * 1024);
+
+    if (payloadSizeInMB > 10) {
+      setFormError(
+        `Payload too large (${payloadSizeInMB.toFixed(2)}MB). Please remove some images or compress them further.`,
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const endpoint = tabConfig[activeTab].endpoint;
@@ -346,16 +387,6 @@ export default function AdminDashboard() {
       } else {
         payload.duration = formData.duration;
       }
-      const estimatedPayload = JSON.stringify(payload);
-      const payloadSizeInMB = new Blob([estimatedPayload]).size / (1024 * 1024);
-
-      if (payloadSizeInMB > 10) {
-        setFormError(
-          `Payload too large (${payloadSizeInMB.toFixed(2)}MB). Please remove some images.`,
-        );
-        setIsSubmitting(false);
-        return;
-      }
 
       const response = await fetch(
         editingId ? `${endpoint}/${editingId}` : endpoint,
@@ -366,30 +397,10 @@ export default function AdminDashboard() {
           body: JSON.stringify(payload),
         },
       );
-      let data;
-      try {
-        data = await response.json();
-      } catch (parseError) {
-        const text = await response.text();
-        console.error("Server response (not JSON):", text);
 
-        if (text.includes("413") || text.includes("Payload Too Large")) {
-          throw new Error(
-            "Payload too large. Please try with fewer or smaller images.",
-          );
-        } else if (text.includes("timeout")) {
-          throw new Error(
-            "Request timeout. Your images may be too large. Please try again.",
-          );
-        } else if (text.length > 0) {
-          throw new Error(`Server error: ${text.substring(0, 150)}`);
-        } else {
-          throw new Error("Server returned an error (no details available)");
-        }
-      }
       if (!response.ok) {
-        const error = response.json();
-        throw new Error(data.error || "Operation failed");
+        const error = await response.json();
+        throw new Error(error.error || "Operation failed");
       }
 
       setSuccessMessage(tabConfig[activeTab].successMsg(!!editingId));
@@ -446,59 +457,23 @@ export default function AdminDashboard() {
       setFormError(error instanceof Error ? error.message : "Delete failed");
     }
   };
-  const compressImage = async (file: File): Promise<string> => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const maxWidth = 800;
-          const maxHeight = 600;
-          let width = img.width;
-          let height = img.height;
 
-          if (width > height) {
-            if (width > maxWidth) {
-              height *= maxWidth / width;
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width *= maxHeight / height;
-              height = maxHeight;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          canvas.getContext("2d")?.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL("image/jpeg", 0.7)); // 70% quality
-        };
-      };
-    });
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      try {
-        const filesToProcess = Array.from(files).slice(0, 10);
-
-        for (const file of filesToProcess) {
-          const compressedBase64 = await compressImage(file);
-          setFormData((prev) => ({
-            ...prev,
-            images: [...prev.images, compressedBase64],
-          }));
-        }
-      } catch (error) {
-        setFormError(
-          `Failed to process image: ${error instanceof Error ? error.message : "Unknown error"}`,
-        );
-      }
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const result = event.target?.result;
+          if (result && typeof result === "string") {
+            setFormData((prev) => ({
+              ...prev,
+              images: [...prev.images, result],
+            }));
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     }
   };
 
@@ -1035,6 +1010,11 @@ export default function AdminDashboard() {
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Description
+                  {activeTab === "activities" && (
+                    <span className="text-gray-500 text-xs ml-2">
+                      (Press Enter after each point to create bullet points)
+                    </span>
+                  )}
                 </label>
                 <textarea
                   value={formData.description}
@@ -1042,9 +1022,13 @@ export default function AdminDashboard() {
                     setFormData({ ...formData, description: e.target.value })
                   }
                   disabled={isSubmitting}
-                  rows={3}
+                  rows={5}
                   className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
-                  placeholder="Description..."
+                  placeholder={
+                    activeTab === "activities"
+                      ? "Add each point on a new line. Each line will become a bullet point."
+                      : "Description..."
+                  }
                 />
               </div>
 

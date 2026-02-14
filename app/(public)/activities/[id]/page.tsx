@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import {
   MapPin,
@@ -13,11 +12,31 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import BookingCard from "@/app/components/bookingCard";
+import ImageGallery from "@/app/components/imageGallery"; // ← IMPORT HERE
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
+const formatDescription = (text: string) => {
+  if (!text) return null;
 
+  const lines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line);
+
+  return (
+    <div className="space-y-3">
+      {lines.map((line, index) => (
+        <div key={index} className="flex gap-3">
+          <div className="shrink-0 w-2 h-2 rounded-full bg-purple-600 mt-2" />
+
+          <p className="text-slate-600 leading-relaxed">{line}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
 async function getActivityData(id: string) {
   try {
     const activity = await prisma.activity.findUnique({
@@ -113,24 +132,22 @@ export default async function ActivityDetailPage({ params }: PageProps) {
               </div>
             </section>
 
-            <div className="relative aspect-video w-full rounded-3xl overflow-hidden shadow-2xl shadow-purple-900/10 group">
-              <Image
-                src={activity.images?.[0] || "/placeholder-activity.jpg"}
-                alt={activity.name}
-                fill
-                className="object-cover transition-transform duration-700"
-                priority
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-            </div>
-
+            <ImageGallery
+              images={activity.images || []}
+              title={activity.name}
+              featured={true}
+            />
             <section className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm">
               <h2 className="text-xl font-black text-slate-900 mb-4 flex items-center gap-2">
                 <Info size={20} className="text-purple-600" /> About Activity
               </h2>
-              <p className="text-slate-600 leading-relaxed text-base md:text-lg font-medium">
-                {activity.description}
-              </p>
+              <div className="text-base md:text-lg font-medium">
+                {activity.description ? (
+                  formatDescription(activity.description)
+                ) : (
+                  <p className="text-slate-600">No description available</p>
+                )}
+              </div>
             </section>
 
             <section className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm">
