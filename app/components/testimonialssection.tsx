@@ -70,7 +70,7 @@ const TESTIMONIALS: Testimonial[] = [
     location: "London",
     country: "United Kingdom 🇬🇧",
     image:
-      "https://images.unsplash.com/photo-1507917591994-14ae08a0b319?w=400&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1704660577560-db9a0147ea44?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     rating: 5,
     text: "HikinHigh exceeded all expectations. The itinerary was well-planned, the accommodation comfortable, and the guides were genuinely passionate about conservation.",
     tour: "Auli Trek",
@@ -80,22 +80,18 @@ const TESTIMONIALS: Testimonial[] = [
 
 export default function TestimonialsSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState<"left" | "right">("right");
 
   const handlePrev = () => {
-    setDirection("left");
     setCurrentIndex(
       (prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length,
     );
   };
 
   const handleNext = () => {
-    setDirection("right");
     setCurrentIndex((prev) => (prev + 1) % TESTIMONIALS.length);
   };
 
   const goToSlide = (index: number) => {
-    setDirection(index > currentIndex ? "right" : "left");
     setCurrentIndex(index);
   };
 
@@ -108,80 +104,77 @@ export default function TestimonialsSection() {
   };
 
   return (
-    <section className="w-full py-20 px-4 md:px-8 bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-50 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-40">
+    <section className="w-full py-12 md:py-20 px-4 md:px-8 bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-50 relative overflow-hidden">
+      <div className="absolute inset-0 opacity-40 hidden md:block">
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
         <div className="absolute bottom-20 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <p className="text-blue-600 font-bold italic mb-2 tracking-wide">
+        <div className="text-center mb-8 md:mb-16">
+          <p className="text-blue-600 font-bold italic mb-1 text-sm md:text-base tracking-wide">
             What Our Adventurers Say
           </p>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl md:text-5xl font-bold text-gray-900 mb-2 md:mb-4">
             Real Stories From Our Community
           </h2>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-600 text-sm md:text-lg max-w-2xl mx-auto px-4">
             Join thousands of satisfied travelers who've discovered their next
-            adventure with HikinHigh
+            adventure.
           </p>
         </div>
 
-        <div className="relative">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="relative px-2 md:px-0">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             {getVisibleTestimonials().map((testimonial, idx) => (
               <div
-                key={testimonial.id}
-                className="group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full hover:border-blue-200 animate-fade-in"
+                key={`${testimonial.id}-${idx}`}
+                className={`${idx > 0 ? "hidden md:flex" : "flex"} group bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex-col h-full hover:border-blue-200`}
               >
-                <div className="p-6 flex flex-col h-full">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-blue-100">
-                          <Image
-                            src={testimonial.image}
-                            alt={testimonial.name}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-gray-900 truncate">
-                            {testimonial.name}
-                          </h4>
-                          <p className="text-xs text-gray-500 flex items-center gap-1">
-                            <MapPin size={12} />
-                            {testimonial.location}, {testimonial.country}
-                          </p>
-                        </div>
-                      </div>
+                <div className="p-5 md:p-6 flex flex-col h-full">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="relative w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-blue-100 shrink-0">
+                      <Image
+                        src={testimonial.image}
+                        alt={testimonial.name}
+                        fill
+                        className="object-cover"
+                      />
                     </div>
-                    <div className="bg-blue-100 px-2 py-1 rounded-full shrink-0">
-                      <p className="text-xs font-bold text-blue-700">
-                        {testimonial.isIndian ? "🇮🇳" : "🌍"}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-gray-900 text-sm md:text-base truncate">
+                        {testimonial.name}
+                      </h4>
+                      <p className="text-[10px] md:text-xs text-gray-500 flex items-center gap-1">
+                        <MapPin size={10} className="md:w-3 md:h-3" />
+                        {testimonial.location}
                       </p>
+                    </div>
+                    <div className="bg-blue-50 px-1.5 py-0.5 rounded text-xs">
+                      {testimonial.isIndian ? "🇮🇳" : "🌍"}
                     </div>
                   </div>
 
-                  <div className="flex gap-1 mb-4">
+                  <div className="flex gap-0.5 mb-3">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star
                         key={i}
-                        size={16}
+                        size={14}
                         className="fill-yellow-400 text-yellow-400"
                       />
                     ))}
                   </div>
 
-                  <p className="text-gray-700 text-sm leading-relaxed mb-4 grow">
+                  <p className="text-gray-700 text-xs md:text-sm leading-relaxed mb-4 grow italic">
                     "{testimonial.text}"
                   </p>
 
-                  <div className="pt-4 border-t border-gray-100">
-                    <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full inline-block">
+                  <div className="pt-3 border-t border-gray-50 flex items-center justify-between">
+                    <span className="text-[10px] md:text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
                       {testimonial.tour}
+                    </span>
+                    <span className="text-[10px] text-gray-400 md:hidden">
+                      {testimonial.country}
                     </span>
                   </div>
                 </div>
@@ -189,49 +182,37 @@ export default function TestimonialsSection() {
             ))}
           </div>
 
-          <div className="flex items-center justify-between mt-8">
+          <div className="flex items-center justify-between mt-6 md:mt-10">
             <button
               onClick={handlePrev}
-              className="p-3 rounded-full bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-300 text-gray-700 hover:text-blue-600 transition-all cursor-pointer shadow-sm hover:shadow-md group"
-              aria-label="Previous testimonial"
+              className="p-2 md:p-3 cursor-pointer rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-blue-50 transition-all shadow-sm"
+              aria-label="Previous"
             >
-              <ChevronLeft
-                size={24}
-                className="transition-transform group-hover:-translate-x-1"
-              />
+              <ChevronLeft size={20} />
             </button>
 
-            <div className="flex gap-2 flex-wrap justify-center">
+            <div className="flex gap-1.5">
               {TESTIMONIALS.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => goToSlide(idx)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all cursor-pointer ${
+                  className={`transition-all cursor-pointer duration-300 h-1.5 rounded-full ${
                     idx === currentIndex
-                      ? "bg-blue-600 w-8"
-                      : "bg-gray-300 hover:bg-gray-400"
+                      ? "bg-blue-600 w-6"
+                      : "bg-gray-300 w-1.5"
                   }`}
-                  aria-label={`Go to testimonial ${idx + 1}`}
+                  aria-label={`Go to slide ${idx + 1}`}
                 />
               ))}
             </div>
 
             <button
               onClick={handleNext}
-              className="p-3 rounded-full bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-300 text-gray-700 hover:text-blue-600 transition-all cursor-pointer shadow-sm hover:shadow-md group"
-              aria-label="Next testimonial"
+              className="p-2 md:p-3 cursor-pointer rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-blue-50 transition-all shadow-sm"
+              aria-label="Next"
             >
-              <ChevronRight
-                size={24}
-                className="transition-transform group-hover:translate-x-1"
-              />
+              <ChevronRight size={20} />
             </button>
-          </div>
-
-          <div className="mt-12 text-center">
-            <p className="text-gray-600 text-sm mb-4">
-              {currentIndex + 1} of {TESTIMONIALS.length} testimonials
-            </p>
           </div>
         </div>
       </div>
