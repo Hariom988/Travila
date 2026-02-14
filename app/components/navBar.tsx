@@ -195,7 +195,7 @@ const Navbar = () => {
               <div
                 onMouseEnter={() => setIsDropdownOpen(true)}
                 onMouseLeave={() => setIsDropdownOpen(false)}
-                className={`absolute right-0 mt-2 w-72 bg-slate-900 rounded-xl shadow-2xl border border-slate-700 overflow-hidden transition-all duration-200 z-[110] ${
+                className={`absolute right-0 mt-2 w-72 bg-slate-900 rounded-xl shadow-2xl border border-slate-700 overflow-hidden transition-all duration-200 z-110 ${
                   isDropdownOpen
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-2 invisible"
