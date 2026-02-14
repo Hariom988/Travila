@@ -76,8 +76,7 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-slate-50 to-slate-100 py-16 md:py-24">
+      <div className="bg-linear-to-br from-slate-50 to-slate-100 py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
@@ -88,8 +87,6 @@ export default function BlogPage() {
               stories from around the world.
             </p>
           </div>
-
-          {/* Search Bar */}
           <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
             <div className="flex-1 relative">
               <Search
@@ -125,7 +122,6 @@ export default function BlogPage() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
         {loading ? (
           <div className="flex items-center justify-center py-24">
@@ -139,7 +135,6 @@ export default function BlogPage() {
           </div>
         ) : (
           <>
-            {/* Blog Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
               {blogs.map((blog) => (
                 <Link key={blog.id} href={`/blog/${blog.slug}`}>
@@ -154,7 +149,7 @@ export default function BlogPage() {
                           className="object-cover hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-blue-200 to-slate-200 flex items-center justify-center">
+                        <div className="w-full h-full bg-linear-to-br from-blue-200 to-slate-200 flex items-center justify-center">
                           <span className="text-slate-400">No image</span>
                         </div>
                       )}
@@ -165,7 +160,6 @@ export default function BlogPage() {
                       </div>
                     </div>
 
-                    {/* Content */}
                     <div className="p-6 flex-1 flex flex-col">
                       <h3 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 hover:text-blue-600 transition-colors">
                         {blog.title}
@@ -174,8 +168,6 @@ export default function BlogPage() {
                       <p className="text-slate-600 text-sm mb-4 line-clamp-2 flex-1">
                         {blog.excerpt}
                       </p>
-
-                      {/* Meta */}
                       <div className="space-y-3 border-t border-slate-200 pt-4">
                         <div className="flex items-center gap-4 text-xs text-slate-500">
                           <div className="flex items-center gap-1">
@@ -192,7 +184,6 @@ export default function BlogPage() {
                           {blog.viewCount} views
                         </div>
 
-                        {/* Tags */}
                         {blog.tags.length > 0 && (
                           <div className="flex gap-2 flex-wrap">
                             {blog.tags.slice(0, 2).map((tag) => (
@@ -207,7 +198,6 @@ export default function BlogPage() {
                         )}
                       </div>
 
-                      {/* Read More */}
                       <div className="mt-4 flex items-center text-blue-600 font-semibold text-sm hover:gap-1.5 transition-all">
                         Read More
                         <ChevronRight size={16} className="ml-1" />
@@ -217,8 +207,6 @@ export default function BlogPage() {
                 </Link>
               ))}
             </div>
-
-            {/* Pagination */}
             <div className="flex items-center justify-center gap-2">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
