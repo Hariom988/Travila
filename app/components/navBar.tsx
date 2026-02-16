@@ -53,6 +53,7 @@ const Navbar = () => {
       links: [
         { name: "Cruise", href: "/cruise" },
         { name: "About", href: "/about" },
+        { name: "Blogs", href: "/blog" },
         { name: "Contact", href: "/contact" },
       ],
     },
