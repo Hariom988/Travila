@@ -123,6 +123,12 @@ model Blog {
   @@index([createdAt])
 }
 
+// 8. Blog Categories
+model BlogCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
 // ENUMS
 enum Role {
   USER

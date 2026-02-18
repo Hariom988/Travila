@@ -18,7 +18,6 @@ import {
   Globe,
   FileText,
   FolderEdit,
-  ArrowRight,
 } from "lucide-react";
 
 interface Blog {
@@ -47,20 +46,12 @@ interface BlogFormData {
   published: boolean;
 }
 
-const DEFAULT_CATEGORIES = [
-  "Travel Tips",
-  "Destination Guide",
-  "Travel Stories",
-  "How-To",
-  "Reviews",
-];
-
 const EMPTY_FORM: BlogFormData = {
   title: "",
   excerpt: "",
   content: "",
   featuredImage: "",
-  category: "Travel Tips",
+  category: "",
   author: "HikinHigh Team",
   tags: "",
   published: false,
@@ -71,35 +62,44 @@ type ActiveView = "posts" | "categories";
 export function BlogSection() {
   const [activeView, setActiveView] = useState<ActiveView>("posts");
 
+  // Posts
   const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [blogsLoading, setBlogsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<
     "all" | "published" | "draft"
   >("all");
+
+  // Form / modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<BlogFormData>(EMPTY_FORM);
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Feedback
   const [successMessage, setSuccessMessage] = useState("");
   const [apiError, setApiError] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
+
+  // Categories — sourced entirely from DB via API
+  const [categories, setCategories] = useState<string[]>([]);
+  const [catsLoading, setCatsLoading] = useState(true);
   const [newCategory, setNewCategory] = useState("");
   const [renamingCategory, setRenamingCategory] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
-  const [categoryLoading, setCategoryLoading] = useState(false);
+  const [catActionLoading, setCatActionLoading] = useState(false);
 
   useEffect(() => {
     fetchBlogs();
     fetchCategories();
   }, []);
 
+  // ── Fetchers ─────────────────────────────────────────────
   const fetchBlogs = async () => {
-    setLoading(true);
+    setBlogsLoading(true);
     try {
       const res = await fetch("/api/blogs?all=true&limit=100", {
         credentials: "include",
@@ -109,23 +109,23 @@ export function BlogSection() {
     } catch {
       setApiError("Failed to load blogs");
     } finally {
-      setLoading(false);
+      setBlogsLoading(false);
     }
   };
 
   const fetchCategories = async () => {
+    setCatsLoading(true);
     try {
-      const res = await fetch("/api/blogs/categories?all=true", {
+      const res = await fetch("/api/blogs/categories", {
         credentials: "include",
       });
       const data = await res.json();
-      if (data.success && data.categories?.length > 0) {
-        const merged = Array.from(
-          new Set([...DEFAULT_CATEGORIES, ...data.categories]),
-        ) as string[];
-        setCategories(merged);
-      }
-    } catch {}
+      if (data.success) setCategories(data.categories);
+    } catch {
+      setApiError("Failed to load categories");
+    } finally {
+      setCatsLoading(false);
+    }
   };
 
   const showSuccess = (msg: string) => {
@@ -133,6 +133,7 @@ export function BlogSection() {
     setTimeout(() => setSuccessMessage(""), 3000);
   };
 
+  // ── Filtered posts ────────────────────────────────────────
   const filtered = blogs.filter((b) => {
     const matchSearch =
       b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -145,39 +146,70 @@ export function BlogSection() {
     return matchSearch && matchCat && matchStatus;
   });
 
+  // ── Modal helpers ─────────────────────────────────────────
   const openAdd = () => {
-    setFormData({ ...EMPTY_FORM, category: categories[0] || "Travel Tips" });
+    setFormData({ ...EMPTY_FORM, category: categories[0] ?? "" });
     setEditingId(null);
     setFormError("");
     setIsModalOpen(true);
   };
 
-  const openEdit = (blog: Blog) => {
+  const openEdit = async (blog: Blog) => {
+    // Open modal immediately with what we have so it feels snappy
     setFormData({
-      title: blog.title,
-      excerpt: blog.excerpt,
-      content: blog.content,
-      featuredImage: blog.featuredImage,
-      category: blog.category,
-      author: blog.author,
-      tags: blog.tags.join(", "),
+      title: blog.title ?? "",
+      excerpt: blog.excerpt ?? "",
+      content: "",
+      featuredImage: blog.featuredImage ?? "",
+      category: blog.category ?? "",
+      author: blog.author ?? "",
+      tags: (blog.tags ?? []).join(", "),
       published: blog.published,
     });
     setEditingId(blog.id);
     setFormError("");
+    setIsSubmitting(true);
     setIsModalOpen(true);
+
+    try {
+      // Fetch full blog (list endpoint omits content for performance)
+      const res = await fetch(`/api/blogs/${blog.id}`, {
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok && data.success && data.data) {
+        const full = data.data;
+        setFormData({
+          title: full.title ?? "",
+          excerpt: full.excerpt ?? "",
+          content: full.content ?? "",
+          featuredImage: full.featuredImage ?? "",
+          category: full.category ?? "",
+          author: full.author ?? "",
+          tags: (full.tags ?? []).join(", "),
+          published: full.published,
+        });
+      }
+    } catch {
+      setFormError(
+        "Failed to load full content. You can still edit other fields.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
+  // ── Blog CRUD ─────────────────────────────────────────────
   const handleSave = async () => {
-    if (!formData.title.trim()) {
+    if (!(formData.title ?? "").trim()) {
       setFormError("Title is required");
       return;
     }
-    if (!formData.excerpt.trim()) {
+    if (!(formData.excerpt ?? "").trim()) {
       setFormError("Excerpt is required");
       return;
     }
-    if (!formData.content.trim()) {
+    if (!(formData.content ?? "").trim()) {
       setFormError("Content is required");
       return;
     }
@@ -208,7 +240,6 @@ export function BlogSection() {
       showSuccess(editingId ? "Blog updated!" : "Blog created!");
       setIsModalOpen(false);
       await fetchBlogs();
-      await fetchCategories();
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Operation failed");
     } finally {
@@ -226,7 +257,6 @@ export function BlogSection() {
       if (!res.ok) throw new Error("Failed to delete");
       showSuccess("Blog deleted!");
       setBlogs((prev) => prev.filter((b) => b.id !== id));
-      await fetchCategories();
     } catch {
       setApiError("Failed to delete blog");
     }
@@ -270,88 +300,123 @@ export function BlogSection() {
     reader.readAsDataURL(file);
   };
 
-  const handleAddCategory = () => {
+  // ── Category CRUD ─────────────────────────────────────────
+  const handleAddCategory = async () => {
     const trimmed = newCategory.trim();
-    if (!trimmed || categories.includes(trimmed)) return;
-    setCategories((prev) => [...prev, trimmed]);
-    setNewCategory("");
-    showSuccess(`Category "${trimmed}" added!`);
-  };
-
-  const handleDeleteCategory = async (cat: string) => {
-    const postsInCat = blogs.filter((b) => b.category === cat).length;
-    if (postsInCat > 0) {
-      if (
-        !window.confirm(
-          `"${cat}" has ${postsInCat} post(s). Deleting it won't delete the posts but they'll keep the old category name. Continue?`,
-        )
-      )
-        return;
-    } else {
-      if (!window.confirm(`Delete category "${cat}"?`)) return;
+    if (!trimmed) return;
+    setCatActionLoading(true);
+    try {
+      const res = await fetch("/api/blogs/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ name: trimmed }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      setCategories((prev) => [...prev, trimmed].sort());
+      setNewCategory("");
+      showSuccess(`Category "${trimmed}" added!`);
+    } catch (err) {
+      setApiError(
+        err instanceof Error ? err.message : "Failed to add category",
+      );
+    } finally {
+      setCatActionLoading(false);
     }
-    setCategories((prev) => prev.filter((c) => c !== cat));
-    showSuccess(`Category "${cat}" removed!`);
   };
 
-  const handleRenameCategory = async (oldCat: string) => {
+  const handleDeleteCategory = async (name: string) => {
+    const postCount = blogs.filter((b) => b.category === name).length;
+    const msg =
+      postCount > 0
+        ? `"${name}" has ${postCount} post(s). Those posts will keep the category name but it won't appear as a filter on the blog page. Delete anyway?`
+        : `Delete category "${name}"?`;
+    if (!window.confirm(msg)) return;
+
+    setCatActionLoading(true);
+    try {
+      const res = await fetch("/api/blogs/categories", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ name }),
+      });
+      if (!res.ok) throw new Error("Failed to delete");
+      setCategories((prev) => prev.filter((c) => c !== name));
+      showSuccess(`Category "${name}" deleted!`);
+    } catch (err) {
+      setApiError(
+        err instanceof Error ? err.message : "Failed to delete category",
+      );
+    } finally {
+      setCatActionLoading(false);
+    }
+  };
+
+  const handleRenameCategory = async (oldName: string) => {
     const trimmed = renameValue.trim();
-    if (!trimmed || trimmed === oldCat) {
+    if (!trimmed || trimmed === oldName) {
       setRenamingCategory(null);
       return;
     }
 
-    setCategoryLoading(true);
+    setCatActionLoading(true);
     try {
       const res = await fetch("/api/blogs/categories", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ oldCategory: oldCat, newCategory: trimmed }),
+        body: JSON.stringify({ oldName, newName: trimmed }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) throw new Error(data.error || "Failed");
 
-      setCategories((prev) => prev.map((c) => (c === oldCat ? trimmed : c)));
+      // Sync local state
+      setCategories((prev) =>
+        prev.map((c) => (c === oldName ? trimmed : c)).sort(),
+      );
       setBlogs((prev) =>
         prev.map((b) =>
-          b.category === oldCat ? { ...b, category: trimmed } : b,
+          b.category === oldName ? { ...b, category: trimmed } : b,
         ),
       );
-      showSuccess(data.message);
       setRenamingCategory(null);
+      showSuccess(data.message);
     } catch (err) {
-      setApiError(err instanceof Error ? err.message : "Failed to rename");
+      setApiError(
+        err instanceof Error ? err.message : "Failed to rename category",
+      );
     } finally {
-      setCategoryLoading(false);
+      setCatActionLoading(false);
     }
   };
 
   return (
     <>
+      {/* ── View toggle ───────────────────────────────────── */}
       <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setActiveView("posts")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${
-            activeView === "posts"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-800 text-gray-400 hover:text-white border border-gray-700"
-          }`}
-        >
-          <FileText size={16} /> Blog Posts
-        </button>
-        <button
-          onClick={() => setActiveView("categories")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${
-            activeView === "categories"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-800 text-gray-400 hover:text-white border border-gray-700"
-          }`}
-        >
-          <FolderEdit size={16} /> Manage Categories
-        </button>
+        {(["posts", "categories"] as ActiveView[]).map((view) => (
+          <button
+            key={view}
+            onClick={() => setActiveView(view)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${
+              activeView === view
+                ? "bg-blue-600 text-white"
+                : "bg-gray-800 text-gray-400 hover:text-white border border-gray-700"
+            }`}
+          >
+            {view === "posts" ? (
+              <FileText size={16} />
+            ) : (
+              <FolderEdit size={16} />
+            )}
+            {view === "posts" ? "Blog Posts" : "Manage Categories"}
+          </button>
+        ))}
       </div>
 
+      {/* ── Alerts ───────────────────────────────────────── */}
       {apiError && (
         <div className="mb-4 p-4 bg-red-900/30 border border-red-700 rounded-lg flex items-center gap-3 text-red-300">
           <AlertCircle size={20} />
@@ -370,6 +435,10 @@ export function BlogSection() {
           <span>{successMessage}</span>
         </div>
       )}
+
+      {/* ══════════════════════════════════════════════════════ */}
+      {/* POSTS VIEW                                             */}
+      {/* ══════════════════════════════════════════════════════ */}
       {activeView === "posts" && (
         <>
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
@@ -401,7 +470,11 @@ export function BlogSection() {
               </select>
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as any)}
+                onChange={(e) =>
+                  setStatusFilter(
+                    e.target.value as "all" | "published" | "draft",
+                  )
+                }
                 className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none"
               >
                 <option value="all">All Status</option>
@@ -417,8 +490,9 @@ export function BlogSection() {
             </button>
           </div>
 
+          {/* Desktop table */}
           <div className="hidden md:block bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
-            {loading ? (
+            {blogsLoading ? (
               <div className="p-12 text-center">
                 <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4" />
                 <p className="text-gray-400">Loading blogs...</p>
@@ -443,27 +517,22 @@ export function BlogSection() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-gray-700 border-b border-gray-600">
-                      <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                        Title
-                      </th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                        Category
-                      </th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                        Author
-                      </th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                        Views
-                      </th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                        Status
-                      </th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                        Date
-                      </th>
-                      <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                        Actions
-                      </th>
+                      {[
+                        "Title",
+                        "Category",
+                        "Author",
+                        "Views",
+                        "Status",
+                        "Date",
+                        "Actions",
+                      ].map((h) => (
+                        <th
+                          key={h}
+                          className="px-6 py-4 text-left font-semibold text-gray-200"
+                        >
+                          {h}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-700">
@@ -473,14 +542,12 @@ export function BlogSection() {
                         className="hover:bg-gray-750 transition"
                       >
                         <td className="px-6 py-4">
-                          <div>
-                            <p className="text-white font-medium line-clamp-1">
-                              {blog.title}
-                            </p>
-                            <p className="text-gray-500 text-xs mt-0.5">
-                              /{blog.slug}
-                            </p>
-                          </div>
+                          <p className="text-white font-medium line-clamp-1">
+                            {blog.title}
+                          </p>
+                          <p className="text-gray-500 text-xs mt-0.5">
+                            /{blog.slug}
+                          </p>
                         </td>
                         <td className="px-6 py-4">
                           <span className="px-2 py-1 bg-indigo-900/40 text-indigo-300 text-xs rounded">
@@ -524,7 +591,7 @@ export function BlogSection() {
                             <button
                               onClick={() => handleTogglePublish(blog)}
                               disabled={updatingId === blog.id}
-                              className={`p-2 cursor-pointer rounded transition ${blog.published ? "bg-gray-700 hover:bg-yellow-700 text-gray-300" : "bg-gray-700 hover:bg-green-700 text-gray-300"}`}
+                              className="p-2 cursor-pointer bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition"
                               title={blog.published ? "Unpublish" : "Publish"}
                             >
                               {blog.published ? (
@@ -550,8 +617,9 @@ export function BlogSection() {
             )}
           </div>
 
+          {/* Mobile cards */}
           <div className="md:hidden space-y-3">
-            {loading ? (
+            {blogsLoading ? (
               <div className="p-12 text-center">
                 <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4" />
                 <p className="text-gray-400">Loading...</p>
@@ -593,7 +661,7 @@ export function BlogSection() {
                     />
                   </div>
                   {expandedId === blog.id && (
-                    <div className="border-t border-gray-700 p-4 space-y-3">
+                    <div className="border-t border-gray-700 p-4">
                       <div className="flex gap-2">
                         <button
                           onClick={() => openEdit(blog)}
@@ -624,17 +692,21 @@ export function BlogSection() {
         </>
       )}
 
+      {/* ══════════════════════════════════════════════════════ */}
+      {/* CATEGORIES VIEW                                        */}
+      {/* ══════════════════════════════════════════════════════ */}
       {activeView === "categories" && (
-        <div className="mx-auto max-w-2xl lg:max-w-full">
+        <div className="max-w-2xl">
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 mb-6">
             <h3 className="text-white font-semibold text-lg mb-1">
               Blog Categories
             </h3>
             <p className="text-gray-400 text-sm mb-6">
-              Add, rename, or remove categories. Renaming updates all existing
-              posts automatically.
+              All changes are saved to the database and sync instantly across
+              the blog page.
             </p>
 
+            {/* Add new */}
             <div className="flex gap-2 mb-6">
               <input
                 type="text"
@@ -646,106 +718,131 @@ export function BlogSection() {
               />
               <button
                 onClick={handleAddCategory}
-                disabled={!newCategory.trim()}
+                disabled={!newCategory.trim() || catActionLoading}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition disabled:opacity-40 cursor-pointer"
               >
-                <Plus size={16} /> Add
+                {catActionLoading ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Plus size={16} />
+                )}
+                Add
               </button>
             </div>
 
-            <div className="space-y-2">
-              {categories.map((cat) => {
-                const postCount = blogs.filter(
-                  (b) => b.category === cat,
-                ).length;
-                const isRenaming = renamingCategory === cat;
+            {/* Category list */}
+            {catsLoading ? (
+              <div className="text-center py-8">
+                <div className="inline-block w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : categories.length === 0 ? (
+              <div className="text-center py-8 text-gray-500 text-sm">
+                No categories yet. Add one above.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {categories.map((cat) => {
+                  const postCount = blogs.filter(
+                    (b) => b.category === cat,
+                  ).length;
+                  const isRenaming = renamingCategory === cat;
 
-                return (
-                  <div
-                    key={cat}
-                    className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg border border-gray-600"
-                  >
-                    <div className="w-2 h-2 rounded-full bg-indigo-400 shrink-0" />
+                  return (
+                    <div
+                      key={cat}
+                      className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg border border-gray-600"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-indigo-400 shrink-0" />
 
-                    {isRenaming ? (
-                      <input
-                        type="text"
-                        value={renameValue}
-                        onChange={(e) => setRenameValue(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleRenameCategory(cat);
-                          if (e.key === "Escape") setRenamingCategory(null);
-                        }}
-                        autoFocus
-                        className="flex-1 px-3 py-1 bg-gray-600 border border-blue-500 rounded text-white text-sm focus:outline-none"
-                      />
-                    ) : (
-                      <span className="flex-1 text-white text-sm font-medium">
-                        {cat}
-                      </span>
-                    )}
-
-                    <span className="text-gray-400 text-xs whitespace-nowrap">
-                      {postCount} post{postCount !== 1 ? "s" : ""}
-                    </span>
-
-                    {isRenaming ? (
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => handleRenameCategory(cat)}
-                          disabled={categoryLoading}
-                          className="p-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-xs cursor-pointer transition"
-                        >
-                          {categoryLoading ? "..." : <CheckCircle size={14} />}
-                        </button>
-                        <button
-                          onClick={() => setRenamingCategory(null)}
-                          className="p-1.5 bg-gray-600 hover:bg-gray-500 text-white rounded cursor-pointer transition"
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => {
-                            setRenamingCategory(cat);
-                            setRenameValue(cat);
+                      {isRenaming ? (
+                        <input
+                          type="text"
+                          value={renameValue}
+                          onChange={(e) => setRenameValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") handleRenameCategory(cat);
+                            if (e.key === "Escape") setRenamingCategory(null);
                           }}
-                          className="p-1.5 bg-gray-600 hover:bg-blue-600 text-gray-300 hover:text-white rounded transition cursor-pointer"
-                          title="Rename"
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteCategory(cat)}
-                          className="p-1.5 bg-gray-600 hover:bg-red-600 text-gray-300 hover:text-white rounded transition cursor-pointer"
-                          title="Delete"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                          autoFocus
+                          className="flex-1 px-3 py-1 bg-gray-600 border border-blue-500 rounded text-white text-sm focus:outline-none"
+                        />
+                      ) : (
+                        <span className="flex-1 text-white text-sm font-medium">
+                          {cat}
+                        </span>
+                      )}
+
+                      <span className="text-gray-400 text-xs whitespace-nowrap">
+                        {postCount} post{postCount !== 1 ? "s" : ""}
+                      </span>
+
+                      {isRenaming ? (
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => handleRenameCategory(cat)}
+                            disabled={catActionLoading}
+                            className="p-1.5 bg-green-600 hover:bg-green-700 text-white rounded cursor-pointer transition"
+                          >
+                            {catActionLoading ? (
+                              "..."
+                            ) : (
+                              <CheckCircle size={14} />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => setRenamingCategory(null)}
+                            className="p-1.5 bg-gray-600 hover:bg-gray-500 text-white rounded cursor-pointer transition"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => {
+                              setRenamingCategory(cat);
+                              setRenameValue(cat);
+                            }}
+                            disabled={catActionLoading}
+                            className="p-1.5 bg-gray-600 hover:bg-blue-600 text-gray-300 hover:text-white rounded transition cursor-pointer disabled:opacity-40"
+                            title="Rename"
+                          >
+                            <Edit2 size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCategory(cat)}
+                            disabled={catActionLoading}
+                            className="p-1.5 bg-gray-600 hover:bg-red-600 text-gray-300 hover:text-white rounded transition cursor-pointer disabled:opacity-40"
+                            title="Delete"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          <div className="bg-yellow-900/20 border border-yellow-700/40 rounded-lg p-4">
-            <div className="flex gap-2 text-yellow-300 text-sm">
+          <div className="bg-blue-900/20 border border-blue-700/40 rounded-lg p-4">
+            <div className="flex gap-2 text-blue-300 text-sm">
               <AlertCircle size={16} className="shrink-0 mt-0.5" />
               <p>
-                <strong>Renaming</strong> a category updates all blog posts with
-                that category in the database instantly.{" "}
-                <strong>Deleting</strong> a category only removes it from this
-                list — existing posts keep their old category name until edited.
+                Categories are saved in the database. <strong>Renaming</strong>{" "}
+                updates all posts instantly. <strong>Deleting</strong> removes
+                it from the filter pills on the blog page — posts with that
+                category become unlisted in filters until reassigned.
               </p>
             </div>
           </div>
         </div>
       )}
 
+      {/* ══════════════════════════════════════════════════════ */}
+      {/* BLOG MODAL                                             */}
+      {/* ══════════════════════════════════════════════════════ */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 flex items-start justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-gray-800 border border-gray-700 rounded-xl w-full max-w-3xl my-8 shadow-2xl">
@@ -805,7 +902,7 @@ export function BlogSection() {
                   disabled={isSubmitting}
                   rows={2}
                   className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm disabled:opacity-50 resize-none"
-                  placeholder="A short teaser that appears on the blog listing page..."
+                  placeholder="A short teaser..."
                 />
               </div>
 
@@ -838,6 +935,9 @@ export function BlogSection() {
                     disabled={isSubmitting}
                     className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500 text-sm disabled:opacity-50"
                   >
+                    {categories.length === 0 && (
+                      <option value="">No categories — add one first</option>
+                    )}
                     {categories.map((c) => (
                       <option key={c} value={c}>
                         {c}
@@ -902,10 +1002,10 @@ export function BlogSection() {
                     }
                     disabled={isSubmitting}
                     className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm disabled:opacity-50"
-                    placeholder="Upload Below"
+                    placeholder="https://images.unsplash.com/..."
                   />
                   <label className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-gray-500 transition text-gray-400 text-sm">
-                    <Upload size={16} />
+                    <Upload size={16} /> Upload image file
                     <input
                       type="file"
                       accept="image/*"
@@ -945,7 +1045,7 @@ export function BlogSection() {
                     <p className="text-gray-400 text-xs">
                       {formData.published
                         ? "Visible to all visitors"
-                        : "Save as draft — not visible to visitors"}
+                        : "Save as draft — not visible"}
                     </p>
                   </div>
                 </div>
