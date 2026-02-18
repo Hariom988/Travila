@@ -21,7 +21,15 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "**",
+        port: "",
+        pathname: "/**",
+      },
     ],
+    dangerouslyAllowSVG: true,
+    unoptimized: true,
   },
 };
 

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { BookingsSection } from "./booking-section";
+import { BlogSection } from "./blogSection";
 
 interface Hotel {
   id: string;
@@ -84,7 +85,7 @@ interface FormData {
   images: string[];
 }
 
-type TabType = "hotels" | "activities" | "bookings";
+type TabType = "hotels" | "activities" | "bookings" | "blogs";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -172,27 +173,17 @@ export default function AdminDashboard() {
       extraField: "",
       hasToggle: false,
     },
-  };
-
-  const formatDescription = (text: string) => {
-    if (!text) return "";
-
-    const lines = text
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => line);
-
-    return (
-      <div className="space-y-3">
-        {lines.map((line, index) => (
-          <div key={index} className="flex gap-3">
-            <div className="shrink-0 w-2 h-2 rounded-full bg-blue-600 mt-2" />
-
-            <p className="text-gray-700 leading-relaxed">{line}</p>
-          </div>
-        ))}
-      </div>
-    );
+    blogs: {
+      label: "Blogs",
+      endpoint: "/api/blogs",
+      addLabel: "",
+      modalTitle: () => "",
+      successMsg: () => "",
+      fields: [] as const,
+      priceLabel: "",
+      extraField: "",
+      hasToggle: false,
+    },
   };
 
   useEffect(() => {
@@ -200,6 +191,11 @@ export default function AdminDashboard() {
   }, [activeTab, bookingFilter, statusFilter]);
 
   const fetchData = async () => {
+    // Blogs tab manages its own data fetching inside BlogSection
+    if (activeTab === "blogs") {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       if (activeTab === "hotels") {
@@ -214,7 +210,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const fetchItems = async (type: Exclude<TabType, "bookings">) => {
+  const fetchItems = async (type: Exclude<TabType, "bookings" | "blogs">) => {
     try {
       const endpoint = tabConfig[type].endpoint;
       const response = await fetch(endpoint, {
@@ -228,7 +224,6 @@ export default function AdminDashboard() {
       const contentType = response.headers.get("content-type");
 
       if (!response.ok) {
-        const text = await response.text();
         throw new Error(`Failed to fetch ${type}: ${response.status}`);
       }
 
@@ -405,7 +400,7 @@ export default function AdminDashboard() {
 
       setSuccessMessage(tabConfig[activeTab].successMsg(!!editingId));
       setIsModalOpen(false);
-      await fetchItems(activeTab as Exclude<TabType, "bookings">);
+      await fetchItems(activeTab as Exclude<TabType, "bookings" | "blogs">);
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "Operation failed");
@@ -451,7 +446,7 @@ export default function AdminDashboard() {
       if (!response.ok) throw new Error("Failed to delete");
 
       setSuccessMessage("Deleted successfully!");
-      await fetchItems(activeTab as Exclude<TabType, "bookings">);
+      await fetchItems(activeTab as Exclude<TabType, "bookings" | "blogs">);
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "Delete failed");
@@ -539,19 +534,21 @@ export default function AdminDashboard() {
       <div className="bg-gray-800 border-b border-gray-700 sticky top-18 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex gap-8 overflow-x-auto">
-            {(["hotels", "activities", "bookings"] as TabType[]).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`py-4 cursor-pointer px-2 font-medium transition border-b-2 whitespace-nowrap ${
-                  activeTab === tab
-                    ? "text-blue-400 border-blue-400"
-                    : "text-gray-400 border-transparent hover:text-gray-300"
-                }`}
-              >
-                {tabConfig[tab].label}
-              </button>
-            ))}
+            {(["hotels", "activities", "bookings", "blogs"] as TabType[]).map(
+              (tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`py-4 cursor-pointer px-2 font-medium transition border-b-2 whitespace-nowrap ${
+                    activeTab === tab
+                      ? "text-blue-400 border-blue-400"
+                      : "text-gray-400 border-transparent hover:text-gray-300"
+                  }`}
+                >
+                  {tabConfig[tab].label}
+                </button>
+              ),
+            )}
           </div>
         </div>
       </div>
@@ -571,7 +568,32 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {activeTab !== "bookings" && (
+        {/* ── Blogs tab ───────────────────────────────────── */}
+        {activeTab === "blogs" && <BlogSection />}
+
+        {/* ── Bookings tab ─────────────────────────────────── */}
+        {activeTab === "bookings" && (
+          <BookingsSection
+            bookings={bookings}
+            loading={loading}
+            onBookingUpdated={(updatedBooking) => {
+              setBookings((prev) =>
+                prev.map((b) =>
+                  b.id === updatedBooking.id ? updatedBooking : b,
+                ),
+              );
+            }}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            bookingFilter={bookingFilter}
+            onBookingFilterChange={setBookingFilter}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+          />
+        )}
+
+        {/* ── Hotels / Activities tabs ──────────────────────── */}
+        {activeTab !== "bookings" && activeTab !== "blogs" && (
           <>
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
               <div className="relative w-full sm:w-64">
@@ -923,29 +945,9 @@ export default function AdminDashboard() {
             </div>
           </>
         )}
-
-        {activeTab === "bookings" && (
-          <BookingsSection
-            bookings={bookings}
-            loading={loading}
-            onBookingUpdated={(updatedBooking) => {
-              setBookings((prev) =>
-                prev.map((b) =>
-                  b.id === updatedBooking.id ? updatedBooking : b,
-                ),
-              );
-            }}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            bookingFilter={bookingFilter}
-            onBookingFilterChange={setBookingFilter}
-            statusFilter={statusFilter}
-            onStatusFilterChange={setStatusFilter}
-          />
-        )}
       </div>
 
-      {isModalOpen && activeTab !== "bookings" && (
+      {isModalOpen && activeTab !== "bookings" && activeTab !== "blogs" && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">

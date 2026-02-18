@@ -24,7 +24,7 @@ model User {
 
   hotelBookings    HotelBooking[]
   activityBookings ActivityBooking[]
-  activityLogs     ActivityLog[] // NEW: Link to activity logs
+  activityLogs     ActivityLog[]
 }
 
 // 2. HOTELS
@@ -90,17 +90,37 @@ model ActivityBooking {
   activity   Activity @relation(fields: [activityId], references: [id])
 }
 
-// 6. ACTIVITY LOGS - NEW!
+// 6. ACTIVITY LOGS
 model ActivityLog {
   id        String   @id @default(uuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  action    String // LOGIN, CREATE_HOTEL, UPDATE_HOTEL, TOGGLE_HOTEL, DELETE_HOTEL, CREATE_ACTIVITY, UPDATE_ACTIVITY, DELETE_ACTIVITY
-  details   String   @default("") // What was created/updated
+  action    String
+  details   String   @default("")
   timestamp DateTime @default(now())
 
   @@index([userId])
   @@index([timestamp])
+}
+
+// 7. BLOGS
+model Blog {
+  id            String   @id @default(uuid())
+  title         String
+  slug          String   @unique
+  excerpt       String   @default("")
+  content       String   @default("")
+  featuredImage String   @default("")
+  category      String   @default("Travel Tips")
+  author        String   @default("HikinHigh Team")
+  tags          String[]
+  published     Boolean  @default(false)
+  viewCount     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([published])
+  @@index([createdAt])
 }
 
 // ENUMS
