@@ -28,7 +28,6 @@ export async function GET(
 
     return NextResponse.json({ success: true, data: blog });
   } catch (error) {
-    console.error('Error fetching blog:', error);
     return NextResponse.json({ error: 'Failed to fetch blog' }, { status: 500 });
   }
 }
@@ -70,7 +69,6 @@ export async function PUT(
     if (error.code === 'P2025') {
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
-    console.error('Error updating blog:', error);
     return NextResponse.json({ error: 'Failed to update blog' }, { status: 500 });
   }
 }
@@ -99,7 +97,6 @@ export async function DELETE(
     if (error.code === 'P2025') {
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
-    console.error('Error deleting blog:', error);
     return NextResponse.json({ error: 'Failed to delete blog' }, { status: 500 });
   }
 }
@@ -136,7 +133,6 @@ export async function PATCH(
     if (error.code === 'P2025') {
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
-    console.error('Error toggling blog:', error);
     return NextResponse.json({ error: 'Failed to update blog' }, { status: 500 });
   }
 }

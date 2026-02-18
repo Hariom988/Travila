@@ -35,7 +35,6 @@ const BlogPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
-  // Fetch categories from API
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -44,14 +43,11 @@ const BlogPage = () => {
         if (data.success && data.categories?.length > 0) {
           setCategories(["All", ...data.categories]);
         }
-      } catch {
-        // fallback: categories will be derived from fetched blogs
-      }
+      } catch {}
     };
     fetchCategories();
   }, []);
 
-  // Fetch blogs
   useEffect(() => {
     const timer = setTimeout(
       () => {
@@ -81,7 +77,6 @@ const BlogPage = () => {
       setTotalPages(data.pagination?.pages ?? 1);
       setTotal(data.pagination?.total ?? 0);
 
-      // Derive categories from blogs if API categories endpoint not available
       if (categories.length <= 1 && data.data?.length > 0) {
         const cats = [
           "All",
@@ -121,7 +116,6 @@ const BlogPage = () => {
 
   return (
     <div className="min-h-screen bg-white text-slate-800 font-sans">
-      {/* Hero */}
       <section className="py-12 px-4 bg-slate-50 border-b border-slate-100">
         <div className="container mx-auto max-w-6xl">
           <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4">
@@ -136,7 +130,6 @@ const BlogPage = () => {
             </span>
           </p>
 
-          {/* Search */}
           <div className="relative max-w-md">
             <Search
               className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
@@ -154,7 +147,6 @@ const BlogPage = () => {
       </section>
 
       <main className="container mx-auto max-w-6xl px-4 py-8">
-        {/* Categories */}
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar md:justify-start">
           {categories.map((cat) => (
             <button
@@ -171,14 +163,12 @@ const BlogPage = () => {
           ))}
         </div>
 
-        {/* Total count */}
         {!loading && total > 0 && (
           <p className="text-slate-400 text-xs mb-4">
             Showing {filteredPosts.length} of {total} articles
           </p>
         )}
 
-        {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <Loader className="w-8 h-8 text-blue-600 animate-spin" />
@@ -252,7 +242,6 @@ const BlogPage = () => {
               ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-3 mt-12">
                 <button

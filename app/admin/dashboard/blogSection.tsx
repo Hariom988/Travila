@@ -71,7 +71,6 @@ type ActiveView = "posts" | "categories";
 export function BlogSection() {
   const [activeView, setActiveView] = useState<ActiveView>("posts");
 
-  // Posts state
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -79,21 +78,15 @@ export function BlogSection() {
   const [statusFilter, setStatusFilter] = useState<
     "all" | "published" | "draft"
   >("all");
-
-  // Form / modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<BlogFormData>(EMPTY_FORM);
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Feedback
   const [successMessage, setSuccessMessage] = useState("");
   const [apiError, setApiError] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-
-  // Categories state
   const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
   const [newCategory, setNewCategory] = useState("");
   const [renamingCategory, setRenamingCategory] = useState<string | null>(null);
@@ -127,15 +120,12 @@ export function BlogSection() {
       });
       const data = await res.json();
       if (data.success && data.categories?.length > 0) {
-        // merge with defaults so we always have something
         const merged = Array.from(
           new Set([...DEFAULT_CATEGORIES, ...data.categories]),
         ) as string[];
         setCategories(merged);
       }
-    } catch {
-      // keep defaults
-    }
+    } catch {}
   };
 
   const showSuccess = (msg: string) => {
@@ -143,7 +133,6 @@ export function BlogSection() {
     setTimeout(() => setSuccessMessage(""), 3000);
   };
 
-  // ── Filter ──────────────────────────────────────────────
   const filtered = blogs.filter((b) => {
     const matchSearch =
       b.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -156,7 +145,6 @@ export function BlogSection() {
     return matchSearch && matchCat && matchStatus;
   });
 
-  // ── Modal helpers ────────────────────────────────────────
   const openAdd = () => {
     setFormData({ ...EMPTY_FORM, category: categories[0] || "Travel Tips" });
     setEditingId(null);
@@ -180,7 +168,6 @@ export function BlogSection() {
     setIsModalOpen(true);
   };
 
-  // ── CRUD ────────────────────────────────────────────────
   const handleSave = async () => {
     if (!formData.title.trim()) {
       setFormError("Title is required");
@@ -283,7 +270,6 @@ export function BlogSection() {
     reader.readAsDataURL(file);
   };
 
-  // ── Category management ──────────────────────────────────
   const handleAddCategory = () => {
     const trimmed = newCategory.trim();
     if (!trimmed || categories.includes(trimmed)) return;
@@ -343,7 +329,6 @@ export function BlogSection() {
 
   return (
     <>
-      {/* ── View toggle ───────────────────────────────────── */}
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => setActiveView("posts")}
@@ -367,7 +352,6 @@ export function BlogSection() {
         </button>
       </div>
 
-      {/* ── Alerts ───────────────────────────────────────── */}
       {apiError && (
         <div className="mb-4 p-4 bg-red-900/30 border border-red-700 rounded-lg flex items-center gap-3 text-red-300">
           <AlertCircle size={20} />
@@ -386,10 +370,6 @@ export function BlogSection() {
           <span>{successMessage}</span>
         </div>
       )}
-
-      {/* ══════════════════════════════════════════════════ */}
-      {/* POSTS VIEW                                         */}
-      {/* ══════════════════════════════════════════════════ */}
       {activeView === "posts" && (
         <>
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
@@ -437,7 +417,6 @@ export function BlogSection() {
             </button>
           </div>
 
-          {/* Desktop table */}
           <div className="hidden md:block bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
             {loading ? (
               <div className="p-12 text-center">
@@ -571,7 +550,6 @@ export function BlogSection() {
             )}
           </div>
 
-          {/* Mobile cards */}
           <div className="md:hidden space-y-3">
             {loading ? (
               <div className="p-12 text-center">
@@ -657,7 +635,6 @@ export function BlogSection() {
               posts automatically.
             </p>
 
-            {/* Add new category */}
             <div className="flex gap-2 mb-6">
               <input
                 type="text"
@@ -676,7 +653,6 @@ export function BlogSection() {
               </button>
             </div>
 
-            {/* Category list */}
             <div className="space-y-2">
               {categories.map((cat) => {
                 const postCount = blogs.filter(
@@ -926,10 +902,10 @@ export function BlogSection() {
                     }
                     disabled={isSubmitting}
                     className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm disabled:opacity-50"
-                    placeholder="https://images.unsplash.com/... or upload below"
+                    placeholder="Upload Below"
                   />
                   <label className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-gray-500 transition text-gray-400 text-sm">
-                    <Upload size={16} /> Upload image file
+                    <Upload size={16} />
                     <input
                       type="file"
                       accept="image/*"
