@@ -1,7 +1,25 @@
 "use client";
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { Search, ArrowLeft, ArrowUpDown, X } from "lucide-react";
+import {
+  Search,
+  ArrowLeft,
+  ArrowUpDown,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Shield,
+  Headphones,
+  CreditCard,
+  MapPin,
+  Star,
+  TrendingUp,
+  Award,
+  Clock,
+  Users,
+  ThumbsUp,
+  Globe,
+} from "lucide-react";
 import SearchBar from "./searchBar";
 import TourCard from "./tourCard";
 
@@ -20,13 +38,371 @@ interface Tour {
 
 type SortOption = "high-to-low" | "low-to-high" | "top-rated" | "default";
 
-const PRICE_RANGES = [
-  { label: "$0-$1500", min: 0, max: 1500 },
-  { label: "$1500-$2500", min: 1500, max: 2500 },
-  { label: "$2500-$5000", min: 2500, max: 5000 },
-  { label: "$5000-$7500", min: 5000, max: 7500 },
-  { label: "$7500+", min: 7500, max: 100000 },
-];
+const ITEMS_PER_PAGE = 12;
+
+const Pagination = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) => {
+  if (totalPages <= 1) return null;
+
+  const getPages = (): (number | "...")[] => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const pages: (number | "...")[] = [1];
+    if (currentPage > 3) pages.push("...");
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (currentPage < totalPages - 2) pages.push("...");
+    pages.push(totalPages);
+    return pages;
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-2 mt-10">
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage <= 1}
+        className="w-10 h-10 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+      >
+        <ChevronLeft size={18} />
+      </button>
+
+      {getPages().map((page, i) =>
+        page === "..." ? (
+          <span
+            key={`dots-${i}`}
+            className="w-10 text-center text-slate-400 font-bold select-none"
+          >
+            …
+          </span>
+        ) : (
+          <button
+            key={`page-${page}`}
+            onClick={() => onPageChange(page as number)}
+            className={`w-10 h-10 rounded-xl text-sm font-bold transition-all shadow-sm ${
+              currentPage === page
+                ? "bg-blue-600 text-white border border-blue-600 shadow-blue-200 shadow-md "
+                : "bg-white border border-slate-200 text-slate-700 hover:border-blue-400 hover:text-blue-600"
+            }`}
+          >
+            {page}
+          </button>
+        ),
+      )}
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage >= totalPages}
+        className="w-10 h-10 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+      >
+        <ChevronRight size={18} />
+      </button>
+    </div>
+  );
+};
+
+const WhyBookWithUs = () => {
+  const features = [
+    {
+      icon: <Shield className="w-6 h-6" />,
+      title: "Secure Booking",
+      desc: "Your payments and personal data are protected with bank-level encryption.",
+      bg: "bg-blue-50",
+      text: "text-blue-600",
+    },
+    {
+      icon: <Headphones className="w-6 h-6" />,
+      title: "24/7 Support",
+      desc: "Our travel experts are available round the clock to assist you anytime.",
+      bg: "bg-purple-50",
+      text: "text-purple-600",
+    },
+    {
+      icon: <CreditCard className="w-6 h-6" />,
+      title: "Best Price Guarantee",
+      desc: "Find a lower price? We'll match it — no questions asked.",
+      bg: "bg-emerald-50",
+      text: "text-emerald-600",
+    },
+    {
+      icon: <ThumbsUp className="w-6 h-6" />,
+      title: "Free Cancellation",
+      desc: "Plans change — cancel up to 48 hours before check-in, completely free.",
+      bg: "bg-orange-50",
+      text: "text-orange-600",
+    },
+  ];
+
+  return (
+    <section className="mt-16">
+      <div className="text-center mb-10">
+        <p className="text-blue-600 font-bold italic text-sm mb-1">
+          Trusted by 50,000+ Travellers
+        </p>
+        <h2 className="text-3xl font-black text-slate-900">
+          Why Book With HikinHigh?
+        </h2>
+        <p className="text-slate-500 mt-2 text-sm max-w-xl mx-auto">
+          We go beyond just listing hotels — we curate experiences, handle
+          details, and ensure your journey is seamless from start to finish.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {features.map((f, i) => (
+          <div
+            key={i}
+            className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all group"
+          >
+            <div
+              className={`w-12 h-12 rounded-xl ${f.bg} ${f.text} flex items-center justify-center mb-4  transition-transform`}
+            >
+              {f.icon}
+            </div>
+            <h3 className="font-bold text-slate-900 mb-2">{f.title}</h3>
+            <p className="text-slate-500 text-sm leading-relaxed">{f.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+const StatsBar = () => (
+  <section className="mt-16 bg-linear-to-r from-blue-600 to-blue-700 rounded-3xl p-8">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center text-white">
+      {[
+        {
+          icon: <Globe className="w-6 h-6" />,
+          value: "500+",
+          label: "Hotels Listed",
+        },
+        {
+          icon: <Users className="w-6 h-6" />,
+          value: "50K+",
+          label: "Happy Travelers",
+        },
+        {
+          icon: <Star className="w-6 h-6" />,
+          value: "4.9★",
+          label: "Average Rating",
+        },
+        {
+          icon: <Award className="w-6 h-6" />,
+          value: "8+",
+          label: "Years of Trust",
+        },
+      ].map((s, i) => (
+        <div key={i} className="flex flex-col items-center gap-2">
+          <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center">
+            {s.icon}
+          </div>
+          <p className="text-3xl font-black">{s.value}</p>
+          <p className="text-blue-100 text-sm font-semibold">{s.label}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+const PopularDestinations = () => {
+  const destinations = [
+    {
+      name: "Manali",
+      hotels: "120+ Hotels",
+      img: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop",
+    },
+    {
+      name: "Goa",
+      hotels: "340+ Hotels",
+      img: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400&h=300&fit=crop",
+    },
+    {
+      name: "Jaipur",
+      hotels: "210+ Hotels",
+      img: "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=400&h=300&fit=crop",
+    },
+    {
+      name: "Kerala",
+      hotels: "185+ Hotels",
+      img: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=400&h=300&fit=crop",
+    },
+    {
+      name: "Ladakh",
+      hotels: "95+ Hotels",
+      img: "https://images.unsplash.com/photo-1598091383021-15ddea10925d?w=400&h=300&fit=crop",
+    },
+    {
+      name: "Shimla",
+      hotels: "150+ Hotels",
+      img: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop",
+    },
+  ];
+
+  return (
+    <section className="mt-16">
+      <div className="text-center mb-10">
+        <p className="text-blue-600 font-bold italic text-sm mb-1">
+          Handpicked for You
+        </p>
+        <h2 className="text-3xl font-black text-slate-900">
+          Popular Destinations
+        </h2>
+        <p className="text-slate-500 mt-2 text-sm">
+          India's most-loved travel spots — find your perfect stay.
+        </p>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        {destinations.map((d, i) => (
+          <div
+            key={i}
+            className="relative rounded-2xl overflow-hidden cursor-pointer group h-44"
+          >
+            <img
+              src={d.img}
+              alt={d.name}
+              className="w-full h-full object-cover  transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+            <div className="absolute bottom-3 left-3">
+              <p className="text-white font-black text-base leading-tight">
+                {d.name}
+              </p>
+              <p className="text-white/70 text-[10px] font-semibold">
+                {d.hotels}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+const TravelTips = () => {
+  const tips = [
+    {
+      icon: <Clock className="w-5 h-5 text-blue-600" />,
+      title: "Book Early for Best Rates",
+      desc: "Hotels booked 30+ days in advance are typically 20–35% cheaper.",
+    },
+    {
+      icon: <TrendingUp className="w-5 h-5 text-emerald-600" />,
+      title: "Travel Mid-Week",
+      desc: "Tuesday and Wednesday stays often see lower prices than weekends.",
+    },
+    {
+      icon: <MapPin className="w-5 h-5 text-purple-600" />,
+      title: "Check Location Carefully",
+      desc: "A centrally located hotel saves time and transport costs.",
+    },
+    {
+      icon: <Star className="w-5 h-5 text-orange-500" />,
+      title: "Read Recent Reviews",
+      desc: "Focus on reviews from the last 3 months for accurate conditions.",
+    },
+  ];
+
+  return (
+    <section className="mt-16 mb-8">
+      <div className="text-center mb-10">
+        <p className="text-blue-600 font-bold italic text-sm mb-1">
+          Pro Traveller Advice
+        </p>
+        <h2 className="text-3xl font-black text-slate-900">
+          Smart Booking Tips
+        </h2>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {tips.map((tip, i) => (
+          <div
+            key={i}
+            className="bg-white border border-slate-100 rounded-2xl p-5 flex gap-4 items-start shadow-sm hover:shadow-md transition-all"
+          >
+            <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
+              {tip.icon}
+            </div>
+            <div>
+              <h4 className="font-bold text-slate-900 mb-1">{tip.title}</h4>
+              <p className="text-slate-500 text-sm leading-relaxed">
+                {tip.desc}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+const FilterSidebarContent = ({
+  sortBy,
+  setSortBy,
+  minBudget,
+  setMinBudget,
+  maxBudget,
+  setMaxBudget,
+}: {
+  sortBy: SortOption;
+  setSortBy: (v: SortOption) => void;
+  minBudget: string;
+  setMinBudget: (v: string) => void;
+  maxBudget: string;
+  setMaxBudget: (v: string) => void;
+}) => (
+  <>
+    <h3 className="font-bold text-lg mb-5 flex items-center gap-2">
+      <ArrowUpDown size={18} className="text-blue-600" /> Filters & Sort
+    </h3>
+    <div className="mb-6">
+      <p className="text-xs font-bold text-slate-500 uppercase mb-3">Sort By</p>
+      <div className="space-y-2">
+        {(
+          ["default", "low-to-high", "high-to-low", "top-rated"] as SortOption[]
+        ).map((opt) => (
+          <button
+            key={opt}
+            onClick={() => setSortBy(opt)}
+            className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              sortBy === opt
+                ? "bg-blue-100 text-blue-700 border border-blue-300"
+                : "text-slate-600 hover:bg-slate-50"
+            }`}
+          >
+            {opt.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+          </button>
+        ))}
+      </div>
+    </div>
+    <div className="border-t border-slate-200 pt-6">
+      <p className="text-xs font-bold text-slate-500 uppercase mb-3">
+        Budget Range
+      </p>
+      <div className="space-y-3">
+        <input
+          type="number"
+          placeholder="Min ($)"
+          className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
+          value={minBudget}
+          onChange={(e) => setMinBudget(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Max ($)"
+          className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
+          value={maxBudget}
+          onChange={(e) => setMaxBudget(e.target.value)}
+        />
+      </div>
+    </div>
+  </>
+);
 
 function HotelPageContent() {
   const searchParams = useSearchParams();
@@ -34,10 +410,7 @@ function HotelPageContent() {
   const [searchQuery, setSearchQuery] = useState(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("hotelSearch");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.searchQuery || "";
-      }
+      if (stored) return JSON.parse(stored).searchQuery || "";
     }
     return searchParams.get("search") || "";
   });
@@ -45,10 +418,7 @@ function HotelPageContent() {
   const [checkIn, setCheckIn] = useState(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("hotelSearch");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.checkIn || "";
-      }
+      if (stored) return JSON.parse(stored).checkIn || "";
     }
     return searchParams.get("checkIn") || "";
   });
@@ -56,10 +426,7 @@ function HotelPageContent() {
   const [checkOut, setCheckOut] = useState(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("hotelSearch");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.checkOut || "";
-      }
+      if (stored) return JSON.parse(stored).checkOut || "";
     }
     return searchParams.get("checkOut") || "";
   });
@@ -67,10 +434,7 @@ function HotelPageContent() {
   const [rooms, setRooms] = useState(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("hotelSearch");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.rooms || 1;
-      }
+      if (stored) return JSON.parse(stored).rooms || 1;
     }
     return Number(searchParams.get("rooms")) || 1;
   });
@@ -78,21 +442,18 @@ function HotelPageContent() {
   const [adults, setAdults] = useState(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("hotelSearch");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.adults || 2;
-      }
+      if (stored) return JSON.parse(stored).adults || 2;
     }
     return Number(searchParams.get("adults")) || 2;
   });
 
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedRangeIdx, setSelectedRangeIdx] = useState<number | null>(null);
-  const [minBudget, setMinBudget] = useState<string>("");
-  const [maxBudget, setMaxBudget] = useState<string>("");
+  const [minBudget, setMinBudget] = useState("");
+  const [maxBudget, setMaxBudget] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("default");
   const [showFiltersModal, setShowFiltersModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchTours = async () => {
@@ -140,32 +501,55 @@ function HotelPageContent() {
     setAdults(params.adults);
   };
 
+  const handleSortChange = (value: SortOption) => {
+    setSortBy(value);
+    setCurrentPage(1);
+  };
+
+  const handleMinBudgetChange = (value: string) => {
+    setMinBudget(value);
+    setCurrentPage(1);
+  };
+
+  const handleMaxBudgetChange = (value: string) => {
+    setMaxBudget(value);
+    setCurrentPage(1);
+  };
+
   const filteredTours = useMemo(() => {
     return tours
       .filter((tour) => {
-        const price = parseFloat(tour.price.replace("$", ""));
+        const price = parseFloat(tour.price);
         const matchesSearch =
           tour.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           tour.location.toLowerCase().includes(searchQuery.toLowerCase());
-
-        const range =
-          selectedRangeIdx !== null ? PRICE_RANGES[selectedRangeIdx] : null;
-        const matchesRange =
-          !range || (price >= range.min && price <= range.max);
         const matchesMin = minBudget === "" || price >= parseFloat(minBudget);
         const matchesMax = maxBudget === "" || price <= parseFloat(maxBudget);
-
-        return matchesSearch && matchesRange && matchesMin && matchesMax;
+        return matchesSearch && matchesMin && matchesMax;
       })
       .sort((a, b) => {
-        const priceA = parseFloat(a.price.replace("$", ""));
-        const priceB = parseFloat(b.price.replace("$", ""));
+        const priceA = parseFloat(a.price);
+        const priceB = parseFloat(b.price);
         if (sortBy === "low-to-high") return priceA - priceB;
         if (sortBy === "high-to-low") return priceB - priceA;
         if (sortBy === "top-rated") return b.rating - a.rating;
         return 0;
       });
-  }, [tours, searchQuery, selectedRangeIdx, minBudget, maxBudget, sortBy]);
+  }, [tours, searchQuery, minBudget, maxBudget, sortBy]);
+
+  const totalPages = Math.ceil(filteredTours.length / ITEMS_PER_PAGE);
+
+  const safePage = totalPages === 0 ? 1 : Math.min(currentPage, totalPages);
+
+  const paginatedTours = useMemo(() => {
+    const start = (safePage - 1) * ITEMS_PER_PAGE;
+    return filteredTours.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredTours, safePage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 pb-20">
@@ -190,59 +574,22 @@ function HotelPageContent() {
           instantSearch={true}
         />
 
-        <div className="flex flex-col lg:flex-row gap-6">
-          <aside className="hidden lg:block w-80 shrink-0">
-            <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 sticky top-32">
-              <h3 className="font-bold text-lg mb-5 flex items-center gap-2">
-                <ArrowUpDown size={18} className="text-blue-600" /> Filters &
-                Sort
-              </h3>
-              <div className="mb-6">
-                <p className="text-xs font-bold text-slate-500 uppercase mb-3">
-                  Sort By
-                </p>
-                <div className="space-y-2">
-                  {["default", "low-to-high", "high-to-low", "top-rated"].map(
-                    (opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => setSortBy(opt as any)}
-                        className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${sortBy === opt ? "bg-blue-100 text-blue-700 border border-blue-300" : "text-slate-600 hover:bg-slate-50"}`}
-                      >
-                        {opt
-                          .replace(/-/g, " ")
-                          .replace(/\b\w/g, (l) => l.toUpperCase())}
-                      </button>
-                    ),
-                  )}
-                </div>
-              </div>
-              <div className="border-t border-slate-200 pt-6">
-                <p className="text-xs font-bold text-slate-500 uppercase mb-3">
-                  Budget Range
-                </p>
-                <div className="space-y-3">
-                  <input
-                    type="number"
-                    placeholder="Min ($)"
-                    className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
-                    value={minBudget}
-                    onChange={(e) => setMinBudget(e.target.value)}
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max ($)"
-                    className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
-                    value={maxBudget}
-                    onChange={(e) => setMaxBudget(e.target.value)}
-                  />
-                </div>
-              </div>
+        <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
+          <aside className="hidden lg:block w-80 shrink-0 sticky top-32 self-start">
+            <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
+              <FilterSidebarContent
+                sortBy={sortBy}
+                setSortBy={handleSortChange}
+                minBudget={minBudget}
+                setMinBudget={handleMinBudgetChange}
+                maxBudget={maxBudget}
+                setMaxBudget={handleMaxBudgetChange}
+              />
             </div>
           </aside>
 
-          <main className="flex-1">
-            <div className="flex items-center justify-between mb-6">
+          <div className="flex-1 min-w-0 w-full max-w-4xl mx-auto lg:max-w-none lg:mx-0">
+            <div className="flex items-center justify-between mb-6 gap-4">
               <h2 className="font-bold text-lg lg:text-xl text-slate-900">
                 {loading ? (
                   "Searching..."
@@ -252,6 +599,11 @@ function HotelPageContent() {
                       {filteredTours.length}
                     </span>{" "}
                     Hotels Found
+                    {totalPages > 1 && (
+                      <span className="text-slate-400 text-sm font-normal ml-2">
+                        — Page {safePage} of {totalPages}
+                      </span>
+                    )}
                   </>
                 )}
               </h2>
@@ -264,7 +616,7 @@ function HotelPageContent() {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
                   <div
                     key={i}
@@ -272,27 +624,44 @@ function HotelPageContent() {
                   />
                 ))}
               </div>
+            ) : paginatedTours.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {paginatedTours.map((tour) => (
+                  <TourCard key={tour.id} tour={tour} />
+                ))}
+              </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredTours.length > 0 ? (
-                  filteredTours.map((tour) => (
-                    <TourCard key={tour.id} tour={tour} />
-                  ))
-                ) : (
-                  <div className="col-span-full py-20 bg-white rounded-2xl border border-dashed text-center">
-                    <Search className="mx-auto text-slate-300 mb-4" size={56} />
-                    <p className="text-slate-600 font-medium">
-                      No hotels found matching your criteria
-                    </p>
-                    <p className="text-slate-400 text-sm mt-2">
-                      Try adjusting your search or filters
-                    </p>
-                  </div>
-                )}
+              <div className="py-20 bg-white rounded-2xl border border-dashed text-center">
+                <Search className="mx-auto text-slate-300 mb-4" size={56} />
+                <p className="text-slate-600 font-medium">
+                  No hotels found matching your criteria
+                </p>
+                <p className="text-slate-400 text-sm mt-2">
+                  Try adjusting your search or filters
+                </p>
               </div>
             )}
-          </main>
+
+            <Pagination
+              currentPage={safePage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+
+            {filteredTours.length > 0 && totalPages > 1 && (
+              <p className="text-center text-xs text-slate-400 mt-3">
+                Showing {(safePage - 1) * ITEMS_PER_PAGE + 1}–
+                {Math.min(safePage * ITEMS_PER_PAGE, filteredTours.length)} of{" "}
+                {filteredTours.length} hotels
+              </p>
+            )}
+          </div>
         </div>
+
+        <WhyBookWithUs />
+        <StatsBar />
+        <PopularDestinations />
+        <TravelTips />
       </div>
 
       {showFiltersModal && (
@@ -308,49 +677,14 @@ function HotelPageContent() {
               </button>
             </div>
             <div className="p-6 space-y-6">
-              <div>
-                <p className="text-xs font-bold text-slate-500 uppercase mb-3">
-                  Sort By
-                </p>
-                <div className="space-y-2">
-                  {["default", "low-to-high", "high-to-low", "top-rated"].map(
-                    (opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => {
-                          setSortBy(opt as any);
-                        }}
-                        className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${sortBy === opt ? "bg-blue-100 text-blue-700 border border-blue-300" : "text-slate-600 hover:bg-slate-50"}`}
-                      >
-                        {opt
-                          .replace(/-/g, " ")
-                          .replace(/\b\w/g, (l) => l.toUpperCase())}
-                      </button>
-                    ),
-                  )}
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-bold text-slate-500 uppercase mb-3">
-                  Budget Range
-                </p>
-                <div className="space-y-3">
-                  <input
-                    type="number"
-                    placeholder="Min ($)"
-                    className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
-                    value={minBudget}
-                    onChange={(e) => setMinBudget(e.target.value)}
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max ($)"
-                    className="w-full bg-slate-50 border border-slate-200 p-3 text-sm rounded-lg"
-                    value={maxBudget}
-                    onChange={(e) => setMaxBudget(e.target.value)}
-                  />
-                </div>
-              </div>
+              <FilterSidebarContent
+                sortBy={sortBy}
+                setSortBy={handleSortChange}
+                minBudget={minBudget}
+                setMinBudget={handleMinBudgetChange}
+                maxBudget={maxBudget}
+                setMaxBudget={handleMaxBudgetChange}
+              />
               <button
                 onClick={() => setShowFiltersModal(false)}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg"
