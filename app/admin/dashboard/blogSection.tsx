@@ -1002,7 +1002,7 @@ export function BlogSection() {
                     }
                     disabled={isSubmitting}
                     className="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm disabled:opacity-50"
-                    placeholder="https://images.unsplash.com/..."
+                    placeholder="Upload your image..."
                   />
                   <label className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-gray-500 transition text-gray-400 text-sm">
                     <Upload size={16} /> Upload image file
