@@ -70,7 +70,7 @@ const Pagination = ({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="w-10 h-10 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+        className="w-10 h-10 cursor-pointer rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
       >
         <ChevronLeft size={18} />
       </button>
@@ -87,7 +87,7 @@ const Pagination = ({
           <button
             key={`page-${page}`}
             onClick={() => onPageChange(page as number)}
-            className={`w-10 h-10 rounded-xl text-sm font-bold transition-all shadow-sm ${
+            className={`w-10 h-10 cursor-pointer rounded-xl text-sm font-bold transition-all shadow-sm ${
               currentPage === page
                 ? "bg-blue-600 text-white border border-blue-600 shadow-blue-200 shadow-md "
                 : "bg-white border border-slate-200 text-slate-700 hover:border-blue-400 hover:text-blue-600"
@@ -101,7 +101,7 @@ const Pagination = ({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="w-10 h-10 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+        className="w-10 h-10 cursor-pointer rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
       >
         <ChevronRight size={18} />
       </button>
@@ -369,7 +369,7 @@ const FilterSidebarContent = ({
           <button
             key={opt}
             onClick={() => setSortBy(opt)}
-            className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            className={`w-full cursor-pointer text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
               sortBy === opt
                 ? "bg-blue-100 text-blue-700 border border-blue-300"
                 : "text-slate-600 hover:bg-slate-50"
@@ -609,7 +609,7 @@ function HotelPageContent() {
               </h2>
               <button
                 onClick={() => setShowFiltersModal(true)}
-                className="lg:hidden flex items-center gap-2 text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg"
+                className="lg:hidden cursor-pointer flex items-center gap-2 text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg"
               >
                 <ArrowUpDown size={16} /> Filters
               </button>
@@ -671,7 +671,7 @@ function HotelPageContent() {
               <h3 className="font-bold text-lg">Filters & Sort</h3>
               <button
                 onClick={() => setShowFiltersModal(false)}
-                className="p-2 hover:bg-slate-100 rounded-lg"
+                className="p-2 cursor-pointer hover:bg-slate-100 rounded-lg"
               >
                 <X size={20} />
               </button>
@@ -687,7 +687,7 @@ function HotelPageContent() {
               />
               <button
                 onClick={() => setShowFiltersModal(false)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg"
+                className="w-full cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg"
               >
                 Apply Filters
               </button>
