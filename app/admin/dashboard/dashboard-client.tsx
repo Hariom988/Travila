@@ -11,11 +11,11 @@ import {
   CheckCircle,
   Upload,
   ChevronDown,
-  BookOpen,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { BookingsSection } from "./booking-section";
 import { BlogSection } from "./blogSection";
+import { TestimonialsSection } from "./testimonialSection";
 
 interface Hotel {
   id: string;
@@ -85,7 +85,7 @@ interface FormData {
   images: string[];
 }
 
-type TabType = "hotels" | "activities" | "bookings" | "blogs";
+type TabType = "hotels" | "activities" | "bookings" | "blogs" | "testimonials";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -184,6 +184,17 @@ export default function AdminDashboard() {
       extraField: "",
       hasToggle: false,
     },
+    testimonials: {
+      label: "Testimonials",
+      endpoint: "/api/testimonials",
+      addLabel: "",
+      modalTitle: () => "",
+      successMsg: () => "",
+      fields: [] as const,
+      priceLabel: "",
+      extraField: "",
+      hasToggle: false,
+    },
   };
 
   useEffect(() => {
@@ -191,8 +202,8 @@ export default function AdminDashboard() {
   }, [activeTab, bookingFilter, statusFilter]);
 
   const fetchData = async () => {
-    // Blogs tab manages its own data fetching inside BlogSection
-    if (activeTab === "blogs") {
+    // These tabs manage their own data fetching internally
+    if (activeTab === "blogs" || activeTab === "testimonials") {
       setLoading(false);
       return;
     }
@@ -210,7 +221,9 @@ export default function AdminDashboard() {
     }
   };
 
-  const fetchItems = async (type: Exclude<TabType, "bookings" | "blogs">) => {
+  const fetchItems = async (
+    type: Exclude<TabType, "bookings" | "blogs" | "testimonials">,
+  ) => {
     try {
       const endpoint = tabConfig[type].endpoint;
       const response = await fetch(endpoint, {
@@ -248,21 +261,11 @@ export default function AdminDashboard() {
     try {
       let url = "/api/admin/booking";
       const params = new URLSearchParams();
+      if (bookingFilter !== "all") params.append("type", bookingFilter);
+      if (statusFilter !== "all") params.append("status", statusFilter);
+      if (params.toString()) url += `?${params.toString()}`;
 
-      if (bookingFilter !== "all") {
-        params.append("type", bookingFilter);
-      }
-      if (statusFilter !== "all") {
-        params.append("status", statusFilter);
-      }
-
-      if (params.toString()) {
-        url += `?${params.toString()}`;
-      }
-
-      const response = await fetch(url, {
-        credentials: "include",
-      });
+      const response = await fetch(url, { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch bookings");
 
       const data = await response.json();
@@ -351,10 +354,9 @@ export default function AdminDashboard() {
     });
 
     const payloadSizeInMB = new Blob([estimatedPayload]).size / (1024 * 1024);
-
     if (payloadSizeInMB > 10) {
       setFormError(
-        `Payload too large (${payloadSizeInMB.toFixed(2)}MB). Please remove some images or compress them further.`,
+        `Payload too large (${payloadSizeInMB.toFixed(2)}MB). Please remove some images or compress them.`,
       );
       setIsSubmitting(false);
       return;
@@ -363,7 +365,6 @@ export default function AdminDashboard() {
     setIsSubmitting(true);
     try {
       const endpoint = tabConfig[activeTab].endpoint;
-
       let payload: any = {
         name: formData.name.trim(),
         location: formData.location.trim(),
@@ -400,7 +401,9 @@ export default function AdminDashboard() {
 
       setSuccessMessage(tabConfig[activeTab].successMsg(!!editingId));
       setIsModalOpen(false);
-      await fetchItems(activeTab as Exclude<TabType, "bookings" | "blogs">);
+      await fetchItems(
+        activeTab as Exclude<TabType, "bookings" | "blogs" | "testimonials">,
+      );
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "Operation failed");
@@ -420,9 +423,7 @@ export default function AdminDashboard() {
         credentials: "include",
         body: JSON.stringify({ available: !currentStatus }),
       });
-
       if (!response.ok) throw new Error("Failed to update availability");
-
       setSuccessMessage(
         !currentStatus ? "Hotel activated!" : "Hotel deactivated!",
       );
@@ -435,18 +436,17 @@ export default function AdminDashboard() {
 
   const handleDelete = async (id: string, name: string) => {
     if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
-
     try {
       const endpoint = tabConfig[activeTab].endpoint;
       const response = await fetch(`${endpoint}/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
-
       if (!response.ok) throw new Error("Failed to delete");
-
       setSuccessMessage("Deleted successfully!");
-      await fetchItems(activeTab as Exclude<TabType, "bookings" | "blogs">);
+      await fetchItems(
+        activeTab as Exclude<TabType, "bookings" | "blogs" | "testimonials">,
+      );
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "Delete failed");
@@ -506,8 +506,17 @@ export default function AdminDashboard() {
   const filteredItems = getFilteredItems();
   const currentConfig = tabConfig[activeTab];
 
+  const ALL_TABS: TabType[] = [
+    "hotels",
+    "activities",
+    "bookings",
+    "blogs",
+    "testimonials",
+  ];
+
   return (
     <div className="min-h-screen bg-gray-900">
+      {/* ── Header ────────────────────────────────────────── */}
       <div className="bg-gray-800 border-b border-gray-700 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex items-center justify-between">
           <div>
@@ -531,24 +540,23 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* ── Tab navigation ────────────────────────────────── */}
       <div className="bg-gray-800 border-b border-gray-700 sticky top-18 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex gap-8 overflow-x-auto">
-            {(["hotels", "activities", "bookings", "blogs"] as TabType[]).map(
-              (tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`py-4 cursor-pointer px-2 font-medium transition border-b-2 whitespace-nowrap ${
-                    activeTab === tab
-                      ? "text-blue-400 border-blue-400"
-                      : "text-gray-400 border-transparent hover:text-gray-300"
-                  }`}
-                >
-                  {tabConfig[tab].label}
-                </button>
-              ),
-            )}
+            {ALL_TABS.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`py-4 cursor-pointer px-2 font-medium transition border-b-2 whitespace-nowrap ${
+                  activeTab === tab
+                    ? "text-blue-400 border-blue-400"
+                    : "text-gray-400 border-transparent hover:text-gray-300"
+                }`}
+              >
+                {tabConfig[tab].label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -568,10 +576,13 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* ── Blogs tab ───────────────────────────────────── */}
+        {/* ── Testimonials tab ──────────────────────────── */}
+        {activeTab === "testimonials" && <TestimonialsSection />}
+
+        {/* ── Blogs tab ─────────────────────────────────── */}
         {activeTab === "blogs" && <BlogSection />}
 
-        {/* ── Bookings tab ─────────────────────────────────── */}
+        {/* ── Bookings tab ──────────────────────────────── */}
         {activeTab === "bookings" && (
           <BookingsSection
             bookings={bookings}
@@ -592,111 +603,290 @@ export default function AdminDashboard() {
           />
         )}
 
-        {/* ── Hotels / Activities tabs ──────────────────────── */}
-        {activeTab !== "bookings" && activeTab !== "blogs" && (
-          <>
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
-              <div className="relative w-full sm:w-64">
-                <Search
-                  className="absolute left-3 top-3 text-gray-500"
-                  size={18}
-                />
-                <input
-                  type="text"
-                  placeholder={`Search ${currentConfig.label.toLowerCase()}...`}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 text-sm"
-                />
+        {/* ── Hotels / Activities tabs ──────────────────── */}
+        {activeTab !== "bookings" &&
+          activeTab !== "blogs" &&
+          activeTab !== "testimonials" && (
+            <>
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
+                <div className="relative w-full sm:w-64">
+                  <Search
+                    className="absolute left-3 top-3 text-gray-500"
+                    size={18}
+                  />
+                  <input
+                    type="text"
+                    placeholder={`Search ${currentConfig.label.toLowerCase()}...`}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 text-sm"
+                  />
+                </div>
+                <button
+                  onClick={handleAddClick}
+                  className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-medium text-sm whitespace-nowrap w-full sm:w-auto justify-center sm:justify-start"
+                >
+                  <Plus size={18} /> {currentConfig.addLabel}
+                </button>
               </div>
-              <button
-                onClick={handleAddClick}
-                className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-medium text-sm whitespace-nowrap w-full sm:w-auto justify-center sm:justify-start"
-              >
-                <Plus size={18} /> {currentConfig.addLabel}
-              </button>
-            </div>
 
-            <div className="hidden md:block bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
-              {loading ? (
-                <div className="p-12 text-center">
-                  <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-gray-400">Loading...</p>
-                </div>
-              ) : filteredItems.length === 0 ? (
-                <div className="p-12 text-center">
-                  <p className="text-gray-400 mb-4">
-                    {searchTerm
-                      ? "No results found"
-                      : `No ${currentConfig.label.toLowerCase()} yet`}
-                  </p>
-                  {!searchTerm && (
-                    <button
-                      onClick={handleAddClick}
-                      className="text-blue-400 cursor-pointer hover:text-blue-300"
+              {/* Desktop table */}
+              <div className="hidden md:block bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
+                {loading ? (
+                  <div className="p-12 text-center">
+                    <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4" />
+                    <p className="text-gray-400">Loading...</p>
+                  </div>
+                ) : filteredItems.length === 0 ? (
+                  <div className="p-12 text-center">
+                    <p className="text-gray-400 mb-4">
+                      {searchTerm
+                        ? "No results found"
+                        : `No ${currentConfig.label.toLowerCase()} yet`}
+                    </p>
+                    {!searchTerm && (
+                      <button
+                        onClick={handleAddClick}
+                        className="text-blue-400 cursor-pointer hover:text-blue-300"
+                      >
+                        Add your first{" "}
+                        {currentConfig.label.toLowerCase().slice(0, -1)}
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-gray-700 border-b border-gray-700">
+                          <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                            Name
+                          </th>
+                          <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                            Location
+                          </th>
+                          <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                            Price
+                          </th>
+                          {activeTab === "hotels" && (
+                            <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                              Facilities
+                            </th>
+                          )}
+                          {activeTab === "activities" && (
+                            <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                              Duration
+                            </th>
+                          )}
+                          {activeTab === "hotels" && (
+                            <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                              Status
+                            </th>
+                          )}
+                          <th className="px-6 py-4 text-left font-semibold text-gray-200">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-700">
+                        {filteredItems.map((item: any) => (
+                          <tr
+                            key={item.id}
+                            className="hover:bg-gray-750 transition"
+                          >
+                            <td className="px-6 py-4 text-white font-medium">
+                              {item.name}
+                            </td>
+                            <td className="px-6 py-4 text-gray-300">
+                              {item.location}
+                            </td>
+                            <td className="px-6 py-4 text-gray-300">
+                              $
+                              {activeTab === "hotels"
+                                ? item.pricePerNight
+                                : item.pricePerPerson}
+                            </td>
+                            {activeTab === "hotels" && (
+                              <td className="px-6 py-4">
+                                <div className="flex flex-wrap gap-1">
+                                  {item.facilities?.length > 0 ? (
+                                    item.facilities.map(
+                                      (f: string, idx: number) => (
+                                        <span
+                                          key={idx}
+                                          className="px-2 py-1 bg-purple-900/30 text-purple-300 text-xs rounded"
+                                        >
+                                          {f}
+                                        </span>
+                                      ),
+                                    )
+                                  ) : (
+                                    <span className="text-gray-500 text-xs">
+                                      —
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+                            )}
+                            {activeTab === "activities" && (
+                              <td className="px-6 py-4 text-gray-300">
+                                {item.duration}
+                              </td>
+                            )}
+                            {activeTab === "hotels" && (
+                              <td className="px-6 py-4">
+                                <span
+                                  className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition ${
+                                    item.available
+                                      ? "bg-green-900/30 text-green-300 hover:bg-green-900/50"
+                                      : "bg-red-900/30 text-red-300 hover:bg-red-900/50"
+                                  }`}
+                                  onClick={() =>
+                                    handleToggleAvailability(
+                                      item.id,
+                                      item.available,
+                                    )
+                                  }
+                                >
+                                  {item.available ? "Active" : "Inactive"}
+                                </span>
+                              </td>
+                            )}
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleEditClick(item)}
+                                  className="p-2 cursor-pointer bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition"
+                                >
+                                  <Edit2 size={16} />
+                                </button>
+                                {activeTab === "hotels" ? (
+                                  <button
+                                    onClick={() =>
+                                      handleToggleAvailability(
+                                        item.id,
+                                        item.available,
+                                      )
+                                    }
+                                    className={`p-2 cursor-pointer rounded transition ${
+                                      item.available
+                                        ? "bg-gray-700 hover:bg-red-600 text-gray-300"
+                                        : "bg-gray-700 hover:bg-green-600 text-gray-300"
+                                    }`}
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      handleDelete(item.id, item.name)
+                                    }
+                                    className="p-2 cursor-pointer bg-gray-700 hover:bg-red-600 text-gray-300 rounded transition"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile cards */}
+              <div className="md:hidden space-y-3">
+                {loading ? (
+                  <div className="p-12 text-center">
+                    <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4" />
+                    <p className="text-gray-400">Loading...</p>
+                  </div>
+                ) : filteredItems.length === 0 ? (
+                  <div className="p-8 text-center bg-gray-800 rounded-lg">
+                    <p className="text-gray-400 mb-4">
+                      {searchTerm
+                        ? "No results found"
+                        : `No ${currentConfig.label.toLowerCase()} yet`}
+                    </p>
+                  </div>
+                ) : (
+                  filteredItems.map((item: any) => (
+                    <div
+                      key={item.id}
+                      className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden"
                     >
-                      Add your first{" "}
-                      {currentConfig.label.toLowerCase().slice(0, -1)}
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-gray-700 border-b border-gray-700">
-                        <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                          Name
-                        </th>
-                        <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                          Location
-                        </th>
-                        <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                          Price
-                        </th>
-                        {activeTab === "hotels" && (
-                          <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                            Facilities
-                          </th>
-                        )}
-                        {activeTab === "activities" && (
-                          <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                            Duration
-                          </th>
-                        )}
-                        {activeTab === "hotels" && (
-                          <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                            Status
-                          </th>
-                        )}
-                        <th className="px-6 py-4 text-left font-semibold text-gray-200">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-700">
-                      {filteredItems.map((item: any) => (
-                        <tr
-                          key={item.id}
-                          className="hover:bg-gray-750 transition"
-                        >
-                          <td className="px-6 py-4 text-white font-medium">
+                      <div
+                        className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-750 transition"
+                        onClick={() =>
+                          setExpandedId(expandedId === item.id ? null : item.id)
+                        }
+                      >
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-white font-medium truncate">
                             {item.name}
-                          </td>
-                          <td className="px-6 py-4 text-gray-300">
-                            {item.location}
-                          </td>
-                          <td className="px-6 py-4 text-gray-300">
+                          </h3>
+                          <p className="text-gray-400 text-sm">
                             $
                             {activeTab === "hotels"
                               ? item.pricePerNight
                               : item.pricePerPerson}
-                          </td>
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3 ml-4">
                           {activeTab === "hotels" && (
-                            <td className="px-6 py-4">
-                              <div className="flex flex-wrap gap-1">
-                                {item.facilities?.length > 0 ? (
-                                  item.facilities.map(
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
+                                item.available
+                                  ? "bg-green-900/30 text-green-300"
+                                  : "bg-red-900/30 text-red-300"
+                              }`}
+                            >
+                              {item.available ? "Active" : "Inactive"}
+                            </span>
+                          )}
+                          <ChevronDown
+                            size={20}
+                            className={`text-gray-400 transition ${expandedId === item.id ? "rotate-180" : ""}`}
+                          />
+                        </div>
+                      </div>
+
+                      {expandedId === item.id && (
+                        <div className="border-t border-gray-700 p-4 space-y-4 bg-gray-750">
+                          <div>
+                            <p className="text-gray-400 text-sm">Location</p>
+                            <p className="text-white font-medium">
+                              {item.location}
+                            </p>
+                          </div>
+                          {activeTab === "activities" && (
+                            <div>
+                              <p className="text-gray-400 text-sm">Duration</p>
+                              <p className="text-white font-medium">
+                                {item.duration}
+                              </p>
+                            </div>
+                          )}
+                          {item.description && (
+                            <div>
+                              <p className="text-gray-400 text-sm">
+                                Description
+                              </p>
+                              <p className="text-gray-300 text-sm">
+                                {item.description}
+                              </p>
+                            </div>
+                          )}
+                          {activeTab === "hotels" &&
+                            item.facilities?.length > 0 && (
+                              <div>
+                                <p className="text-gray-400 text-sm mb-2">
+                                  Facilities
+                                </p>
+                                <div className="flex flex-wrap gap-1">
+                                  {item.facilities.map(
                                     (f: string, idx: number) => (
                                       <span
                                         key={idx}
@@ -705,449 +895,276 @@ export default function AdminDashboard() {
                                         {f}
                                       </span>
                                     ),
-                                  )
-                                ) : (
-                                  <span className="text-gray-500 text-xs">
-                                    —
-                                  </span>
-                                )}
+                                  )}
+                                </div>
                               </div>
-                            </td>
+                            )}
+                          {item.images?.length > 0 && (
+                            <div>
+                              <p className="text-gray-400 text-sm mb-2">
+                                Images
+                              </p>
+                              <div className="grid grid-cols-2 gap-2">
+                                {item.images
+                                  .slice(0, 4)
+                                  .map((img: string, idx: number) => (
+                                    <img
+                                      key={idx}
+                                      src={img}
+                                      alt={`${item.name} ${idx + 1}`}
+                                      className="h-20 object-cover rounded border border-gray-600"
+                                    />
+                                  ))}
+                              </div>
+                            </div>
                           )}
-                          {activeTab === "activities" && (
-                            <td className="px-6 py-4 text-gray-300">
-                              {item.duration}
-                            </td>
-                          )}
-                          {activeTab === "hotels" && (
-                            <td className="px-6 py-4">
-                              <span
-                                className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition ${
-                                  item.available
-                                    ? "bg-green-900/30 text-green-300 hover:bg-green-900/50"
-                                    : "bg-red-900/30 text-red-300 hover:bg-red-900/50"
-                                }`}
+                          <div className="flex gap-2 pt-2">
+                            <button
+                              onClick={() => handleEditClick(item)}
+                              className="flex-1 cursor-pointer py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition flex items-center justify-center gap-2"
+                            >
+                              <Edit2 size={16} /> Edit
+                            </button>
+                            {activeTab === "hotels" ? (
+                              <button
                                 onClick={() =>
                                   handleToggleAvailability(
                                     item.id,
                                     item.available,
                                   )
                                 }
+                                className={`flex-1 cursor-pointer py-2 rounded text-sm font-medium transition ${
+                                  item.available
+                                    ? "bg-red-600 hover:bg-red-700 text-white"
+                                    : "bg-green-600 hover:bg-green-700 text-white"
+                                }`}
                               >
-                                {item.available ? "Active" : "Inactive"}
-                              </span>
-                            </td>
-                          )}
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => handleEditClick(item)}
-                                className="p-2 cursor-pointer bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition"
-                              >
-                                <Edit2 size={16} />
+                                {item.available ? "Deactivate" : "Activate"}
                               </button>
-                              {activeTab === "hotels" ? (
-                                <button
-                                  onClick={() =>
-                                    handleToggleAvailability(
-                                      item.id,
-                                      item.available,
-                                    )
-                                  }
-                                  className={`p-2 cursor-pointer rounded transition ${
-                                    item.available
-                                      ? "bg-gray-700 hover:bg-red-600 text-gray-300"
-                                      : "bg-gray-700 hover:bg-green-600 text-gray-300"
-                                  }`}
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() =>
-                                    handleDelete(item.id, item.name)
-                                  }
-                                  className="p-2 cursor-pointer bg-gray-700 hover:bg-red-600 text-gray-300 rounded transition"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            <div className="md:hidden space-y-3">
-              {loading ? (
-                <div className="p-12 text-center">
-                  <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-gray-400">Loading...</p>
-                </div>
-              ) : filteredItems.length === 0 ? (
-                <div className="p-8 text-center bg-gray-800 rounded-lg">
-                  <p className="text-gray-400 mb-4">
-                    {searchTerm
-                      ? "No results found"
-                      : `No ${currentConfig.label.toLowerCase()} yet`}
-                  </p>
-                </div>
-              ) : (
-                filteredItems.map((item: any) => (
-                  <div
-                    key={item.id}
-                    className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden"
-                  >
-                    <div
-                      className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-750 transition"
-                      onClick={() =>
-                        setExpandedId(expandedId === item.id ? null : item.id)
-                      }
-                    >
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-white font-medium truncate">
-                          {item.name}
-                        </h3>
-                        <p className="text-gray-400 text-sm">
-                          $
-                          {activeTab === "hotels"
-                            ? item.pricePerNight
-                            : item.pricePerPerson}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-3 ml-4">
-                        {activeTab === "hotels" && (
-                          <span
-                            className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
-                              item.available
-                                ? "bg-green-900/30 text-green-300"
-                                : "bg-red-900/30 text-red-300"
-                            }`}
-                          >
-                            {item.available ? "Active" : "Inactive"}
-                          </span>
-                        )}
-                        <ChevronDown
-                          size={20}
-                          className={`text-gray-400 transition ${expandedId === item.id ? "rotate-180" : ""}`}
-                        />
-                      </div>
+                            ) : (
+                              <button
+                                onClick={() => handleDelete(item.id, item.name)}
+                                className="flex-1 cursor-pointer py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-medium transition"
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
-
-                    {expandedId === item.id && (
-                      <div className="border-t border-gray-700 p-4 space-y-4 bg-gray-750">
-                        <div>
-                          <p className="text-gray-400 text-sm">Location</p>
-                          <p className="text-white font-medium">
-                            {item.location}
-                          </p>
-                        </div>
-
-                        {activeTab === "activities" && (
-                          <div>
-                            <p className="text-gray-400 text-sm">Duration</p>
-                            <p className="text-white font-medium">
-                              {item.duration}
-                            </p>
-                          </div>
-                        )}
-
-                        {item.description && (
-                          <div>
-                            <p className="text-gray-400 text-sm">Description</p>
-                            <p className="text-gray-300 text-sm">
-                              {item.description}
-                            </p>
-                          </div>
-                        )}
-
-                        {activeTab === "hotels" &&
-                          item.facilities?.length > 0 && (
-                            <div>
-                              <p className="text-gray-400 text-sm mb-2">
-                                Facilities
-                              </p>
-                              <div className="flex flex-wrap gap-1">
-                                {item.facilities.map(
-                                  (f: string, idx: number) => (
-                                    <span
-                                      key={idx}
-                                      className="px-2 py-1 bg-purple-900/30 text-purple-300 text-xs rounded"
-                                    >
-                                      {f}
-                                    </span>
-                                  ),
-                                )}
-                              </div>
-                            </div>
-                          )}
-
-                        {item.images?.length > 0 && (
-                          <div>
-                            <p className="text-gray-400 text-sm mb-2">Images</p>
-                            <div className="grid grid-cols-2 gap-2">
-                              {item.images
-                                .slice(0, 4)
-                                .map((img: string, idx: number) => (
-                                  <img
-                                    key={idx}
-                                    src={img}
-                                    alt={`${item.name} ${idx + 1}`}
-                                    className="h-20 object-cover rounded border border-gray-600"
-                                  />
-                                ))}
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="flex gap-2 pt-2">
-                          <button
-                            onClick={() => handleEditClick(item)}
-                            className="flex-1 cursor-pointer py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium transition flex items-center justify-center gap-2"
-                          >
-                            <Edit2 size={16} /> Edit
-                          </button>
-                          {activeTab === "hotels" ? (
-                            <button
-                              onClick={() =>
-                                handleToggleAvailability(
-                                  item.id,
-                                  item.available,
-                                )
-                              }
-                              className={`flex-1 cursor-pointer py-2 rounded text-sm font-medium transition ${
-                                item.available
-                                  ? "bg-red-600 hover:bg-red-700 text-white"
-                                  : "bg-green-600 hover:bg-green-700 text-white"
-                              }`}
-                            >
-                              {item.available ? "Deactivate" : "Activate"}
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleDelete(item.id, item.name)}
-                              className="flex-1 cursor-pointer py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-medium transition"
-                            >
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          </>
-        )}
+                  ))
+                )}
+              </div>
+            </>
+          )}
       </div>
 
-      {isModalOpen && activeTab !== "bookings" && activeTab !== "blogs" && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">
-                {currentConfig.modalTitle(!!editingId)}
-              </h2>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                disabled={isSubmitting}
-                className="p-1 cursor-pointer hover:bg-gray-700 rounded transition text-gray-400"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {formError && (
-              <div className="mb-4 p-3 bg-red-900/30 border border-red-700 rounded text-red-300 text-sm flex items-center gap-2">
-                <AlertCircle size={16} />
-                {formError}
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    {activeTab === "hotels" ? "Hotel" : "Activity"} Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    disabled={isSubmitting}
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
-                    placeholder={
-                      activeTab === "hotels"
-                        ? "e.g., Azure Paradise Resort"
-                        : "e.g., Taj Mahal Sunrise Tour"
-                    }
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Location *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) =>
-                      setFormData({ ...formData, location: e.target.value })
-                    }
-                    disabled={isSubmitting}
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
-                    placeholder="e.g., Agra, Uttar Pradesh"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Description
-                  {activeTab === "activities" && (
-                    <span className="text-gray-500 text-xs ml-2">
-                      (Press Enter after each point to create bullet points)
-                    </span>
-                  )}
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
+      {/* ── Hotel / Activity modal ─────────────────────── */}
+      {isModalOpen &&
+        activeTab !== "bookings" &&
+        activeTab !== "blogs" &&
+        activeTab !== "testimonials" && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-white">
+                  {currentConfig.modalTitle(!!editingId)}
+                </h2>
+                <button
+                  onClick={() => setIsModalOpen(false)}
                   disabled={isSubmitting}
-                  rows={5}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
-                  placeholder={
-                    activeTab === "activities"
-                      ? "Add each point on a new line. Each line will become a bullet point."
-                      : "Description..."
-                  }
-                />
+                  className="p-1 cursor-pointer hover:bg-gray-700 rounded transition text-gray-400"
+                >
+                  <X size={20} />
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    {currentConfig.priceLabel} *
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) =>
-                      setFormData({ ...formData, price: e.target.value })
-                    }
-                    disabled={isSubmitting}
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
-                    placeholder="0.00"
-                  />
+              {formError && (
+                <div className="mb-4 p-3 bg-red-900/30 border border-red-700 rounded text-red-300 text-sm flex items-center gap-2">
+                  <AlertCircle size={16} />
+                  {formError}
+                </div>
+              )}
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      {activeTab === "hotels" ? "Hotel" : "Activity"} Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      disabled={isSubmitting}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
+                      placeholder={
+                        activeTab === "hotels"
+                          ? "e.g., Azure Paradise Resort"
+                          : "e.g., Taj Mahal Sunrise Tour"
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Location *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.location}
+                      onChange={(e) =>
+                        setFormData({ ...formData, location: e.target.value })
+                      }
+                      disabled={isSubmitting}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
+                      placeholder="e.g., Agra, Uttar Pradesh"
+                    />
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    {activeTab === "activities" ? "Duration" : "Facilities"}{" "}
-                    {activeTab === "activities" ? "*" : ""}
+                    Description
+                    {activeTab === "activities" && (
+                      <span className="text-gray-500 text-xs ml-2">
+                        (Press Enter after each point to create bullet points)
+                      </span>
+                    )}
                   </label>
-                  <input
-                    type="text"
-                    value={
-                      activeTab === "activities"
-                        ? formData.duration
-                        : formData.facilities
-                    }
+                  <textarea
+                    value={formData.description}
                     onChange={(e) =>
-                      activeTab === "activities"
-                        ? setFormData({ ...formData, duration: e.target.value })
-                        : setFormData({
-                            ...formData,
-                            facilities: e.target.value,
-                          })
+                      setFormData({ ...formData, description: e.target.value })
                     }
                     disabled={isSubmitting}
+                    rows={5}
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
                     placeholder={
                       activeTab === "activities"
-                        ? "e.g., 4 hours, Full Day"
-                        : "e.g., WiFi, Pool, Gym, Spa"
+                        ? "Add each point on a new line."
+                        : "Description..."
                     }
                   />
                 </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      {currentConfig.priceLabel} *
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.price}
+                      onChange={(e) =>
+                        setFormData({ ...formData, price: e.target.value })
+                      }
+                      disabled={isSubmitting}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      {activeTab === "activities" ? "Duration" : "Facilities"}{" "}
+                      {activeTab === "activities" ? "*" : ""}
+                    </label>
+                    <input
+                      type="text"
+                      value={
+                        activeTab === "activities"
+                          ? formData.duration
+                          : formData.facilities
+                      }
+                      onChange={(e) =>
+                        activeTab === "activities"
+                          ? setFormData({
+                              ...formData,
+                              duration: e.target.value,
+                            })
+                          : setFormData({
+                              ...formData,
+                              facilities: e.target.value,
+                            })
+                      }
+                      disabled={isSubmitting}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm disabled:opacity-50"
+                      placeholder={
+                        activeTab === "activities"
+                          ? "e.g., 4 hours, Full Day"
+                          : "e.g., WiFi, Pool, Gym, Spa"
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    {activeTab === "hotels" ? "Hotel" : "Activity"} Images
+                  </label>
+                  <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-gray-500 transition">
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <Upload size={18} />
+                      <span className="text-sm">Click to upload images</span>
+                    </div>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={isSubmitting}
+                      className="hidden"
+                    />
+                  </label>
+                  {formData.images.length > 0 && (
+                    <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {formData.images.map((image, idx) => (
+                        <div key={idx} className="relative group">
+                          <img
+                            src={image}
+                            alt={`Image ${idx + 1}`}
+                            className="w-full h-24 object-cover rounded border border-gray-600"
+                          />
+                          <button
+                            onClick={() => removeImage(idx)}
+                            className="absolute cursor-pointer top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                            type="button"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  {activeTab === "hotels" ? "Hotel" : "Activity"} Images
-                </label>
-                <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-gray-500 transition">
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <Upload size={18} />
-                    <span className="text-sm">Click to upload images</span>
-                  </div>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    disabled={isSubmitting}
-                    className="hidden"
-                  />
-                </label>
-
-                {formData.images.length > 0 && (
-                  <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {formData.images.map((image, idx) => (
-                      <div key={idx} className="relative group">
-                        <img
-                          src={image}
-                          alt={`Image ${idx + 1}`}
-                          className="w-full h-24 object-cover rounded border border-gray-600"
-                        />
-                        <button
-                          onClick={() => removeImage(idx)}
-                          className="absolute cursor-pointer top-1 right-1 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
-                          type="button"
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  disabled={isSubmitting}
+                  className="flex-1 cursor-pointer px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition font-medium disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={isSubmitting}
+                  className="flex-1 cursor-pointer px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isSubmitting && (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  )}
+                  {editingId ? "Update" : "Add"}{" "}
+                  {activeTab === "hotels" ? "Hotel" : "Activity"}
+                </button>
               </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 mt-6">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                disabled={isSubmitting}
-                className="flex-1 cursor-pointer px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition font-medium disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={isSubmitting}
-                className="flex-1 cursor-pointer px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition font-medium disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {isSubmitting && (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                )}
-                {editingId ? "Update" : "Add"}{" "}
-                {activeTab === "hotels" ? "Hotel" : "Activity"}
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }

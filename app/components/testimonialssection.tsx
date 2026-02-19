@@ -1,10 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Star, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import Image from "next/image";
 
 interface Testimonial {
-  id: number;
+  id: string;
   name: string;
   location: string;
   country: string;
@@ -15,9 +15,9 @@ interface Testimonial {
   isIndian: boolean;
 }
 
-const TESTIMONIALS: Testimonial[] = [
+const FALLBACK_TESTIMONIALS: Testimonial[] = [
   {
-    id: 1,
+    id: "1",
     name: "Rajesh Kumar",
     location: "Delhi",
     country: "India 🇮🇳",
@@ -29,7 +29,7 @@ const TESTIMONIALS: Testimonial[] = [
     isIndian: true,
   },
   {
-    id: 2,
+    id: "2",
     name: "Sarah Johnson",
     location: "California",
     country: "United States 🇺🇸",
@@ -41,7 +41,7 @@ const TESTIMONIALS: Testimonial[] = [
     isIndian: false,
   },
   {
-    id: 3,
+    id: "3",
     name: "Priya Sharma",
     location: "Mumbai",
     country: "India 🇮🇳",
@@ -53,7 +53,7 @@ const TESTIMONIALS: Testimonial[] = [
     isIndian: true,
   },
   {
-    id: 4,
+    id: "4",
     name: "Marco Rossi",
     location: "Rome",
     country: "Italy 🇮🇹",
@@ -65,12 +65,12 @@ const TESTIMONIALS: Testimonial[] = [
     isIndian: false,
   },
   {
-    id: 5,
+    id: "5",
     name: "Emma Thompson",
     location: "London",
     country: "United Kingdom 🇬🇧",
     image:
-      "https://images.unsplash.com/photo-1704660577560-db9a0147ea44?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1704660577560-db9a0147ea44?q=80&w=687&auto=format&fit=crop",
     rating: 5,
     text: "HikinHigh exceeded all expectations. The itinerary was well-planned, the accommodation comfortable, and the guides were genuinely passionate about conservation.",
     tour: "Auli Trek",
@@ -79,16 +79,37 @@ const TESTIMONIALS: Testimonial[] = [
 ];
 
 export default function TestimonialsSection() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const res = await fetch("/api/testimonials?published=true");
+        const data = await res.json();
+        if (data.success && data.data.length > 0) {
+          setTestimonials(data.data);
+        } else {
+          setTestimonials(FALLBACK_TESTIMONIALS);
+        }
+      } catch {
+        setTestimonials(FALLBACK_TESTIMONIALS);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTestimonials();
+  }, []);
 
   const handlePrev = () => {
     setCurrentIndex(
-      (prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length,
+      (prev) => (prev - 1 + testimonials.length) % testimonials.length,
     );
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % TESTIMONIALS.length);
+    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
   };
 
   const goToSlide = (index: number) => {
@@ -96,12 +117,53 @@ export default function TestimonialsSection() {
   };
 
   const getVisibleTestimonials = () => {
+    if (testimonials.length === 0) return [];
     const result = [];
     for (let i = 0; i < 3; i++) {
-      result.push(TESTIMONIALS[(currentIndex + i) % TESTIMONIALS.length]);
+      result.push(testimonials[(currentIndex + i) % testimonials.length]);
     }
     return result;
   };
+
+  if (loading) {
+    return (
+      <section className="w-full py-12 md:py-20 px-4 md:px-8 bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-8 md:mb-16">
+            <p className="text-blue-600 font-bold italic mb-1 text-sm md:text-base tracking-wide">
+              What Our Adventurers Say
+            </p>
+            <h2 className="text-2xl md:text-5xl font-bold text-gray-900 mb-2 md:mb-4">
+              Real Stories From Our Community
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className={`${i > 1 ? "hidden md:block" : ""} bg-white rounded-xl border border-gray-100 p-5 md:p-6 animate-pulse`}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-200" />
+                  <div className="flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-24 mb-1" />
+                    <div className="h-3 bg-gray-200 rounded w-16" />
+                  </div>
+                </div>
+                <div className="space-y-2 mb-4">
+                  <div className="h-3 bg-gray-200 rounded" />
+                  <div className="h-3 bg-gray-200 rounded" />
+                  <div className="h-3 bg-gray-200 rounded w-3/4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) return null;
 
   return (
     <section className="w-full py-12 md:py-20 px-4 md:px-8 bg-linear-to-br from-slate-50 via-blue-50/30 to-slate-50 relative overflow-hidden">
@@ -134,12 +196,18 @@ export default function TestimonialsSection() {
                 <div className="p-5 md:p-6 flex flex-col h-full">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="relative w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-blue-100 shrink-0">
-                      <Image
-                        src={testimonial.image}
-                        alt={testimonial.name}
-                        fill
-                        className="object-cover"
-                      />
+                      {testimonial.image ? (
+                        <Image
+                          src={testimonial.image}
+                          alt={testimonial.name}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
+                          {testimonial.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="font-bold text-gray-900 text-sm md:text-base truncate">
@@ -192,7 +260,7 @@ export default function TestimonialsSection() {
             </button>
 
             <div className="flex gap-1.5">
-              {TESTIMONIALS.map((_, idx) => (
+              {testimonials.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => goToSlide(idx)}
