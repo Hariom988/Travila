@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { ShieldCheck, X } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
-import HotelBookingModal from "./hotelBookingModal";
-import ActivityBookingModal from "./activityBookingModal";
+import HotelBookingModal from "./(hotelPage)/hotelBookingModal";
+import ActivityBookingModal from "./(activityPage)/activityBookingModal";
 
 function ClientOnly({ children }: { children: React.ReactNode }) {
   const [hasMounted, setHasMounted] = useState(false);

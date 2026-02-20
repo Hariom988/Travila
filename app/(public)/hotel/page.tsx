@@ -1,4 +1,4 @@
-import HotelPage from "../../components/hotelPage";
+import HotelPage from "../../components/(hotelPage)/hotelPage";
 
 const Page = () => {
   return <HotelPage />;

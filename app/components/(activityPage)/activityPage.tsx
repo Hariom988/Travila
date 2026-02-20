@@ -24,8 +24,8 @@ import {
   Mountain,
   Waves,
 } from "lucide-react";
-import SearchBar from "./searchBar";
-import ActivityCard from "./activityCard";
+import SearchBar from "../searchBar";
+import ActivityCard from "../activityCard";
 
 interface activity {
   id: string;

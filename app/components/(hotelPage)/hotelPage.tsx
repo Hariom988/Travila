@@ -20,8 +20,8 @@ import {
   ThumbsUp,
   Globe,
 } from "lucide-react";
-import SearchBar from "./searchBar";
-import TourCard from "./tourCard";
+import SearchBar from "../searchBar";
+import TourCard from "../tourCard";
 
 interface Tour {
   id: string;

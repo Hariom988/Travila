@@ -1,4 +1,4 @@
-import ActivityPage from "@/app/components/activityPage";
+import ActivityPage from "@/app/components/(activityPage)/activityPage";
 
 const Page = () => {
   return <ActivityPage />;
