@@ -271,7 +271,7 @@ function MiniCalendar({
 
   return (
     <div
-      className="absolute left-0 top-[calc(100%+12px)] z-[9999] w-[300px] rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl"
+      className="absolute left-0 top-[calc(100%+12px)] z-9999 w-75 rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl"
       onClick={(e) => e.stopPropagation()}
     >
       <div className="mb-3 flex items-center justify-between">
@@ -412,7 +412,7 @@ function TrainSearchWidget() {
 
           {active === "from" && (
             <div
-              className="absolute left-0 top-[calc(100%+12px)] z-[9999] w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+              className="absolute left-0 top-[calc(100%+12px)] z-9999 w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-2 bg-slate-50 px-4 py-3 border-b border-slate-100">
@@ -480,7 +480,7 @@ function TrainSearchWidget() {
 
           {active === "to" && (
             <div
-              className="absolute left-0 md:left-auto md:right-0 top-[calc(100%+12px)] z-[9999] w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+              className="absolute left-0 md:left-auto md:right-0 top-[calc(100%+12px)] z-9999 w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-2 bg-slate-50 px-4 py-3 border-b border-slate-100">
@@ -626,7 +626,7 @@ function TrainResultCard({ train }: { train: (typeof TRAIN_RESULTS)[0] }) {
               <p className="text-2xl font-black leading-none text-slate-900">
                 {train.departure}
               </p>
-              <p className="mt-0.5 max-w-[80px] truncate text-[10px] font-medium text-slate-400">
+              <p className="mt-0.5 max-w-20 truncate text-[10px] font-medium text-slate-400">
                 {train.from}
               </p>
             </div>
@@ -648,7 +648,7 @@ function TrainResultCard({ train }: { train: (typeof TRAIN_RESULTS)[0] }) {
               <p className="text-2xl font-black leading-none text-slate-900">
                 {train.arrival}
               </p>
-              <p className="mt-0.5 max-w-[80px] truncate text-[10px] font-medium text-slate-400">
+              <p className="mt-0.5 max-w-20 truncate text-[10px] font-medium text-slate-400">
                 {train.to}
               </p>
             </div>
@@ -770,7 +770,7 @@ function PopularRoutes() {
                   alt={r.to}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent" />
                 <div className="absolute bottom-2 left-3 text-white">
                   <p className="text-[10px] font-bold opacity-80">from</p>
                   <p className="text-xl font-extrabold leading-none">
@@ -1066,7 +1066,7 @@ export default function TrainPage() {
             alt="Train"
             className="h-full w-full object-cover opacity-25"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-r from-slate-900/90 via-slate-900/60 to-transparent" />
         </div>
         <div className="relative z-10 mx-auto max-w-6xl px-4 pt-16 pb-8 md:pt-24">
           <span className="mb-4 inline-block rounded-full bg-blue-600/80 px-3 py-1 text-xs font-bold uppercase tracking-widest text-white">
