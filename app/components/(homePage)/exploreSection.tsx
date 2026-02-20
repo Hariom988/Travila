@@ -1,6 +1,5 @@
-import React from "react";
 import HeroImage from "@/public/assets/explore/hero-image.jpg";
-import ScrollFloat from "./scrollFoat";
+import ScrollFloat from "@/app/components/scrollFoat";
 
 const ExploreSection = () => {
   const scrollToTop = () => {
@@ -59,7 +58,7 @@ const ExploreSection = () => {
           stagger={0.05}
           containerClassName="w-full text-center p-0 m-0 leading-[0.9] md:leading-none"
           textClassName="
-    font-black uppercase 
+            font-black uppercase 
     text-3xl sm:text-5xl md:text-6xl 
     tracking-tighter md:tracking-widest 
     text-transparent [-webkit-text-stroke:1px_white] md:[-webkit-text-stroke:2px_white] 

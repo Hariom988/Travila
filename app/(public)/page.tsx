@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import Home from "../components/home";
+import Home from "@/app/components/(homePage)/home";
 
 const Page = () => {
   return (
