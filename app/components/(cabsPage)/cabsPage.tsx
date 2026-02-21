@@ -1,7 +1,9 @@
 import CabBookingWidget from "./cabBookingWidget";
 import CabDemoInfo from "./cabDemoInfo";
+import CabDiscovery from "./cabDiscovery";
 import CabPromotionalSection from "./cabPromotionalSection";
 import CabServiceHighlights from "./cabServiceHighlights";
+import CabTravelInfo from "./cabTravelInfo";
 
 const CabsPage = () => {
   return (
@@ -9,7 +11,9 @@ const CabsPage = () => {
       <CabBookingWidget />
       <CabDemoInfo />
       <CabPromotionalSection />
+      <CabDiscovery />
       <CabServiceHighlights />
+      <CabTravelInfo />
     </>
   );
 };
