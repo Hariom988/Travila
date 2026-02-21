@@ -133,7 +133,7 @@ const POPULAR_ROUTES = [
     to: "New York",
     price: 35,
     duration: "4h 5m",
-    img: "https://images.unsplash.com/photo-1538970272646-f61fabb3bfb8?w=400&h=260&fit=crop",
+    img: "https://images.unsplash.com/photo-1555109307-f7d9da25c244?w=400&h=260&fit=crop",
   },
 ];
 
