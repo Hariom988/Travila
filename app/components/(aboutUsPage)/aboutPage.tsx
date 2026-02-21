@@ -308,7 +308,7 @@ const AboutPage = () => {
                 HikinHigh Travels was founded in September 2024 by a group of
                 Himalayan trekking enthusiasts who believed that the mountains
                 should be experienced by everyone — not just elite adventurers.
-                Operating from Prayagraj with a Delhi-registered base, we
+                Operating from Najafgarh with a Delhi-registered base, we
                 combine outdoor passion with professional, transparent, and
                 safety-first service.
               </p>
@@ -690,8 +690,8 @@ const AboutPage = () => {
                   },
                   {
                     icon: Mail,
-                    label: "hello@hikinhigh.com",
-                    href: "mailto:hello@hikinhigh.com",
+                    label: "booking@hikinhigh.com",
+                    href: "mailto:booking@hikinhigh.com",
                   },
                   {
                     icon: Clock,
@@ -700,7 +700,7 @@ const AboutPage = () => {
                   },
                   {
                     icon: MapPin,
-                    label: "Prayagraj, India · Registered in Delhi",
+                    label: "Najafgarh, India · Registered in Delhi",
                     href: "#",
                   },
                 ].map((c, i) => (
