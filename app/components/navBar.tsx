@@ -124,6 +124,7 @@ const Navbar = () => {
               alt="HikinHigh Logo"
               className="w-full h-full rounded-2xl object-contain"
             />
+            <span className="absolute top-0 -right-2">™</span>
           </div>
           <div className="flex flex-col">
             <span className="text-lg md:text-xl font-bold tracking-tight leading-none text-white">
