@@ -34,12 +34,13 @@ const Footer = () => {
       <div className="container mx-auto px-5 py-8 md:py-8 lg:px-8">
         <div className="flex flex-row justify-between items-center mb-8 border-b border-white/5 pb-6 md:border-0 md:pb-0 md:mb-10">
           <Link href="/" className="flex items-center gap-2.5 md:gap-3">
-            <div className="w-12 h-12 flex items-center justify-center  rounded-lg p-1">
+            <div className="w-12 h-12 relative flex items-center justify-center  rounded-lg p-1">
               <img
                 src={logo.src}
                 alt="Logo"
                 className="w-full rounded-2xl  h-full object-contain"
               />
+              <span className="absolute top-0 -right-2">™</span>
             </div>
             <div className="flex flex-col">
               <span className="text-xl md:text-2xl font-bold text-white leading-tight">
