@@ -1,4 +1,4 @@
-import CabsPage from "@/app/components/(cabsPage)/cabsPage";
+import CabsPage from "@/app/components/(carRentalPage)/cabsPage";
 
 const Page = () => {
   return <CabsPage />;

@@ -45,7 +45,7 @@ const Navbar = () => {
       links: [
         { name: "Trains", href: "/train" },
         { name: "Buses", href: "/bus" },
-        { name: "Cabs", href: "/cabs" },
+        { name: "Car Rental", href: "/car-rental" },
       ],
     },
     {
