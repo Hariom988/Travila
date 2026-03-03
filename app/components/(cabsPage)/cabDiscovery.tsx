@@ -12,6 +12,7 @@ import {
   PhoneIcon,
 } from "@heroicons/react/24/outline";
 import { FireIcon, BoltIcon, SparklesIcon } from "@heroicons/react/24/solid";
+import Link from "next/dist/client/link";
 
 const STATS = [
   { value: "1M+", label: "Happy Riders", emoji: "😊" },
@@ -60,7 +61,7 @@ const POPULAR_ROUTES = [
     price: "1,999",
     duration: "3h",
     image:
-      "https://images.unsplash.com/photo-1607650424823-d4a9b52fe0c7?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1661366698983-3cb843219300?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     rating: "4.8",
     cabs: "Hatchback / Sedan",
     highlight: "Coastal Drive",
@@ -120,7 +121,7 @@ const AMENITIES = [
   },
   {
     icon: "🧼",
-    title: "Sanitized Cabs",
+    title: "Sanitized Cars",
     desc: "Every cab is cleaned and sanitized before your pickup — guaranteed.",
   },
   {
@@ -200,7 +201,7 @@ export default function CabDiscovery() {
             <div>
               <h2 className="text-xl md:text-3xl font-black text-gray-900 tracking-tight leading-none flex items-center gap-2">
                 <GiftIcon className="w-5 h-5 md:w-7 md:h-7 text-rose-500" />
-                Cab Offers & Deals
+                Car Offers & Deals
               </h2>
               <p className="text-xs md:text-sm text-gray-500 mt-1 font-medium">
                 Exclusive discounts on every ride
@@ -279,7 +280,7 @@ export default function CabDiscovery() {
                   <img
                     src={route.image}
                     alt={`${route.from} to ${route.to}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover  transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                   <div className="absolute bottom-2 left-3">
@@ -331,7 +332,7 @@ export default function CabDiscovery() {
         <section>
           <div className="mb-5">
             <h2 className="text-xl md:text-3xl font-black text-gray-900 tracking-tight leading-none">
-              Every Cab. Every Ride.
+              Every Car. Every Ride.
             </h2>
             <p className="text-xs md:text-sm text-gray-500 mt-1 font-medium">
               Comfort features standard across our entire fleet
@@ -343,7 +344,7 @@ export default function CabDiscovery() {
                 key={i}
                 className="flex gap-3 bg-white rounded-2xl p-4 md:p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all group"
               >
-                <span className="text-2xl md:text-3xl shrink-0 group-hover:scale-110 transition-transform">
+                <span className="text-2xl md:text-3xl shrink-0  transition-transform">
                   {am.icon}
                 </span>
                 <div>
@@ -488,10 +489,12 @@ export default function CabDiscovery() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <button className="w-full sm:w-auto cursor-pointer bg-white text-blue-700 font-black px-6 py-3 rounded-xl text-sm hover:bg-blue-50 transition-colors active:scale-95 shadow-md">
-                Book a Cab Now
+                Book a Car Now
               </button>
               <button className="w-full sm:w-auto cursor-pointer border-2 border-white/40 text-white font-bold px-6 py-3 rounded-xl text-sm hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
-                <PhoneIcon className="w-4 h-4" /> Call to Book
+                <Link href="tel:+918130069469">
+                  <PhoneIcon className="w-4 h-4" /> Call to Book
+                </Link>
               </button>
             </div>
           </div>
