@@ -152,7 +152,7 @@ export default function CompactCabDemoInfo() {
                 },
                 {
                   icon: <CheckCircle size={18} className="text-green-500" />,
-                  title: "Select Cab",
+                  title: "Select Car",
                   desc: "Choose Hatchback, Sedan or SUV as per your need.",
                 },
                 {
